@@ -1,0 +1,6614 @@
+{
+  "admin_apps_approve": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.apps.approve'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_apps_restrict": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.apps.restrict'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_apps_approved_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.apps.approved.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_apps_requests_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.apps.requests.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_apps_restricted_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.apps.restricted.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_archive": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.conversations.archive'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'channel_id=CHANNEL_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_convertToPrivate": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.conversations.convertToPrivate'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'channel_id=CHANNEL_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_create": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.conversations.create'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'name=name' \\\n  -d 'is_private=true'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_delete": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.conversations.delete'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'channel_id=CHANNEL_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_disconnectShared": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.conversations.disconnectShared'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'channel_id=CHANNEL_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_getConversationPrefs": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.conversations.getConversationPrefs'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'channel_id=CHANNEL_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_getTeams": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.conversations.getTeams'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'channel_id=CHANNEL_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_invite": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.conversations.invite'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'user_ids=user_ids' \\\n  -d 'channel_id=CHANNEL_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_rename": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.conversations.rename'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'channel_id=CHANNEL_ID' \\\n  -d 'name=name'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_search": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.conversations.search'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_setConversationPrefs": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.conversations.setConversationPrefs'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'channel_id=CHANNEL_ID' \\\n  -d 'prefs=prefs'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_setTeams": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.conversations.setTeams'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'channel_id=CHANNEL_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_unarchive": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.conversations.unarchive'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'channel_id=CHANNEL_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_ekm_listOriginalConnectedChannelInfo": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.conversations.ekm.listOriginalConnectedChannelInfo'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_restrictAccess_addGroup": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.conversations.restrictAccess.addGroup'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'token=token' \\\n  -d 'group_id=GROUP_ID' \\\n  -d 'channel_id=CHANNEL_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_restrictAccess_listGroups": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.conversations.restrictAccess.listGroups'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token' \\\n  -d 'channel_id=CHANNEL_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_conversations_restrictAccess_removeGroup": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.conversations.restrictAccess.removeGroup'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'token=token' \\\n  -d 'team_id=TEAM_ID' \\\n  -d 'group_id=GROUP_ID' \\\n  -d 'channel_id=CHANNEL_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_emoji_add": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.emoji.add'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'token=token' \\\n  -d 'name=name' \\\n  -d 'url=https%3A%2F%2Fexample.com'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_emoji_addAlias": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.emoji.addAlias'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'token=token' \\\n  -d 'name=name' \\\n  -d 'alias_for=alias_for'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_emoji_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.emoji.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_emoji_remove": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.emoji.remove'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'token=token' \\\n  -d 'name=name'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_emoji_rename": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.emoji.rename'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'token=token' \\\n  -d 'name=name' \\\n  -d 'new_name=new_name'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_inviteRequests_approve": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.inviteRequests.approve'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'invite_request_id=INVITE_REQUEST_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_inviteRequests_deny": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.inviteRequests.deny'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'invite_request_id=INVITE_REQUEST_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_inviteRequests_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.inviteRequests.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_inviteRequests_approved_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.inviteRequests.approved.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_inviteRequests_denied_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.inviteRequests.denied.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_teams_admins_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.teams.admins.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token' \\\n  -d 'team_id=TEAM_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_teams_create": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.teams.create'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'team_domain=team_domain' \\\n  -d 'team_name=team_name'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_teams_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.teams.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_teams_owners_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.teams.owners.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token' \\\n  -d 'team_id=TEAM_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_teams_settings_info": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.teams.settings.info'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'team_id=TEAM_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_teams_settings_setDefaultChannels": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.teams.settings.setDefaultChannels'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'token=token' \\\n  -d 'team_id=TEAM_ID' \\\n  -d 'channel_ids=channel_ids'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_teams_settings_setDescription": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.teams.settings.setDescription'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'team_id=TEAM_ID' \\\n  -d 'description=description'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_teams_settings_setDiscoverability": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.teams.settings.setDiscoverability'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'team_id=TEAM_ID' \\\n  -d 'discoverability=discoverability'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_teams_settings_setIcon": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.teams.settings.setIcon'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'token=token' \\\n  -d 'image_url=image_url' \\\n  -d 'team_id=TEAM_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_teams_settings_setName": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.teams.settings.setName'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'team_id=TEAM_ID' \\\n  -d 'name=name'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_usergroups_addChannels": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.usergroups.addChannels'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'usergroup_id=USERGROUP_ID' \\\n  -d 'channel_ids=channel_ids'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_usergroups_addTeams": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.usergroups.addTeams'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'usergroup_id=USERGROUP_ID' \\\n  -d 'team_ids=team_ids'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_usergroups_listChannels": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.usergroups.listChannels'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'usergroup_id=USERGROUP_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_usergroups_removeChannels": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.usergroups.removeChannels'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'usergroup_id=USERGROUP_ID' \\\n  -d 'channel_ids=channel_ids'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_users_assign": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.users.assign'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'team_id=TEAM_ID' \\\n  -d 'user_id=USER_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_users_invite": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.users.invite'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'team_id=TEAM_ID' \\\n  -d 'email=user%40example.com' \\\n  -d 'channel_ids=channel_ids'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_users_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/admin.users.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'team_id=TEAM_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_users_remove": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.users.remove'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'team_id=TEAM_ID' \\\n  -d 'user_id=USER_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_users_setAdmin": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.users.setAdmin'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'team_id=TEAM_ID' \\\n  -d 'user_id=USER_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_users_setExpiration": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.users.setExpiration'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'team_id=TEAM_ID' \\\n  -d 'user_id=USER_ID' \\\n  -d 'expiration_ts=1'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_users_setOwner": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.users.setOwner'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'team_id=TEAM_ID' \\\n  -d 'user_id=USER_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_users_setRegular": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.users.setRegular'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'team_id=TEAM_ID' \\\n  -d 'user_id=USER_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_users_session_invalidate": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.users.session.invalidate'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'team_id=TEAM_ID' \\\n  -d 'session_id=1'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "admin_users_session_reset": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/admin.users.session.reset'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'user_id=USER_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "api_test": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/api.test'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "apps_event_authorizations_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/apps.event.authorizations.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'event_context=event_context'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "apps_permissions_info": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/apps.permissions.info'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "apps_permissions_request": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/apps.permissions.request'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token' \\\n  -d 'scopes=scopes' \\\n  -d 'trigger_id=TRIGGER_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "apps_permissions_resources_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/apps.permissions.resources.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "apps_permissions_scopes_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/apps.permissions.scopes.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "apps_permissions_users_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/apps.permissions.users.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "apps_permissions_users_request": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/apps.permissions.users.request'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token' \\\n  -d 'scopes=scopes' \\\n  -d 'trigger_id=TRIGGER_ID' \\\n  -d 'user=user'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "apps_uninstall": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/apps.uninstall'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "auth_revoke": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/auth.revoke'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "auth_test": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET \\\n  --url 'https://slack.com/api/auth.test'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "bots_info": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/bots.info'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "calls_add": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/calls.add'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'external_unique_id=EXTERNAL_UNIQUE_ID' \\\n  -d 'join_url=join_url'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "calls_end": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/calls.end'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'id=CALLS_END_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "calls_info": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/calls.info'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'id=CALLS_INFO_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "calls_update": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/calls.update'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'id=CALLS_UPDATE_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "calls_participants_add": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/calls.participants.add'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'id=CALLS_PARTICIPANTS_ADD_ID' \\\n  -d 'users=users'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "calls_participants_remove": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/calls.participants.remove'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'id=CALLS_PARTICIPANTS_REMOVE_ID' \\\n  -d 'users=users'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "chat_delete": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/chat.delete'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "chat_deleteScheduledMessage": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/chat.deleteScheduledMessage'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'channel=channel' \\\n  -d 'scheduled_message_id=SCHEDULED_MESSAGE_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "chat_getPermalink": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/chat.getPermalink'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token' \\\n  -d 'channel=channel' \\\n  -d 'message_ts=message_ts'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "chat_meMessage": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/chat.meMessage'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "chat_postEphemeral": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/chat.postEphemeral'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'channel=channel' \\\n  -d 'user=user'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "chat_postMessage": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/chat.postMessage'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'channel=channel'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "chat_scheduleMessage": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/chat.scheduleMessage'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "chat_unfurl": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/chat.unfurl'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'channel=channel' \\\n  -d 'ts=ts'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "chat_update": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/chat.update'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'channel=channel' \\\n  -d 'ts=ts'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "chat_scheduledMessages_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/chat.scheduledMessages.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_archive": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/conversations.archive'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_close": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/conversations.close'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_create": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/conversations.create'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_history": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/conversations.history'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_info": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/conversations.info'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_invite": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/conversations.invite'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_join": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/conversations.join'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_kick": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/conversations.kick'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_leave": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/conversations.leave'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/conversations.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_mark": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/conversations.mark'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_members": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/conversations.members'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_open": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/conversations.open'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_rename": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/conversations.rename'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_replies": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/conversations.replies'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_setPurpose": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/conversations.setPurpose'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_setTopic": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/conversations.setTopic'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "conversations_unarchive": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/conversations.unarchive'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "dialog_open": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/dialog.open'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'dialog=dialog' \\\n  -d 'trigger_id=TRIGGER_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "dnd_endDnd": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/dnd.endDnd'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "dnd_endSnooze": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/dnd.endSnooze'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "dnd_info": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/dnd.info'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "dnd_setSnooze": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/dnd.setSnooze'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'token=token' \\\n  -d 'num_minutes=num_minutes'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "dnd_teamInfo": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/dnd.teamInfo'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "emoji_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/emoji.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "files_comments_delete": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/files.comments.delete'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "files_delete": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/files.delete'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "files_info": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/files.info'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "files_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/files.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "files_revokePublicURL": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/files.revokePublicURL'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "files_sharedPublicURL": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/files.sharedPublicURL'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "files_upload": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/files.upload'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "files_remote_add": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/files.remote.add'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "files_remote_info": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/files.remote.info'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "files_remote_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/files.remote.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "files_remote_remove": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/files.remote.remove'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "files_remote_share": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/files.remote.share'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "files_remote_update": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/files.remote.update'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "migration_exchange": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/migration.exchange'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token' \\\n  -d 'users=users'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "oauth_access": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/oauth.access'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "oauth_token": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/oauth.token'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "oauth_v2_access": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/oauth.v2.access'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'code=code'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "pins_add": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/pins.add'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'channel=channel'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "pins_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/pins.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token' \\\n  -d 'channel=channel'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "pins_remove": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/pins.remove'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'channel=channel'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "reactions_add": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/reactions.add'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'channel=channel' \\\n  -d 'name=name' \\\n  -d 'timestamp=2024-01-01T00%3A00%3A00Z'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "reactions_get": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/reactions.get'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "reactions_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/reactions.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "reactions_remove": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/reactions.remove'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'name=name'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "reminders_add": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/reminders.add'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'text=text' \\\n  -d 'time=time'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "reminders_complete": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/reminders.complete'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "reminders_delete": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/reminders.delete'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "reminders_info": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/reminders.info'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "reminders_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/reminders.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "rtm_connect": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/rtm.connect'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "search_messages": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/search.messages'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token' \\\n  -d 'query=query'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "stars_add": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/stars.add'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "stars_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/stars.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "stars_remove": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/stars.remove'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "team_accessLogs": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/team.accessLogs'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "team_billableInfo": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/team.billableInfo'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "team_info": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/team.info'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "team_integrationLogs": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/team.integrationLogs'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "team_profile_get": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/team.profile.get'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "usergroups_create": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/usergroups.create'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'name=name'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "usergroups_disable": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/usergroups.disable'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'usergroup=usergroup'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "usergroups_enable": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/usergroups.enable'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'usergroup=usergroup'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "usergroups_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/usergroups.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "usergroups_update": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/usergroups.update'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'usergroup=usergroup'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "usergroups_users_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/usergroups.users.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token' \\\n  -d 'usergroup=usergroup'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "usergroups_users_update": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/usergroups.users.update'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'usergroup=usergroup' \\\n  -d 'users=users'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "users_conversations": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/users.conversations'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "users_deletePhoto": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/users.deletePhoto'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "users_getPresence": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/users.getPresence'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "users_identity": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/users.identity'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "users_info": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/users.info'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "users_list": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/users.list'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "users_lookupByEmail": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/users.lookupByEmail'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token' \\\n  -d 'email=user%40example.com'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "users_setActive": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/users.setActive'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "users_setPhoto": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/users.setPhoto'  \\\n  -H 'Accept: application/json' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "users_setPresence": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/users.setPresence'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\\\n  -d 'presence=presence'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "users_profile_get": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/users.profile.get'  \\\n  -H 'Accept: application/json' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'token=token'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "users_profile_set": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X POST \\\n  --url 'https://slack.com/api/users.profile.set'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "views_open": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/views.open'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'trigger_id=TRIGGER_ID' \\\n  -d 'view=view'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "views_publish": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/views.publish'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'user_id=USER_ID' \\\n  -d 'view=view'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "views_push": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/views.push'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'trigger_id=TRIGGER_ID' \\\n  -d 'view=view'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "views_update": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/views.update'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "workflows_stepCompleted": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/workflows.stepCompleted'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'workflow_step_execute_id=WORKFLOW_STEP_EXECUTE_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "workflows_stepFailed": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/workflows.stepFailed'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'workflow_step_execute_id=WORKFLOW_STEP_EXECUTE_ID' \\\n  -d 'error=error'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ],
+  "workflows_updateStep": [
+    {
+      "id": "curl",
+      "lang": "bash",
+      "label": "cURL",
+      "source": "curl -X GET -G \\\n  --url 'https://slack.com/api/workflows.updateStep'  \\\n  -H 'Accept: application/json' \\\n  -H 'token: token' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  -H 'Authorization: Bearer {OAUTH_ACCESS_TOKEN}' \\\n  -d 'workflow_step_edit_id=WORKFLOW_STEP_EDIT_ID'\n"
+    },
+    {
+      "id": "js",
+      "lang": "javascript",
+      "source": false
+    },
+    {
+      "id": "go",
+      "lang": "go",
+      "source": false
+    },
+    {
+      "id": "python",
+      "lang": "python",
+      "source": false
+    },
+    {
+      "id": "java",
+      "lang": "java",
+      "source": false
+    },
+    {
+      "id": "csharp",
+      "lang": "csharp",
+      "source": false
+    },
+    {
+      "id": "rust",
+      "lang": "rust",
+      "source": false
+    }
+  ]
+}

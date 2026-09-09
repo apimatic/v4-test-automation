@@ -1,0 +1,154 @@
+name: dxV2 Visual Regression
+
+# Runs the same three steps you'd run locally, as separate jobs steps so each
+# one's log stands on its own:
+#
+#   1. pnpm generate-docs -- --customer-build ./test-builds/<build>
+#   2. pnpm dev                     (the portal dev server, on :3000)
+#   3. pnpm test:visual             (Playwright, against that server)
+#
+# The runner is windows-latest on purpose: the committed baselines were captured
+# on win32/Chromium, and font rasterization differs enough across operating
+# systems that a ubuntu runner would fail every snapshot.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      portal_ref:
+        description: >-
+          Portal ref to test. Leave blank to use the commit pinned in
+          config/portal-source.json. Set it to a branch (e.g. apimatic-docs) to
+          check the latest portal for visual regressions.
+        required: false
+        type: string
+      build:
+        description: Which build under test-builds/ to render
+        required: false
+        default: slack
+        type: string
+
+# A newer push supersedes an in-flight run on the same ref.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  visual:
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    env:
+      PORTAL_PORT: '3000'
+      PORTAL: ${{ inputs.build || 'slack' }}
+      BUILD_DIR: ./test-builds/${{ inputs.build || 'slack' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      # The portal requires Node >= 24.14.0 (its .nvmrc), and we run its build.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.14.0'
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install test dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~\AppData\Local\ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: playwright-${{ runner.os }}-
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      # Clones the portal app into .portal/ at the pinned commit, installs its
+      # dependencies, and builds the workspace packages apps/docs imports from.
+      # apimatic-dx-portal-v2 is private, so this needs a credential with read
+      # access to it — GITHUB_TOKEN is scoped to this repo only and won't work.
+      - name: Set up the portal app
+        env:
+          PORTAL_REPO_TOKEN: ${{ secrets.PORTAL_REPO_TOKEN }}
+          PORTAL_REF: ${{ inputs.portal_ref }}
+        run: pnpm setup:portal
+
+      # ---- Step 1: generate the portal from the build fixture
+      - name: Generate docs
+        run: pnpm generate-docs -- --customer-build ${{ env.BUILD_DIR }}
+
+      # ---- Step 2: start the dev server
+      # Start-Process detaches it so it outlives this step. `pnpm dev` is
+      # --no-generate, so it serves what the previous step produced.
+      - name: Start the portal dev server
+        shell: pwsh
+        run: |
+          Start-Process -FilePath 'pnpm.cmd' -ArgumentList 'dev' -NoNewWindow `
+            -RedirectStandardOutput portal-server.log `
+            -RedirectStandardError portal-server.err.log
+
+      - name: Wait for the portal to answer
+        shell: pwsh
+        run: |
+          $url = "http://localhost:$env:PORTAL_PORT/docs/getting-started/quickstart"
+          $deadline = (Get-Date).AddMinutes(5)
+          while ((Get-Date) -lt $deadline) {
+            try {
+              $r = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 10
+              if ($r.StatusCode -eq 200) { Write-Host "portal is up: $url"; exit 0 }
+            } catch { Start-Sleep -Seconds 3 }
+          }
+          Write-Host '--- portal-server.log ---'
+          if (Test-Path portal-server.log) { Get-Content portal-server.log }
+          Write-Host '--- portal-server.err.log ---'
+          if (Test-Path portal-server.err.log) { Get-Content portal-server.err.log }
+          throw "Portal did not become ready at $url within 5 minutes"
+
+      # ---- Step 3: the tests
+      # PORTAL_BASE_URL makes Playwright treat the portal as externally managed,
+      # so its own `webServer` stays out of the way instead of racing us for
+      # port 3000 (reuseExistingServer is deliberately off when CI is set).
+      - name: Run visual tests
+        env:
+          PORTAL_BASE_URL: http://localhost:3000
+        run: pnpm test:visual
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ inputs.build || 'slack' }}
+          path: playwright-report/
+          retention-days: 30
+
+      # The actual/diff PNGs for anything that failed — the thing you need to
+      # decide whether a diff is a regression or an intended change.
+      - name: Upload failure screenshots
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: failed-snapshots-${{ inputs.build || 'slack' }}
+          path: test-results/
+          retention-days: 30
+
+      - name: Upload portal server logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-server-logs-${{ inputs.build || 'slack' }}
+          path: |
+            portal-server.log
+            portal-server.err.log
+          retention-days: 7
+          if-no-files-found: ignore

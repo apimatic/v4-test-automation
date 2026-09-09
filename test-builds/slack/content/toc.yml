@@ -1,0 +1,34 @@
+toc:
+  - group: Getting Started
+    icon: astroid
+    items:
+      - generate: Quickstart
+        from: getting-started
+  - group: Documentation
+    icon: book-open      
+    items:
+      - page: 5-Minute Quickstart
+        file: guides/quickstart.md  
+      - page: Get API Credentials
+        file: guides/get-api-credentials.md 
+
+      - group: Builder's Special
+        icon: chef-hat
+        items:
+          - page: Building Workflows
+            file: guides/workflows.md
+          - page: Building Bots
+            file: guides/bots.md
+          - page: Building Integrations
+            file: guides/integrations.md
+  - group: API Reference
+    icon: hammer
+    items:      
+      - generate: Endpoints
+        from: endpoints
+  
+  - group: SDKs
+    dir: sdks
+
+  - group: MCP
+    dir: mcp  

@@ -1,0 +1,173 @@
+{
+  "$schema": "https://titan.apimatic.io/api/build/schema",
+  "buildFileVersion": "1",
+  "generatePortal": {
+    "debug": {
+      "publishReport": true
+    },
+    "useHostedPortalScript": true,
+    "pageTitle": "Slack for Developers",
+    "navTitle": "Slack for Developers",
+    "logoUrl": "static/images/placeholder-logo.png",
+    "logoUrlDark": "static/images/placeholder-logo-dark.png",
+    "logoLink": "https://www.apimatic.io",
+    "faviconUrl": "static/images/slack.png",
+
+    "languageConfig": {
+      "http": {},
+      "csharp": {
+        "packageRepository": "NuGet",
+        "packageSettings": {
+          "PackageName": "SlackApimaticSdk",
+          "Version": "1.0.0"
+        }
+      },
+      "java": {
+        "packageRepository": "Maven",
+        "packageSettings": {
+          "GroupId": "io.sdks",
+          "PackageName": "slack-apimatic-sdk",
+          "Version": "1.0.0"
+        }
+      },
+      "php": {
+        "packageRepository": "Packagist",
+        "packageSettings": {
+          "VendorName": "ai-apimatic",
+          "PackageName": "slack-apimatic-sdk",
+          "Version": "1.0.0"
+        }
+      },
+      "python": {
+        "packageRepository": "PyPI",
+        "packageSettings": {
+          "PackageName": "slack-apimatic-sdk",
+          "Version": "1.0.0"
+        }
+      },
+      "ruby": {
+        "packageRepository": "RubyGems",
+        "packageSettings": {
+          "PackageName": "slack-apimatic-sdk",
+          "Version": "1.0.0"
+        }
+      },
+      "typescript": {
+        "packageRepository": "Npm",
+        "packageSettings": {
+          "PackageName": "slack-apimatic-sdk",
+          "Version": "1.0.0"
+        }
+      }
+    },
+    "portalSettings": {
+      "theme": {
+        "baseTheme": "black"
+      },
+      "quickstart": {
+        "heading": "API to AI-ready context in one command",
+        "description": "One command wires the full API context into your coding tool."
+      },
+      "mcp": {
+        "serverName": "slack"
+      },
+      "languageSettings": {
+        "ts_generic_lib": {
+          "disableSdkDownload": true,
+          "aiIntegration": {
+            "cursor": {
+              "isEnabled": true
+            },
+            "vscode": {
+              "isEnabled": true
+            },
+            "claudeCode": {
+              "isEnabled": true
+            }
+          }
+        },
+        "cs_net_standard_lib": {
+          "disableSdkDownload": true,
+          "aiIntegration": {
+            "cursor": {
+              "isEnabled": true
+            },
+            "vscode": {
+              "isEnabled": true
+            },
+            "claudeCode": {
+              "isEnabled": true
+            }
+          }
+        },
+        "java_eclipse_jre_lib": {
+          "disableSdkDownload": true,
+          "aiIntegration": {
+            "cursor": {
+              "isEnabled": true
+            },
+            "vscode": {
+              "isEnabled": true
+            },
+            "claudeCode": {
+              "isEnabled": true
+            }
+          }
+        },
+        "php_generic_lib_v2": {
+          "disableSdkDownload": true,
+          "aiIntegration": {
+            "cursor": {
+              "isEnabled": true
+            },
+            "vscode": {
+              "isEnabled": true
+            },
+            "claudeCode": {
+              "isEnabled": true
+            }
+          }
+        },
+        "python_generic_lib": {
+          "disableSdkDownload": true,
+          "aiIntegration": {
+            "cursor": {
+              "isEnabled": true
+            },
+            "vscode": {
+              "isEnabled": true
+            },
+            "claudeCode": {
+              "isEnabled": true
+            }
+          }
+        },
+        "ruby_generic_lib": {
+          "disableSdkDownload": true,
+          "aiIntegration": {
+            "cursor": {
+              "isEnabled": true
+            },
+            "vscode": {
+              "isEnabled": true
+            },
+            "claudeCode": {
+              "isEnabled": true
+            }
+          }
+        },
+        "http_curl_v1": {}
+      },
+
+      "enableHttpVerbsForAllLangs": true,
+      "enableExport": true,
+      "enableConsoleCalls": true,
+      "initialPlatform": "ts_generic_lib"
+    }
+  },
+  "apiCopilotConfig": {
+    "isEnabled": true,
+    "key": "bfb758aa-626b-42ea-817e-43a716b3d036",
+    "welcomeMessage": "Hi there! I'm your API Integration Assistant, here to help you learn and integrate with this API.\n\nAsk me anything about this API or try one of these example prompts:\n\n- `What authentication methods does this API support?`\n- `How to initiate a conversation?`\n"
+  }
+}

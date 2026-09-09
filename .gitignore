@@ -1,0 +1,18 @@
+node_modules/
+
+# Local config — paths and secrets stay on your machine
+.env
+
+# Playwright output
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# Portal app, cloned by `pnpm setup:portal`
+.portal/
+
+# CI portal server logs
+portal-server.log
+portal-server.err.log

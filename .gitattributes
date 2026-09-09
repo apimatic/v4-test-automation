@@ -1,0 +1,9 @@
+# Normalize text to LF in the repo; check out native on Windows.
+# Without this, the CRLF the Windows runner writes shows up as a whole-file diff.
+* text=auto
+
+# Snapshot baselines are compared byte-for-byte — never let git touch them.
+*.png binary
+*.gif binary
+*.ico binary
+*.zip binary

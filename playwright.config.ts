@@ -1,0 +1,76 @@
+import { defineConfig, devices } from "@playwright/test";
+import dotenv from "dotenv";
+import { baseURL, portalPort, usingExternalPortal } from "./utils/env.ts";
+
+dotenv.config({ quiet: true });
+
+/**
+ * dxV2 test automation — visual and (later) functional tests for the
+ * apimatic-dx-portal-v2 docs portal.
+ *
+ * The portal under test is generated and served out of a local clone of
+ * apimatic/apimatic-dx-portal-v2; see .env.example and scripts/serve-portal.mts.
+ *
+ * https://playwright.dev/docs/test-configuration
+ */
+export default defineConfig({
+  testDir: "./tests",
+
+  /* Fail the build if a test.only was left in the source. */
+  forbidOnly: !!process.env.CI,
+
+  /* One retry on CI — a dev-server cold compile can blow a first-load timeout. */
+  retries: process.env.CI ? 1 : 0,
+
+  /* Visual tests share one dev server; running them serially keeps the
+     screenshots stable and avoids compile-storming the server. */
+  workers: 1,
+
+  reporter: process.env.CI ? [["html"], ["github"]] : "html",
+
+  /* Baselines live in the repo, grouped by project and by portal (the test's
+     own folder), e.g. dxv2-portal-snapshots/dxv2-visual/slack/quickstart.png */
+  snapshotPathTemplate: "dxv2-portal-snapshots/{projectName}/{testFileDir}/{arg}{ext}",
+
+  /* The dev server compiles routes on demand, so first hits are slow. */
+  timeout: 120_000,
+  expect: { timeout: 30_000 },
+
+  use: {
+    baseURL: baseURL(),
+    trace: "retain-on-failure",
+  },
+
+  projects: [
+    {
+      name: "dxv2-visual",
+      testDir: "./tests/visual",
+      use: {
+        ...devices["Desktop Chrome"],
+        /* Pinned so snapshots don't shift with whatever window the runner has. */
+        viewport: { width: 1920, height: 1080 },
+        deviceScaleFactor: 1,
+      },
+    },
+    {
+      /* Placeholder for the functional suite — tests/functional/ is empty for now. */
+      name: "dxv2-functional",
+      testDir: "./tests/functional",
+      use: { ...devices["Desktop Chrome"] },
+    },
+  ],
+
+  /* Generate + serve the portal, unless PORTAL_BASE_URL points somewhere already up. */
+  webServer: usingExternalPortal()
+    ? undefined
+    : {
+        command: "node scripts/serve-portal.mts",
+        url: `http://localhost:${portalPort()}/docs/getting-started/quickstart`,
+        /* Generation + a Next.js cold start + first route compile. */
+        timeout: 300_000,
+        /* Locally, reuse a portal you already have running. */
+        reuseExistingServer: !process.env.CI,
+        stdout: "pipe",
+        stderr: "pipe",
+      },
+});
