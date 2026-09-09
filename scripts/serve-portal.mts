@@ -26,6 +26,9 @@
  */
 
 import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
+import { cp } from "node:fs/promises";
+import path from "node:path";
 import process from "node:process";
 import dotenv from "dotenv";
 import {
@@ -78,11 +81,57 @@ function run(args: string[], env: Record<string, string> = {}): Promise<void> {
   });
 }
 
+/** Runs a plain executable (no shell needed) and resolves when it exits 0. */
+function runExe(
+  cmd: string,
+  args: string[],
+  execCwd: string,
+  env: Record<string, string> = {},
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(cmd, args, {
+      cwd: execCwd,
+      stdio: "inherit",
+      env: { ...process.env, ...env },
+    });
+    child.on("error", reject);
+    child.on("exit", (code) =>
+      code === 0
+        ? resolve()
+        : reject(new Error(`${cmd} ${args.join(" ")} exited with code ${code}`)),
+    );
+  });
+}
+
+// The portal sets `output: 'standalone'` unconditionally in next.config.ts, and
+// pins outputFileTracingRoot to the monorepo root, so the bundle mirrors the
+// repo layout and the entrypoint lands at apps/docs/server.js rather than at the
+// standalone root.
+const standaloneDir = path.join(cwd, ".next", "standalone", "apps", "docs");
+
+/**
+ * `next build` deliberately leaves the static assets out of the standalone
+ * bundle, so the server 404s its own CSS and JS until they're copied in. The
+ * portal's Dockerfile does exactly this; without it every page renders unstyled
+ * and every snapshot is garbage.
+ */
+async function prepareStandalone(): Promise<void> {
+  await cp(path.join(cwd, ".next", "static"), path.join(standaloneDir, ".next", "static"), {
+    recursive: true,
+  });
+  const publicDir = path.join(cwd, "public");
+  if (existsSync(publicDir)) {
+    await cp(publicDir, path.join(standaloneDir, "public"), { recursive: true });
+  }
+}
+
 console.log(`[serve-portal] portal app : ${cwd}`);
 console.log(`[serve-portal] portal     : ${portalName()} (${portal.label})`);
 console.log(`[serve-portal] build dir  : ${buildDir}`);
 console.log(`[serve-portal] port       : ${port}`);
-console.log(`[serve-portal] mode       : ${devMode ? "next dev" : "next build + next start"}`);
+console.log(
+  `[serve-portal] mode       : ${devMode ? "next dev" : "next build + standalone server"}`,
+);
 
 // ---- 1. generate
 if (skipGenerate) {
@@ -110,24 +159,27 @@ if (buildOnly) {
 
 // ---- 3. serve
 //
-// `pnpm exec next` rather than the portal's own `pnpm run start`, because the
-// host has to be passed as a flag and `pnpm run start -- -H 0.0.0.0` doesn't
-// work: pnpm hands the `--` to the script, so Next sees a stray positional and
-// reads it as a project directory. `start`/`dev` in the portal are exactly
-// `next start`/`next dev`, so nothing is lost. (`next start` also ignores the
-// HOSTNAME env var — only the standalone server.js reads that.)
-//
-// Binding 0.0.0.0 is not cosmetic. Left alone Next binds `localhost`, which
-// resolved to ::1 only on the Windows CI runner: a probe against 127.0.0.1 got
-// connection refused for three minutes while the server sat there reporting
-// "Ready". It happens to work locally because Windows dual-stacks the `::`
-// socket, which is exactly the kind of difference that only shows up in CI.
-await run([
-  "exec",
-  "next",
-  devMode ? "dev" : "start",
-  "--hostname",
-  "0.0.0.0",
-  "--port",
-  String(port),
-]);
+// Binding 0.0.0.0 is not cosmetic. Left alone Next binds `localhost`, which on
+// the Windows CI runner resolved to ::1 only: a probe against 127.0.0.1 got
+// connection refused while the server sat there reporting "Ready". It passes
+// locally regardless because Windows dual-stacks the `::` socket — exactly the
+// kind of difference that only shows up in CI.
+if (devMode) {
+  // The flag has to reach Next directly: `pnpm run dev -- -H 0.0.0.0` makes pnpm
+  // hand the `--` to the script, and Next reads it as a project directory.
+  await run(["exec", "next", "dev", "--hostname", "0.0.0.0", "--port", String(port)]);
+} else {
+  // `next start` refuses to serve a build made with `output: 'standalone'` — it
+  // prints "Ready", warns, and exits, so every request is refused. (It appeared
+  // to work locally only because leftovers from earlier non-standalone builds
+  // were still sitting in .next/.) Run the bundle Next actually produced, the
+  // way the portal's own Dockerfile does.
+  console.log(`[serve-portal] serving standalone bundle from ${standaloneDir}`);
+  await prepareStandalone();
+  // server.js resolves generated/ relative to process.cwd(), so the cwd must be
+  // the bundle's own directory, not the workspace.
+  await runExe(process.execPath, ["server.js"], standaloneDir, {
+    PORT: String(port),
+    HOSTNAME: "0.0.0.0",
+  });
+}

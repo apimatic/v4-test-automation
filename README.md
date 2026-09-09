@@ -22,7 +22,7 @@ tests/ + dxv2-portal-snapshots/  ← the specs and their baselines
 .portal/apps/docs
   ├─ pnpm generate-docs -- --customer-build <build>   ← fixture -> .mdx + meta.json
   ├─ pnpm build                                       ← next build, prerenders every page
-  └─ pnpm start                                       ← next start, on :3000
+  └─ pnpm start                                       ← standalone server, on :3000
         │
         ▼
 this repo's Playwright tests
@@ -34,6 +34,13 @@ pages — never finished inside a 12-minute budget on a CI runner. `next build`
 does that work once (~30s) and then every page answers in milliseconds. It
 renders identically: moving the suite from dev to production moved zero
 baselines. `pnpm dev` is still there for poking at the portal by hand.
+
+**Why not `next start`:** the portal sets `output: 'standalone'` in
+next.config.ts, and `next start` refuses to serve such a build — it prints
+"Ready", warns, and exits, so every request is refused. `pnpm start` runs the
+standalone bundle instead (`.next/standalone/apps/docs/server.js`), copying in
+the static assets and `public/` first, the same way the portal's Dockerfile
+does. Skip that copy and every page renders unstyled.
 
 `scripts/serve-portal.mts` runs those three stages, and Playwright's `webServer`
 runs the script — so `pnpm test:visual` goes from nothing to a green suite in one
@@ -106,7 +113,7 @@ pnpm test:visual
 |---|---|
 | `pnpm generate-docs` | fixture → `generated/docs/**` |
 | `pnpm build` | `next build` — prerenders every page |
-| `pnpm start` | `next start` |
+| `pnpm start` | serves the standalone bundle `next build` produced |
 | `pnpm dev` | `next dev` instead, for browsing the portal by hand |
 | `pnpm portal:serve` | all three stages in one go |
 
