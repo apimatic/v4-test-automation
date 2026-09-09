@@ -104,6 +104,58 @@ if (!shallow) {
 await run("git", ["checkout", "--force", "FETCH_HEAD"], dir);
 await run("git", ["rev-parse", "--short", "HEAD"], dir);
 
+/**
+ * Turns off `output: 'standalone'` in the checked-out portal config.
+ *
+ * The portal sets it unconditionally so it can ship a Docker image, and two
+ * things follow from that which make it unusable for this suite on Windows:
+ *
+ *  * `next start` refuses to serve a standalone build — it prints "Ready", warns,
+ *    and exits, so nothing listens.
+ *  * Running the bundle's own server.js instead dies with `EPERM ... stat
+ *    node_modules/.pnpm/next@.../node_modules/react`: pnpm fills the bundle's
+ *    node_modules with symlinks that Windows can't stat. (The same build also
+ *    warns that link names are "too long".) That path only works on Linux, which
+ *    is what the portal's Dockerfile targets.
+ *
+ * Standalone is a packaging choice, not a rendering one — a normal build serves
+ * byte-identical pages, which the baselines confirm. `.portal/` is a disposable
+ * checkout this repo manages, so patching it here is cheaper than maintaining a
+ * second, Linux-only baseline set.
+ *
+ * Deliberately loud if the line isn't found: silently skipping would send us
+ * back to a three-minute CI timeout with no clue why.
+ */
+async function disableStandaloneOutput(): Promise<void> {
+  const configPath = path.join(dir, "apps", "docs", "next.config.ts");
+  const original = await fs.readFile(configPath, "utf-8");
+  const marker = "output: 'standalone',";
+
+  if (!original.includes(marker)) {
+    if (original.includes("dxv2-test-automation")) {
+      console.log("[setup-portal] standalone output already disabled");
+      return;
+    }
+    throw new Error(
+      `Could not find \`${marker}\` in ${configPath}. The portal's next.config.ts ` +
+        `has changed — check whether standalone output still needs disabling, and ` +
+        `update disableStandaloneOutput() in scripts/setup-portal.mts.`,
+    );
+  }
+
+  await fs.writeFile(
+    configPath,
+    original.replace(
+      marker,
+      "// output: 'standalone', // disabled by dxv2-test-automation (setup-portal.mts)",
+    ),
+    "utf-8",
+  );
+  console.log("[setup-portal] disabled `output: standalone` so next start can serve");
+}
+
+await disableStandaloneOutput();
+
 if (skipInstall) {
   console.log("[setup-portal] --no-install: skipping install and package build");
 } else {

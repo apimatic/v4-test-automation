@@ -22,7 +22,7 @@ tests/ + dxv2-portal-snapshots/  ← the specs and their baselines
 .portal/apps/docs
   ├─ pnpm generate-docs -- --customer-build <build>   ← fixture -> .mdx + meta.json
   ├─ pnpm build                                       ← next build, prerenders every page
-  └─ pnpm start                                       ← standalone server, on :3000
+  └─ pnpm start                                       ← next start, on :3000
         │
         ▼
 this repo's Playwright tests
@@ -35,12 +35,21 @@ does that work once (~30s) and then every page answers in milliseconds. It
 renders identically: moving the suite from dev to production moved zero
 baselines. `pnpm dev` is still there for poking at the portal by hand.
 
-**Why not `next start`:** the portal sets `output: 'standalone'` in
-next.config.ts, and `next start` refuses to serve such a build — it prints
-"Ready", warns, and exits, so every request is refused. `pnpm start` runs the
-standalone bundle instead (`.next/standalone/apps/docs/server.js`), copying in
-the static assets and `public/` first, the same way the portal's Dockerfile
-does. Skip that copy and every page renders unstyled.
+**Why `setup:portal` patches the portal's next.config.ts:** the portal sets
+`output: 'standalone'` unconditionally so it can ship a Docker image, and that
+breaks serving on Windows two ways. `next start` refuses a standalone build
+outright — it prints "Ready", warns, and exits, so nothing listens. Running the
+bundle's own `server.js` instead dies with `EPERM ... stat
+node_modules/.pnpm/next@.../node_modules/react`, because pnpm fills the bundle's
+node_modules with symlinks Windows can't stat; that path only works on Linux,
+which is what the Dockerfile targets.
+
+So `setup:portal` comments the line out in the `.portal/` checkout. Standalone is
+a packaging choice, not a rendering one — a normal build serves identical pages,
+which the baselines confirm — and `.portal/` is a disposable checkout this repo
+manages. The alternative was moving CI to Linux and maintaining a second,
+platform-suffixed baseline set. The patch **fails loudly** if that line ever
+moves, rather than silently reverting us to a CI timeout with no clue why.
 
 `scripts/serve-portal.mts` runs those three stages, and Playwright's `webServer`
 runs the script — so `pnpm test:visual` goes from nothing to a green suite in one
@@ -113,7 +122,7 @@ pnpm test:visual
 |---|---|
 | `pnpm generate-docs` | fixture → `generated/docs/**` |
 | `pnpm build` | `next build` — prerenders every page |
-| `pnpm start` | serves the standalone bundle `next build` produced |
+| `pnpm start` | `next start` |
 | `pnpm dev` | `next dev` instead, for browsing the portal by hand |
 | `pnpm portal:serve` | all three stages in one go |
 
