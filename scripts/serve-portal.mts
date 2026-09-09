@@ -109,9 +109,25 @@ if (buildOnly) {
 }
 
 // ---- 3. serve
-// Port goes through the environment: pnpm forwards `--` to the script itself, so
-// `pnpm run start -- --port N` reaches Next as a stray positional and it reads
-// that as a project directory. Both `next start` and `next dev` honour PORT.
 //
-// This takes over the process so Playwright can kill it on teardown.
-await run(["run", devMode ? "dev" : "start"], { PORT: String(port) });
+// `pnpm exec next` rather than the portal's own `pnpm run start`, because the
+// host has to be passed as a flag and `pnpm run start -- -H 0.0.0.0` doesn't
+// work: pnpm hands the `--` to the script, so Next sees a stray positional and
+// reads it as a project directory. `start`/`dev` in the portal are exactly
+// `next start`/`next dev`, so nothing is lost. (`next start` also ignores the
+// HOSTNAME env var — only the standalone server.js reads that.)
+//
+// Binding 0.0.0.0 is not cosmetic. Left alone Next binds `localhost`, which
+// resolved to ::1 only on the Windows CI runner: a probe against 127.0.0.1 got
+// connection refused for three minutes while the server sat there reporting
+// "Ready". It happens to work locally because Windows dual-stacks the `::`
+// socket, which is exactly the kind of difference that only shows up in CI.
+await run([
+  "exec",
+  "next",
+  devMode ? "dev" : "start",
+  "--hostname",
+  "0.0.0.0",
+  "--port",
+  String(port),
+]);

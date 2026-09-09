@@ -125,8 +125,10 @@ jobs:
       # Serving prerendered output, so this is a question of process startup,
       # not compilation — seconds, not minutes.
       #
-      # The address is pinned to IPv4 here and in PORTAL_BASE_URL below because
-      # `localhost` can resolve to ::1 first on Windows.
+      # IPv4 here and in PORTAL_BASE_URL below. serve-portal.mts binds the server
+      # to 0.0.0.0 so this reaches it; without that Next binds `localhost`, which
+      # on this runner is ::1 only, and every probe gets connection refused while
+      # the server reports itself Ready.
       - name: Wait for the portal to answer
         shell: pwsh
         run: |
