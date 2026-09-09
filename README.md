@@ -20,14 +20,22 @@ tests/ + dxv2-portal-snapshots/  ← the specs and their baselines
         │  pnpm setup:portal  clones the pinned portal app into .portal/ (gitignored)
         ▼
 .portal/apps/docs
-  ├─ pnpm generate-docs -- --customer-build <build>   ← build the portal
-  └─ pnpm run dev                                     ← serve it on :3000
+  ├─ pnpm generate-docs -- --customer-build <build>   ← fixture -> .mdx + meta.json
+  ├─ pnpm build                                       ← next build, prerenders every page
+  └─ pnpm start                                       ← next start, on :3000
         │
         ▼
 this repo's Playwright tests
 ```
 
-`scripts/serve-portal.mts` runs those two commands, and Playwright's `webServer`
+**Why a production build and not `next dev`:** `next dev` compiles routes on
+demand, and the first request to `/docs/[[...slug]]` — an SSG route spanning 182
+pages — never finished inside a 12-minute budget on a CI runner. `next build`
+does that work once (~30s) and then every page answers in milliseconds. It
+renders identically: moving the suite from dev to production moved zero
+baselines. `pnpm dev` is still there for poking at the portal by hand.
+
+`scripts/serve-portal.mts` runs those three stages, and Playwright's `webServer`
 runs the script — so `pnpm test:visual` goes from nothing to a green suite in one
 command.
 
@@ -76,31 +84,35 @@ pnpm test:visual:update       # accept the current rendering as the new baseline
 pnpm report                   # open the HTML report
 ```
 
+From a clean slate that's about 60s end to end: ~2s to generate, ~30s to build,
+~4s to start, ~25s of tests.
+
 `webServer` uses `reuseExistingServer` locally, so if the portal is already
 running on `PORTAL_PORT` the tests attach to it and skip the rebuild. That's the
 fast loop while you're writing tests — and everything runs from this directory,
-because the portal's two commands are mirrored here as scripts:
+because the portal's own scripts are mirrored here:
 
 ```bash
-# Terminal 1 — build the portal, then serve it on :3000
+# Terminal 1 — generate, prerender, then serve on :3000
 pnpm generate-docs -- --customer-build ./test-builds/slack
-pnpm dev
+pnpm build
+pnpm start
 
 # Terminal 2 — tests attach to the running server
 pnpm test:visual
 ```
 
+| Script | Stage |
+|---|---|
+| `pnpm generate-docs` | fixture → `generated/docs/**` |
+| `pnpm build` | `next build` — prerenders every page |
+| `pnpm start` | `next start` |
+| `pnpm dev` | `next dev` instead, for browsing the portal by hand |
+| `pnpm portal:serve` | all three stages in one go |
+
 `generate-docs` takes the same `--customer-build <path>` flag as the portal's own
 script, and it overrides the registry — handy for a build you haven't registered
 in `config/portals.ts` yet. Omit it and it uses `PORTAL` from `.env`.
-
-Equivalent, if you'd rather not think about paths:
-
-```bash
-pnpm portal:serve                 # generate + serve, leave it running
-pnpm portal:serve --no-generate   # serve what's already generated
-pnpm portal:generate              # generate only
-```
 
 Testing a different build — copy it into `test-builds/` first, then:
 
@@ -194,10 +206,9 @@ dxv2-portal-snapshots/     committed baselines, grouped by project/portal
 
 ## CI
 
-`.github/workflows/dxv2-visual.yml` runs the same three steps as the local flow,
-kept as separate steps so each log stands alone: `generate-docs`, then the dev
-server, then the tests. Triggers on pushes and PRs to `main`, plus manual
-dispatch.
+`.github/workflows/dxv2-visual.yml` runs the same stages as the local flow, kept
+as separate steps so each log stands alone: `generate-docs`, `build`, `start`,
+then the tests. Triggers on pushes and PRs to `main`, plus manual dispatch.
 
 It runs on **windows-latest** deliberately — the committed baselines were
 captured on win32/Chromium, and font rasterization differs enough across

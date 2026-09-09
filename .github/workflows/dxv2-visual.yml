@@ -1,11 +1,18 @@
 name: dxV2 Visual Regression
 
-# Runs the same three steps you'd run locally, as separate jobs steps so each
-# one's log stands on its own:
+# Runs the same stages you'd run locally, kept as separate steps so each one's
+# log stands on its own:
 #
 #   1. pnpm generate-docs -- --customer-build ./test-builds/<build>
-#   2. pnpm dev                     (the portal dev server, on :3000)
-#   3. pnpm test:visual             (Playwright, against that server)
+#   2. pnpm build                   (next build — prerenders every page)
+#   3. pnpm start                   (next start, on :3000)
+#   4. pnpm test:visual             (Playwright, against that server)
+#
+# Stage 2 exists because `next dev` was unusable here: it compiles routes on
+# demand, and the first request to the 182-page SSG route never finished inside
+# a 12-minute budget on this runner. `next build` does that work once, and then
+# pages answer in milliseconds. It renders identically — moving the suite from
+# dev to production changed zero baselines.
 #
 # The runner is windows-latest on purpose: the committed baselines were captured
 # on win32/Chromium, and font rasterization differs enough across operating
@@ -47,6 +54,8 @@ jobs:
       NEXT_TELEMETRY_DISABLED: '1'
       PORTAL: ${{ inputs.build || 'slack' }}
       BUILD_DIR: ./test-builds/${{ inputs.build || 'slack' }}
+      # Must match the cache path above, and applies to install and test alike.
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}\.playwright-browsers
 
     steps:
       - name: Checkout
@@ -66,15 +75,20 @@ jobs:
       - name: Install test dependencies
         run: pnpm install --frozen-lockfile
 
+      # Cached into the workspace rather than the user profile: the default
+      # location made actions/cache miss every run, and reinstalling Chromium
+      # cost about four minutes each time.
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
-          path: ~\AppData\Local\ms-playwright
+          path: ${{ github.workspace }}\.playwright-browsers
           key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: playwright-${{ runner.os }}-
 
+      # No --with-deps: that installs OS-level libraries, which is a Linux
+      # concern and does nothing but burn minutes on a Windows runner.
       - name: Install Chromium
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm exec playwright install chromium
 
       # Clones the portal app into .portal/ at the pinned commit, installs its
       # dependencies, and builds the workspace packages apps/docs imports from.
@@ -94,52 +108,52 @@ jobs:
       - name: Generate docs
         run: pnpm generate-docs -- --customer-build ${{ env.BUILD_DIR }}
 
-      # ---- Step 2: start the dev server
-      # Start-Process detaches it so it outlives this step. `pnpm dev` is
-      # --no-generate, so it serves what the previous step produced.
-      - name: Start the portal dev server
+      # ---- Step 2: prerender the whole portal
+      - name: Build the portal
+        run: pnpm build
+
+      # ---- Step 3: serve the prerendered output
+      # Start-Process detaches it so it outlives this step. `pnpm start` skips
+      # generate and build, serving what the two previous steps produced.
+      - name: Start the portal server
         shell: pwsh
         run: |
-          Start-Process -FilePath 'pnpm.cmd' -ArgumentList 'dev' -NoNewWindow `
+          Start-Process -FilePath 'pnpm.cmd' -ArgumentList 'start' -NoNewWindow `
             -RedirectStandardOutput portal-server.log `
             -RedirectStandardError portal-server.err.log
 
-      # Two things this has to tolerate, both learned the hard way:
+      # Serving prerendered output, so this is a question of process startup,
+      # not compilation — seconds, not minutes.
       #
-      #  * The first request triggers a cold Turbopack compile of the route,
-      #    which on a Windows runner takes minutes, not seconds. A short
-      #    per-request timeout just abandons the compile and retries forever —
-      #    so each attempt gets a long timeout of its own.
-      #  * `localhost` can resolve to ::1 before 127.0.0.1 on Windows, so the
-      #    address is pinned to IPv4 here and in PORTAL_BASE_URL below.
+      # The address is pinned to IPv4 here and in PORTAL_BASE_URL below because
+      # `localhost` can resolve to ::1 first on Windows.
       - name: Wait for the portal to answer
         shell: pwsh
         run: |
           $url = "http://127.0.0.1:$env:PORTAL_PORT/docs/getting-started/quickstart"
-          $deadline = (Get-Date).AddMinutes(12)
+          $deadline = (Get-Date).AddMinutes(3)
           $attempt = 0
           while ((Get-Date) -lt $deadline) {
             $attempt++
-            Write-Host "attempt $attempt : GET $url (first one compiles the route, be patient)"
             try {
-              $r = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 240
+              $r = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30
               if ($r.StatusCode -eq 200) {
                 Write-Host "portal is up after $attempt attempt(s)"
                 exit 0
               }
-              Write-Host "  got HTTP $($r.StatusCode)"
+              Write-Host "attempt $attempt : HTTP $($r.StatusCode)"
             } catch {
-              Write-Host "  not ready yet: $($_.Exception.Message)"
-              Start-Sleep -Seconds 5
+              Write-Host "attempt $attempt : not ready yet: $($_.Exception.Message)"
+              Start-Sleep -Seconds 3
             }
           }
           Write-Host '--- portal-server.log ---'
           if (Test-Path portal-server.log) { Get-Content portal-server.log }
           Write-Host '--- portal-server.err.log ---'
           if (Test-Path portal-server.err.log) { Get-Content portal-server.err.log }
-          throw "Portal did not become ready at $url within 12 minutes"
+          throw "Portal did not become ready at $url within 3 minutes"
 
-      # ---- Step 3: the tests
+      # ---- Step 4: the tests
       # PORTAL_BASE_URL makes Playwright treat the portal as externally managed,
       # so its own `webServer` stays out of the way instead of racing us for
       # port 3000 (reuseExistingServer is deliberately off when CI is set).

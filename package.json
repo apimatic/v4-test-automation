@@ -11,8 +11,9 @@
   "scripts": {
     "setup:portal": "node scripts/setup-portal.mts",
     "generate-docs": "node scripts/serve-portal.mts --generate-only",
-    "dev": "node scripts/serve-portal.mts --no-generate",
-    "portal:generate": "node scripts/serve-portal.mts --generate-only",
+    "build": "node scripts/serve-portal.mts --no-generate --build-only",
+    "start": "node scripts/serve-portal.mts --no-generate --no-build",
+    "dev": "node scripts/serve-portal.mts --no-generate --dev",
     "portal:serve": "node scripts/serve-portal.mts",
     "test": "playwright test",
     "test:visual": "playwright test --project=dxv2-visual",

@@ -1,24 +1,28 @@
 /**
- * Builds and serves one portal build out of the apimatic-dx-portal-v2 repo, so
+ * Builds and serves one portal build out of the portal app in `.portal/`, so
  * Playwright has something to point a browser at.
  *
- * This is the scripted version of what you'd run by hand in apps/docs:
+ * Three stages, mirroring the portal's own scripts:
  *
- *   pnpm generate-docs -- --customer-build ./test-specs/customer-build/slack/
- *   pnpm run dev
+ *   1. generate-docs   the build fixture -> generated/docs/** (.mdx + meta.json)
+ *   2. build           next build — prerenders every page
+ *   3. start           next start — serves the prerendered output
  *
- * Playwright's `webServer` runs this (see playwright.config.ts). Run it directly
- * if you'd rather keep a portal up across several test runs:
+ * It's a production build on purpose. `next dev` compiles routes on demand, and
+ * the first request to `/docs/[[...slug]]` — an SSG route spanning 182 pages —
+ * takes many minutes on a cold machine, which made CI unusable. `next build`
+ * does that work once, up front, and then every page answers in milliseconds.
+ * The rendering is identical: switching the suite from dev to production moved
+ * zero baselines.
  *
- *   pnpm portal:serve                 # uses PORTAL / PORTAL_PORT from .env
- *   pnpm portal:serve --no-generate   # skip generation, serve what's already there
- *   pnpm portal:generate              # generate only, don't serve
+ * Playwright's `webServer` runs this with no arguments (see playwright.config.ts).
+ * Run it directly to keep a portal up across several test runs:
  *
- * The portal repo's own two commands are also mirrored as scripts here, so you
- * can drive everything from this directory and never cd into the portal repo:
- *
+ *   pnpm portal:serve      # all three stages
  *   pnpm generate-docs -- --customer-build ./test-builds/slack
- *   pnpm dev
+ *   pnpm build             # stage 2 only
+ *   pnpm start             # stage 3 only
+ *   pnpm dev               # next dev instead, for poking at the portal by hand
  */
 
 import { spawn } from "node:child_process";
@@ -40,16 +44,22 @@ function argValue(flag: string): string | undefined {
   return i === -1 ? undefined : process.argv[i + 1];
 }
 
-const skipGenerate = process.argv.includes("--no-generate");
-const generateOnly = process.argv.includes("--generate-only");
+const has = (flag: string) => process.argv.includes(flag);
+
+const devMode = has("--dev");
+const skipGenerate = has("--no-generate");
+const skipBuild = has("--no-build") || devMode;
+const generateOnly = has("--generate-only");
+const buildOnly = has("--build-only");
+
 const cwd = portalDocsDir();
 const portal = portalConfig();
-// `--customer-build <path>` overrides the registry, matching the flag the portal
-// repo's own generate-docs takes.
+// `--customer-build <path>` overrides the registry, matching the flag the
+// portal's own generate-docs takes.
 const buildDir = portalBuildDir(argValue("--customer-build"));
 const port = portalPort();
 
-/** Runs a pnpm script in the portal repo and resolves when it exits 0. */
+/** Runs a pnpm script in the portal app and resolves when it exits 0. */
 function run(args: string[], env: Record<string, string> = {}): Promise<void> {
   return new Promise((resolve, reject) => {
     const child = spawn("pnpm", args, {
@@ -68,26 +78,40 @@ function run(args: string[], env: Record<string, string> = {}): Promise<void> {
   });
 }
 
-console.log(`[serve-portal] portal repo : ${cwd}`);
-console.log(`[serve-portal] portal      : ${portalName()} (${portal.label})`);
-console.log(`[serve-portal] build dir   : ${buildDir}`);
-console.log(`[serve-portal] port        : ${port}`);
+console.log(`[serve-portal] portal app : ${cwd}`);
+console.log(`[serve-portal] portal     : ${portalName()} (${portal.label})`);
+console.log(`[serve-portal] build dir  : ${buildDir}`);
+console.log(`[serve-portal] port       : ${port}`);
+console.log(`[serve-portal] mode       : ${devMode ? "next dev" : "next build + next start"}`);
 
+// ---- 1. generate
 if (skipGenerate) {
-  console.log("[serve-portal] --no-generate: serving existing generated/ output");
+  console.log("[serve-portal] --no-generate: using the existing generated/ output");
 } else {
   // Note: generating overwrites apps/docs/app/theme.css, which is tracked in the
-  // portal repo. Expect a dirty working tree there after a run.
+  // portal repo. Expect a dirty working tree in .portal/ after a run.
   await run(["generate-docs", "--", "--customer-build", buildDir]);
 }
-
 if (generateOnly) {
-  console.log("[serve-portal] --generate-only: generated, not serving");
-} else {
-  // Port goes through the environment: pnpm forwards `--` to the script itself,
-  // so `pnpm run dev -- --port N` reaches `next dev` as a stray positional and
-  // Next reads it as a project directory. `next dev` honours PORT.
-  //
-  // `next dev` takes over this process so Playwright can kill it on teardown.
-  await run(["run", "dev"], { PORT: String(port) });
+  console.log("[serve-portal] --generate-only: stopping after generate");
+  process.exit(0);
 }
+
+// ---- 2. build
+if (skipBuild) {
+  console.log(`[serve-portal] ${devMode ? "--dev" : "--no-build"}: skipping next build`);
+} else {
+  await run(["run", "build"]);
+}
+if (buildOnly) {
+  console.log("[serve-portal] --build-only: stopping after build");
+  process.exit(0);
+}
+
+// ---- 3. serve
+// Port goes through the environment: pnpm forwards `--` to the script itself, so
+// `pnpm run start -- --port N` reaches Next as a stray positional and it reads
+// that as a project directory. Both `next start` and `next dev` honour PORT.
+//
+// This takes over the process so Playwright can kill it on teardown.
+await run(["run", devMode ? "dev" : "start"], { PORT: String(port) });
