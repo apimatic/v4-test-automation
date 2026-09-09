@@ -60,14 +60,29 @@ export default defineConfig({
     },
   ],
 
-  /* Generate + serve the portal, unless PORTAL_BASE_URL points somewhere already up. */
+  /**
+   * Generate, build and serve the portal, unless PORTAL_BASE_URL points at
+   * something already up.
+   *
+   * Playwright owns the server process on purpose. Starting it in its own CI
+   * step and polling for it does not work: the Windows runner tears down a
+   * step's process tree when the step ends, so the server was gone before the
+   * tests ran — it reported "Ready", then every request was refused. Playwright
+   * keeps the server as a child of the test run and shuts it down afterwards.
+   *
+   * PORTAL_PREBUILT is for CI, where generate and build are their own steps (so
+   * their logs and timings stand alone); this then only has to serve.
+   */
   webServer: usingExternalPortal()
     ? undefined
     : {
-        command: "node scripts/serve-portal.mts",
-        url: `http://localhost:${portalPort()}/docs/getting-started/quickstart`,
-        /* Generation + a Next.js cold start + first route compile. */
-        timeout: 300_000,
+        command: process.env.PORTAL_PREBUILT
+          ? "node scripts/serve-portal.mts --no-generate --no-build"
+          : "node scripts/serve-portal.mts",
+        /* 127.0.0.1 to match --hostname 0.0.0.0; `localhost` can be ::1-only. */
+        url: `http://127.0.0.1:${portalPort()}/docs/getting-started/quickstart`,
+        /* Generate + next build + server start, from cold. */
+        timeout: 600_000,
         /* Locally, reuse a portal you already have running. */
         reuseExistingServer: !process.env.CI,
         stdout: "pipe",

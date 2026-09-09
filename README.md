@@ -222,9 +222,17 @@ dxv2-portal-snapshots/     committed baselines, grouped by project/portal
 
 ## CI
 
-`.github/workflows/dxv2-visual.yml` runs the same stages as the local flow, kept
-as separate steps so each log stands alone: `generate-docs`, `build`, `start`,
-then the tests. Triggers on pushes and PRs to `main`, plus manual dispatch.
+`.github/workflows/dxv2-visual.yml` runs the same stages as the local flow:
+`generate-docs` and `build` as their own steps, then the tests. Triggers on
+pushes and PRs to `main`, plus manual dispatch.
+
+**Playwright starts the server, not a separate CI step.** A step that launches a
+detached server does not survive on a Windows runner: the runner tears down the
+step's process tree when the step ends, so the server was gone before the tests
+ran — it logged "Ready in 169ms" and then every request was refused, which looks
+exactly like a slow or crashed server. Playwright keeps it as a child of the test
+run, waits for it properly, and cleans up. `PORTAL_PREBUILT=1` tells it to serve
+only, since generate and build already ran.
 
 It runs on **windows-latest** deliberately — the committed baselines were
 captured on win32/Chromium, and font rasterization differs enough across
@@ -236,9 +244,12 @@ Two details worth knowing:
   to this repo alone, so the workflow uses the org-level `ACTIONS_PAT` — the same
   secret other repos here use for cross-repo checkouts. Set a repo-level
   `PORTAL_REPO_TOKEN` if you'd rather use something narrowly scoped.
-- **`PORTAL_BASE_URL` is set for the test step.** `reuseExistingServer` is off
-  when `CI` is set, so without it Playwright would start a second server and race
-  the one we just started for port 3000.
+- **Addresses are IPv4.** The server is started with `--hostname 0.0.0.0`, and
+  `localhost` resolves to `::1` first on Windows runners — that mismatch presents
+  as a flat connection refused, so `baseURL` uses `127.0.0.1`.
+- **`setup:portal` patches the portal's `next.config.ts`** to turn off
+  `output: 'standalone'`; see the note above on why standalone can't be served
+  on Windows.
 
 Manual dispatch takes a `portal_ref` input: leave it blank to test the pinned
 commit, or set it to `apimatic-docs` to check the latest portal for regressions

@@ -80,7 +80,10 @@ export function usingExternalPortal(): boolean {
 export function baseURL(): string {
   const external = process.env.PORTAL_BASE_URL?.trim();
   if (external) return external.replace(/\/$/, "");
-  return `http://localhost:${portalPort()}`;
+  // 127.0.0.1, not localhost: the server is started with --hostname 0.0.0.0
+  // (IPv4), and `localhost` resolves to ::1 first on Windows CI runners, where
+  // that mismatch shows up as a flat connection refused.
+  return `http://127.0.0.1:${portalPort()}`;
 }
 
 /**

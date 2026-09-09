@@ -5,14 +5,13 @@ name: dxV2 Visual Regression
 #
 #   1. pnpm generate-docs -- --customer-build ./test-builds/<build>
 #   2. pnpm build                   (next build — prerenders every page)
-#   3. pnpm start                   (next start, on :3000)
-#   4. pnpm test:visual             (Playwright, against that server)
+#   3. pnpm test:visual             (Playwright starts `next start` and tests it)
 #
-# Stage 2 exists because `next dev` was unusable here: it compiles routes on
-# demand, and the first request to the 182-page SSG route never finished inside
-# a 12-minute budget on this runner. `next build` does that work once, and then
-# pages answer in milliseconds. It renders identically — moving the suite from
-# dev to production changed zero baselines.
+# Stage 2 prerenders rather than relying on `next dev`, which compiles routes on
+# demand — the first hit on the 182-page SSG route is slow and variable, which is
+# no basis for pixel comparison. `next build` does that work once, up front, and
+# then pages answer in milliseconds. It renders identically: moving the suite
+# from dev to production changed zero baselines.
 #
 # The runner is windows-latest on purpose: the committed baselines were captured
 # on win32/Chromium, and font rasterization differs enough across operating
@@ -112,57 +111,19 @@ jobs:
       - name: Build the portal
         run: pnpm build
 
-      # ---- Step 3: serve the prerendered output
-      # Start-Process detaches it so it outlives this step. `pnpm start` skips
-      # generate and build, serving what the two previous steps produced.
-      - name: Start the portal server
-        shell: pwsh
-        run: |
-          Start-Process -FilePath 'pnpm.cmd' -ArgumentList 'start' -NoNewWindow `
-            -RedirectStandardOutput portal-server.log `
-            -RedirectStandardError portal-server.err.log
-
-      # Serving prerendered output, so this is a question of process startup,
-      # not compilation — seconds, not minutes.
+      # ---- Step 3: the tests
       #
-      # IPv4 here and in PORTAL_BASE_URL below. serve-portal.mts binds the server
-      # to 0.0.0.0 so this reaches it; without that Next binds `localhost`, which
-      # on this runner is ::1 only, and every probe gets connection refused while
-      # the server reports itself Ready.
-      - name: Wait for the portal to answer
-        shell: pwsh
-        run: |
-          $url = "http://127.0.0.1:$env:PORTAL_PORT/docs/getting-started/quickstart"
-          $deadline = (Get-Date).AddMinutes(3)
-          $attempt = 0
-          while ((Get-Date) -lt $deadline) {
-            $attempt++
-            try {
-              $r = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30
-              if ($r.StatusCode -eq 200) {
-                Write-Host "portal is up after $attempt attempt(s)"
-                exit 0
-              }
-              Write-Host "attempt $attempt : HTTP $($r.StatusCode)"
-            } catch {
-              Write-Host "attempt $attempt : not ready yet: $($_.Exception.Message)"
-              Start-Sleep -Seconds 3
-            }
-          }
-          Write-Host '--- portal-server.log ---'
-          if (Test-Path portal-server.log) { Get-Content portal-server.log }
-          Write-Host '--- portal-server.err.log ---'
-          if (Test-Path portal-server.err.log) { Get-Content portal-server.err.log }
-          throw "Portal did not become ready at $url within 3 minutes"
-
-      # ---- Step 4: the tests
-      # PORTAL_BASE_URL makes Playwright treat the portal as externally managed,
-      # so its own `webServer` stays out of the way instead of racing us for
-      # port 3000 (reuseExistingServer is deliberately off when CI is set).
+      # Playwright starts and stops the server itself (PORTAL_PREBUILT makes it
+      # serve only, since generate and build already ran above).
+      #
+      # It is deliberately NOT started in its own step: the Windows runner tears
+      # down a step's process tree when the step ends, so a server started that
+      # way was already gone by the time the tests ran — it logged "Ready in
+      # 169ms" and then every request was refused. Playwright keeps it as a child
+      # of the test run, waits for it properly, and cleans up after.
       - name: Run visual tests
         env:
-          # IPv4-pinned for the same reason as the readiness probe above.
-          PORTAL_BASE_URL: http://127.0.0.1:3000
+          PORTAL_PREBUILT: '1'
         run: pnpm test:visual
 
       - name: Upload Playwright report
@@ -183,13 +144,3 @@ jobs:
           path: test-results/
           retention-days: 30
 
-      - name: Upload portal server logs
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: portal-server-logs-${{ inputs.build || 'slack' }}
-          path: |
-            portal-server.log
-            portal-server.err.log
-          retention-days: 7
-          if-no-files-found: ignore
