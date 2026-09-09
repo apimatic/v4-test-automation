@@ -192,11 +192,33 @@ dxv2-portal-snapshots/     committed baselines, grouped by project/portal
 - **Tests run with `workers: 1`.** They share one dev server that compiles routes
   on demand; running them in parallel makes both the timings and the pixels worse.
 
+## CI
+
+`.github/workflows/dxv2-visual.yml` runs the same three steps as the local flow,
+kept as separate steps so each log stands alone: `generate-docs`, then the dev
+server, then the tests. Triggers on pushes and PRs to `main`, plus manual
+dispatch.
+
+It runs on **windows-latest** deliberately — the committed baselines were
+captured on win32/Chromium, and font rasterization differs enough across
+operating systems that a ubuntu runner would fail every snapshot.
+
+Two details worth knowing:
+
+- **It needs a credential for the private portal repo.** `GITHUB_TOKEN` is scoped
+  to this repo alone, so the workflow uses the org-level `ACTIONS_PAT` — the same
+  secret other repos here use for cross-repo checkouts. Set a repo-level
+  `PORTAL_REPO_TOKEN` if you'd rather use something narrowly scoped.
+- **`PORTAL_BASE_URL` is set for the test step.** `reuseExistingServer` is off
+  when `CI` is set, so without it Playwright would start a second server and race
+  the one we just started for port 3000.
+
+Manual dispatch takes a `portal_ref` input: leave it blank to test the pinned
+commit, or set it to `apimatic-docs` to check the latest portal for regressions
+without touching `config/portal-source.json`.
+
 ## Still to do
 
-- CI workflow (GitHub Actions) — `pnpm setup:portal` gives CI the portal without
-  any cross-repo checkout wiring; the runner OS still has to match the baselines
-  (captured on win32, so `windows-latest`).
 - Functional suite under `tests/functional/`.
 - More portal builds — there are ~18 upstream under
   `apps/docs/test-specs/customer-build/`; vendor the ones worth testing into

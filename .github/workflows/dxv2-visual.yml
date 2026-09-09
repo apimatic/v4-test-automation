@@ -76,11 +76,15 @@ jobs:
 
       # Clones the portal app into .portal/ at the pinned commit, installs its
       # dependencies, and builds the workspace packages apps/docs imports from.
-      # apimatic-dx-portal-v2 is private, so this needs a credential with read
-      # access to it — GITHUB_TOKEN is scoped to this repo only and won't work.
+      #
+      # apimatic-dx-portal-v2 is private, so this needs a credential that can
+      # read it — GITHUB_TOKEN is scoped to this repo alone and won't do. The
+      # org-level ACTIONS_PAT is what other repos here use for exactly this
+      # (see ui-test-automation's cross-repo checkout). Set a repo-level
+      # PORTAL_REPO_TOKEN to use something more narrowly scoped instead.
       - name: Set up the portal app
         env:
-          PORTAL_REPO_TOKEN: ${{ secrets.PORTAL_REPO_TOKEN }}
+          PORTAL_REPO_TOKEN: ${{ secrets.PORTAL_REPO_TOKEN || secrets.ACTIONS_PAT }}
           PORTAL_REF: ${{ inputs.portal_ref }}
         run: pnpm setup:portal
 
