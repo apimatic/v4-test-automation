@@ -43,6 +43,8 @@ jobs:
 
     env:
       PORTAL_PORT: '3000'
+      # Keeps the first-run telemetry notice out of the server's cold start.
+      NEXT_TELEMETRY_DISABLED: '1'
       PORTAL: ${{ inputs.build || 'slack' }}
       BUILD_DIR: ./test-builds/${{ inputs.build || 'slack' }}
 
@@ -102,22 +104,40 @@ jobs:
             -RedirectStandardOutput portal-server.log `
             -RedirectStandardError portal-server.err.log
 
+      # Two things this has to tolerate, both learned the hard way:
+      #
+      #  * The first request triggers a cold Turbopack compile of the route,
+      #    which on a Windows runner takes minutes, not seconds. A short
+      #    per-request timeout just abandons the compile and retries forever —
+      #    so each attempt gets a long timeout of its own.
+      #  * `localhost` can resolve to ::1 before 127.0.0.1 on Windows, so the
+      #    address is pinned to IPv4 here and in PORTAL_BASE_URL below.
       - name: Wait for the portal to answer
         shell: pwsh
         run: |
-          $url = "http://localhost:$env:PORTAL_PORT/docs/getting-started/quickstart"
-          $deadline = (Get-Date).AddMinutes(5)
+          $url = "http://127.0.0.1:$env:PORTAL_PORT/docs/getting-started/quickstart"
+          $deadline = (Get-Date).AddMinutes(12)
+          $attempt = 0
           while ((Get-Date) -lt $deadline) {
+            $attempt++
+            Write-Host "attempt $attempt : GET $url (first one compiles the route, be patient)"
             try {
-              $r = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 10
-              if ($r.StatusCode -eq 200) { Write-Host "portal is up: $url"; exit 0 }
-            } catch { Start-Sleep -Seconds 3 }
+              $r = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 240
+              if ($r.StatusCode -eq 200) {
+                Write-Host "portal is up after $attempt attempt(s)"
+                exit 0
+              }
+              Write-Host "  got HTTP $($r.StatusCode)"
+            } catch {
+              Write-Host "  not ready yet: $($_.Exception.Message)"
+              Start-Sleep -Seconds 5
+            }
           }
           Write-Host '--- portal-server.log ---'
           if (Test-Path portal-server.log) { Get-Content portal-server.log }
           Write-Host '--- portal-server.err.log ---'
           if (Test-Path portal-server.err.log) { Get-Content portal-server.err.log }
-          throw "Portal did not become ready at $url within 5 minutes"
+          throw "Portal did not become ready at $url within 12 minutes"
 
       # ---- Step 3: the tests
       # PORTAL_BASE_URL makes Playwright treat the portal as externally managed,
@@ -125,7 +145,8 @@ jobs:
       # port 3000 (reuseExistingServer is deliberately off when CI is set).
       - name: Run visual tests
         env:
-          PORTAL_BASE_URL: http://localhost:3000
+          # IPv4-pinned for the same reason as the readiness probe above.
+          PORTAL_BASE_URL: http://127.0.0.1:3000
         run: pnpm test:visual
 
       - name: Upload Playwright report
