@@ -78,9 +78,14 @@ entirely optional; see `.env.example` for the overrides it offers.
 `setup:portal` shallow-fetches the single pinned commit and installs the portal's
 dependencies. It's the slow step, but it only re-runs when the pin changes.
 
-**Already have a portal clone you work in?** Point `PORTAL_REPO` at it in `.env`
-and `setup:portal` steps aside. Useful when you're changing the portal itself and
-want the tests to see your working tree.
+**Already have a portal checkout?** Point `PORTAL_REPO` at it and `setup:portal`
+skips the clone, the install and the package build — but still applies the
+standalone patch, without which `next start` won't serve. Useful when you're
+changing the portal itself and want the tests to see your working tree. Note it
+edits `apps/docs/next.config.ts` in that checkout, so expect a dirty file there.
+
+This is also how the portal repo tests a pull request against its own code — see
+[Two-way CI](#two-way-ci).
 
 `.env` — all optional:
 
@@ -267,6 +272,26 @@ Two details worth knowing:
 Manual dispatch takes a `portal_ref` input: leave it blank to test the pinned
 commit, or set it to `apimatic-docs` to check the latest portal for regressions
 without touching `config/portal-source.json`.
+
+## Two-way CI
+
+The suite runs from both sides, answering different questions:
+
+| | This repo's workflow | The portal repo's workflow |
+|---|---|---|
+| Portal under test | cloned at the **pinned commit** | **the pull request's checkout** |
+| Tests + baselines | here | checked out from here (`tests_ref`, default `main`) |
+| Question | "did the pinned portal drift?" — when you bump the pin | "does this PR change how portals look?" — every PR |
+
+The portal side points `PORTAL_REPO` at its own checkout, so the three stages are
+identical; only the source of the portal differs. A straight copy of this
+workflow would be useless there — it would test a pinned commit and pass
+regardless of what the PR changed.
+
+**When a portal PR legitimately changes the UI** its check goes red, because the
+baselines live here. Refresh them in a branch of this repo, then re-run the
+portal check with `tests_ref` pointed at that branch. The friction is deliberate:
+a deliberate visual change should be reviewed, not absorbed silently.
 
 ## Still to do
 

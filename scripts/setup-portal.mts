@@ -12,8 +12,15 @@
  *   pnpm setup:portal --no-install # just the checkout
  *   PORTAL_REF=apimatic-docs pnpm setup:portal   # track a branch instead
  *
- * Already have a clone you're working in? Point PORTAL_REPO at it in .env and
- * this is skipped entirely.
+ * Already have a checkout? Point PORTAL_REPO at it and the clone, install and
+ * package build are all skipped — but the standalone patch still runs, because
+ * without it `next start` won't serve. That's the mode the portal repo's own CI
+ * uses to test a pull request's code:
+ *
+ *   PORTAL_REPO=<portal checkout> pnpm setup:portal
+ *
+ * Note it edits `apps/docs/next.config.ts` in that checkout, so expect a dirty
+ * file if you point it at a clone you're working in.
  */
 
 import { spawn } from "node:child_process";
@@ -29,7 +36,17 @@ dotenv.config({ quiet: true });
 const skipInstall = process.argv.includes("--no-install");
 const source = portalSource();
 const ref = process.env.PORTAL_REF?.trim() || source.ref;
-const dir = managedPortalDir();
+
+/**
+ * Where the portal app lives for this run.
+ *
+ * With PORTAL_REPO set we're pointed at a checkout somebody else owns — your
+ * working clone, or the portal repo's own CI checkout of the pull request. We
+ * don't clone or install into that; but the standalone patch still has to be
+ * applied, or `next start` won't serve.
+ */
+const ownClone = process.env.PORTAL_REPO?.trim();
+const dir = ownClone ? path.resolve(ownClone) : managedPortalDir();
 
 function run(cmd: string, args: string[], cwd: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -56,14 +73,6 @@ function tryRun(cmd: string, args: string[], cwd: string): Promise<boolean> {
   );
 }
 
-if (process.env.PORTAL_REPO?.trim()) {
-  console.log(
-    `[setup-portal] PORTAL_REPO is set (${process.env.PORTAL_REPO.trim()}) — ` +
-      `using your own clone, nothing to set up.`,
-  );
-  process.exit(0);
-}
-
 /**
  * The portal repo is private, so CI needs a credential. Supply one as
  * PORTAL_REPO_TOKEN (a PAT or an App installation token with read access) and
@@ -78,31 +87,45 @@ function fetchUrl(): string {
   return source.repo.replace("https://", `https://x-access-token:${token}@`);
 }
 
-// Log the plain URL — never the authenticated one.
-console.log(`[setup-portal] repo : ${source.repo}`);
-console.log(`[setup-portal] ref  : ${ref}${ref === source.ref ? " (pinned)" : " (override)"}`);
-console.log(`[setup-portal] auth : ${process.env.PORTAL_REPO_TOKEN?.trim() ? "PORTAL_REPO_TOKEN" : "none (relying on your git credentials)"}`);
-console.log(`[setup-portal] into : ${dir}`);
+if (ownClone) {
+  console.log(`[setup-portal] PORTAL_REPO is set — using ${dir} as-is, no checkout`);
+  if (!existsSync(path.join(dir, "apps", "docs", "package.json"))) {
+    throw new Error(
+      `PORTAL_REPO="${ownClone}" does not look like the apimatic-dx-portal-v2 repo — ` +
+        `expected ${path.join(dir, "apps", "docs", "package.json")}.`,
+    );
+  }
+} else {
+  // Log the plain URL — never the authenticated one.
+  console.log(`[setup-portal] repo : ${source.repo}`);
+  console.log(`[setup-portal] ref  : ${ref}${ref === source.ref ? " (pinned)" : " (override)"}`);
+  console.log(
+    `[setup-portal] auth : ${process.env.PORTAL_REPO_TOKEN?.trim() ? "PORTAL_REPO_TOKEN" : "none (relying on your git credentials)"}`,
+  );
+  console.log(`[setup-portal] into : ${dir}`);
 
-if (!existsSync(path.join(dir, ".git"))) {
-  await fs.mkdir(dir, { recursive: true });
-  await run("git", ["init", "--quiet"], dir);
+  if (!existsSync(path.join(dir, ".git"))) {
+    await fs.mkdir(dir, { recursive: true });
+    await run("git", ["init", "--quiet"], dir);
+  }
 }
 
 // A shallow fetch of exactly the ref we want — far quicker than cloning all of
 // history (the repo's pack is ~132 MiB). Works for a branch name or a raw SHA,
 // but a server can refuse SHA fetches, so fall back to fetching everything.
-const url = fetchUrl();
-const shallow = await tryRun("git", ["fetch", "--depth", "1", url, ref], dir);
-if (!shallow) {
-  console.log("[setup-portal] shallow fetch of that ref failed — fetching full history");
-  // Keep the ref in the refspec: a bare `git fetch <url>` points FETCH_HEAD at
-  // the remote's HEAD, which is not the ref we asked for.
-  await run("git", ["fetch", url, ref], dir);
-}
+if (!ownClone) {
+  const url = fetchUrl();
+  const shallow = await tryRun("git", ["fetch", "--depth", "1", url, ref], dir);
+  if (!shallow) {
+    console.log("[setup-portal] shallow fetch of that ref failed — fetching full history");
+    // Keep the ref in the refspec: a bare `git fetch <url>` points FETCH_HEAD at
+    // the remote's HEAD, which is not the ref we asked for.
+    await run("git", ["fetch", url, ref], dir);
+  }
 
-await run("git", ["checkout", "--force", "FETCH_HEAD"], dir);
-await run("git", ["rev-parse", "--short", "HEAD"], dir);
+  await run("git", ["checkout", "--force", "FETCH_HEAD"], dir);
+  await run("git", ["rev-parse", "--short", "HEAD"], dir);
+}
 
 /**
  * Turns off `output: 'standalone'` in the checked-out portal config.
@@ -156,7 +179,11 @@ async function disableStandaloneOutput(): Promise<void> {
 
 await disableStandaloneOutput();
 
-if (skipInstall) {
+if (ownClone) {
+  console.log(
+    "[setup-portal] PORTAL_REPO is set — leaving install and package build to whoever owns it",
+  );
+} else if (skipInstall) {
   console.log("[setup-portal] --no-install: skipping install and package build");
 } else {
   // The portal is a pnpm workspace; install from its root, not apps/docs.
