@@ -178,6 +178,19 @@ pnpm report
   before committing them.** A baseline committed without being looked at silently
   switches the test off.
 
+**There are no retries.** A visual test that only passes on a second attempt is
+telling you the snapshot is unstable, and retrying hides the very signal this
+suite exists to surface.
+
+**What the tolerance will and won't catch.** `maxDiffPixelRatio: 0.03` counts
+*differing pixels*, and a pixel only counts once it clears Playwright's per-pixel
+`threshold` (default 0.2, YIQ distance). Repainting the whole header
+`#ffffff` -> `#fff3cd` registered as **zero** differing pixels; hiding the sidebar
+and reddening the header registered 178,929 (ratio 0.09) and failed as it should.
+So subtle brand-colour drift can pass. If you need to catch that, tighten
+`threshold` on the specific assertion rather than lowering the ratio globally —
+the ratio is what absorbs font-rasterisation noise.
+
 ## Layout
 
 ```

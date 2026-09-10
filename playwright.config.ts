@@ -19,8 +19,13 @@ export default defineConfig({
   /* Fail the build if a test.only was left in the source. */
   forbidOnly: !!process.env.CI,
 
-  /* One retry on CI — a dev-server cold compile can blow a first-load timeout. */
-  retries: process.env.CI ? 1 : 0,
+  /**
+   * No retries, anywhere. A visual test that only passes on a second attempt is
+   * telling you the snapshot is unstable, and a retry hides exactly the signal
+   * this suite exists to surface. The portal is served from a prerendered build,
+   * so there's no cold-compile flakiness left to paper over either.
+   */
+  retries: 0,
 
   /* Visual tests share one dev server; running them serially keeps the
      screenshots stable and avoids compile-storming the server. */

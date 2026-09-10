@@ -6,11 +6,12 @@ import { snapshotOptions } from "../../../utils/visual.ts";
 /**
  * Visual regression for the Slack customer build of the dxV2 docs portal.
  *
- * The portal is generated and served by scripts/serve-portal.ts, which runs the
- * same two commands you'd run by hand in apimatic-dx-portal-v2/apps/docs:
+ * The portal is generated and served by scripts/serve-portal.mts, which runs the
+ * same stages you'd run by hand from the repo root:
  *
- *   pnpm generate-docs -- --customer-build ./test-specs/customer-build/slack/
- *   pnpm run dev
+ *   pnpm generate-docs -- --customer-build ./test-builds/slack
+ *   pnpm build
+ *   pnpm start
  *
  * Baselines: dxv2-portal-snapshots/dxv2-visual/slack/
  * Update them with `pnpm test:visual:update` after an intentional UI change,

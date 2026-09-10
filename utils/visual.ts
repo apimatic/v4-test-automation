@@ -7,7 +7,25 @@ import type { Locator, Page } from "@playwright/test";
  * late, a caret blinking.
  */
 
-/** Max diff we tolerate before calling it a regression. Matches the V1 suite. */
+/**
+ * Max diff we tolerate before calling it a regression. Matches the V1 suite.
+ *
+ * Know what this does and does not catch. It's a ratio of *differing pixels*,
+ * and a pixel only counts as differing once it passes Playwright's per-pixel
+ * `threshold` (default 0.2, YIQ colour distance). So two things slip through:
+ *
+ *  * a subtle recolour anywhere — repainting the whole header #ffffff -> #fff3cd
+ *    was measured at zero differing pixels, because no single pixel moved far
+ *    enough to count;
+ *  * any change confined to under 3% of the image — on a 1920x1080 page that's
+ *    ~62k pixels, roughly a third of the header's area.
+ *
+ * A structural break is caught easily: hiding the sidebar and reddening the
+ * header came out at 178,929 pixels (ratio 0.09). If you need to catch brand
+ * colour drift, tighten `threshold` on that specific assertion rather than
+ * lowering this ratio globally — the ratio is what absorbs font-rasterisation
+ * noise, and dropping it makes every test flaky.
+ */
 export const MAX_DIFF_PIXEL_RATIO = 0.03;
 
 /**
