@@ -34,7 +34,7 @@ export default defineConfig({
   reporter: process.env.CI ? [["html"], ["github"]] : "html",
 
   /* Baselines live in the repo, grouped by project and by portal (the test's
-     own folder), e.g. dxv2-portal-snapshots/dxv2-visual/slack/quickstart.png */
+     own folder), e.g. dxv2-portal-snapshots/dxv2-visual/petstore/quickstart-light.png */
   snapshotPathTemplate: "dxv2-portal-snapshots/{projectName}/{testFileDir}/{arg}{ext}",
 
   /* The dev server compiles routes on demand, so first hits are slow. */

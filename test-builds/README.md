@@ -15,20 +15,19 @@ It also keeps this repo standing on its own: the fixtures are committed here, an
 `.portal/` is a throwaway checkout that `pnpm setup:portal` can recreate at any
 time.
 
-The cost is duplication: refreshing a build is a manual step (below), and these
-folders are large — `slack/` is 9.3 MB, mostly `static/images/slacksampleapp.gif`
-(3.7 MB) and the six SDK zips (4.6 MB).
+The cost is duplication: refreshing a build is a manual step (below). Watch the
+size — a build carrying sample media and SDK zips can run to several MB.
 
 ## What a build contains
 
-Taking `slack/` as the example:
+Taking `petstore/` as the example:
 
 | Path | What it drives |
 |---|---|
-| `APIMATIC-BUILD.json` | Branding, theme (`baseTheme: "black"`), the 7 language configs, `apiCopilotConfig`, quickstart copy |
+| `APIMATIC-BUILD.json` | Branding, theme (base theme, colours, fonts), the language configs, `apiCopilotConfig` |
 | `content/toc.yml` | The sidebar and the top-level sections |
-| `content/guides/*.md` | Hand-authored pages, e.g. `quickstart.md` → `/docs/documentation/quickstart` |
-| `spec/slack-web-api/*.json` | The OpenAPI spec — source of all 182 endpoint pages |
+| `content/**/*.md` | Hand-authored pages, e.g. `why-apimatic/what-apimatic-offers.md` |
+| `spec/openapi.json` | The OpenAPI spec — source of the endpoint and model pages |
 | `static/` | Logos, favicon, SDK zips |
 
 Change any of these and the generated portal changes, so **editing a build is
@@ -55,11 +54,11 @@ baselines:
 
 ```bash
 # 1. See what actually changed first
-diff -r test-builds/slack .portal/apps/docs/test-specs/customer-build/slack
+diff -r test-builds/petstore .portal/apps/docs/test-specs/customer-build/petstore
 
 # 2. Take the new copy
-rm -rf test-builds/slack
-cp -r .portal/apps/docs/test-specs/customer-build/slack test-builds/slack
+rm -rf test-builds/petstore
+cp -r .portal/apps/docs/test-specs/customer-build/petstore test-builds/petstore
 
 # 3. Re-baseline, then LOOK at the new PNGs before committing
 npm run test:visual:update

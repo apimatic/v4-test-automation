@@ -1,0 +1,240 @@
+{
+  "$schema": "https://titan.apimatic.io/api/build/schema",
+  "buildFileVersion": "1",
+  "generatePortal": {
+    "debug": {
+      "publishReport": true
+    },
+    "pageTitle": "My First Portal",
+    "navTitle": "Developer Experience Portal",
+    "logoUrl": "static/images/placeholder-logo.png",
+    "logoUrlDark": "static/images/placeholder-logo-dark.png",
+    "logoLink": "https://www.apimatic.io",
+    "faviconUrl": "static/images/favicon.ico",
+    "languageConfig": {
+      "http": {},
+      "typescript": {},
+      "ruby": {},
+      "python": {},
+      "java": {},
+      "csharp": {},
+      "php": {},
+      "go": {}
+    },
+    "portalSettings": {
+      "theme": {
+        "baseTheme": "cosmos",
+        "colorMode": {
+          "defaultMode": "light",
+          "disableSwitch": false
+        },
+        "colors": {
+          "primaryColor": {
+            "light": "#0C7FF2",
+            "dark": "#7CBAF8"
+          },
+          "linkColor": {
+            "light": "#004AD7",
+            "dark": "#A3D1FF"
+          }
+        },
+        "fontSource": [
+          "https://fonts.googleapis.com/css?family=Inter:100,100i,300,300i,400,400i,500,500i,700,700i,900,900",
+          "https://fonts.googleapis.com/css?family=Courier+Prime:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i"
+        ],
+        "cssStyles": {
+          "headings": {
+            "fontFamily": "Inter",
+            "h1": {
+              "fontFamily": "Inter",
+              "fontSize": "22.5px",
+              "fontWeight": "500",
+              "fontStyle": "normal",
+              "lineHeight": "1.2"
+            },
+            "h2": {
+              "fontFamily": "Inter",
+              "fontSize": "21px",
+              "fontWeight": "500",
+              "fontStyle": "normal",
+              "lineHeight": "1.2"
+            },
+            "h3": {
+              "fontFamily": "Inter",
+              "fontSize": "19.5px",
+              "fontWeight": "500",
+              "fontStyle": "normal",
+              "lineHeight": "1.2"
+            },
+            "h4": {
+              "fontFamily": "Inter",
+              "fontSize": "18px",
+              "fontWeight": "500",
+              "fontStyle": "normal",
+              "lineHeight": "1.2"
+            },
+            "h5": {
+              "fontFamily": "Inter",
+              "fontSize": "16.5px",
+              "fontWeight": "500",
+              "fontStyle": "normal",
+              "lineHeight": "1.2"
+            },
+            "h6": {
+              "fontFamily": "Inter",
+              "fontSize": "15px",
+              "fontWeight": "500",
+              "fontStyle": "normal",
+              "lineHeight": "1.2"
+            }
+          },
+          "body": {
+            "fontFamily": "Inter",
+            "text1": {
+              "fontFamily": "Inter",
+              "fontSize": "15px",
+              "fontWeight": "400",
+              "fontStyle": "normal",
+              "lineHeight": "1.75"
+            },
+            "text2": {
+              "fontFamily": "Inter",
+              "fontSize": "13.33px",
+              "fontWeight": "400",
+              "fontStyle": "normal",
+              "lineHeight": "1.75"
+            },
+            "text3": {
+              "fontFamily": "Inter",
+              "fontSize": "11.85px",
+              "fontWeight": "400",
+              "fontStyle": "normal",
+              "lineHeight": "1.75"
+            }
+          },
+          "code": {
+            "fontFamily": "Courier Prime, monospace",
+            "blockCode": {
+              "fontFamily": "Courier Prime, monospace",
+              "fontSize": "15px",
+              "fontWeight": "400",
+              "fontStyle": "normal",
+              "lineHeight": "1.75"
+            },
+            "inlineCode": {
+              "fontFamily": "Courier Prime, monospace",
+              "fontSize": "15px",
+              "fontWeight": "400",
+              "fontStyle": "normal",
+              "lineHeight": "1.75"
+            }
+          }
+        }
+      },
+      "enableHttpVerbsForAllLangs": true,
+      "enableExport": true,
+      "enableConsoleCalls": true,
+      "languageSettings": {
+        "http_curl_v1": {},
+        "ts_generic_lib": {
+          "aiIntegration": {
+            "cursor": {
+              "isEnabled": true
+            },
+            "claudeCode": {
+              "isEnabled": true
+            },
+            "vscode": {
+              "isEnabled": true
+            }
+          }
+        },
+        "ruby_generic_lib": {
+          "aiIntegration": {
+            "cursor": {
+              "isEnabled": true
+            },
+            "claudeCode": {
+              "isEnabled": true
+            },
+            "vscode": {
+              "isEnabled": true
+            }
+          }
+        },
+        "python_generic_lib": {
+          "aiIntegration": {
+            "cursor": {
+              "isEnabled": true
+            },
+            "claudeCode": {
+              "isEnabled": true
+            },
+            "vscode": {
+              "isEnabled": true
+            }
+          }
+        },
+        "java_eclipse_jre_lib": {
+          "aiIntegration": {
+            "cursor": {
+              "isEnabled": true
+            },
+            "claudeCode": {
+              "isEnabled": true
+            },
+            "vscode": {
+              "isEnabled": true
+            }
+          }
+        },
+        "cs_net_standard_lib": {
+          "aiIntegration": {
+            "cursor": {
+              "isEnabled": true
+            },
+            "claudeCode": {
+              "isEnabled": true
+            },
+            "vscode": {
+              "isEnabled": true
+            }
+          }
+        },
+        "php_generic_lib_v2": {
+          "aiIntegration": {
+            "cursor": {
+              "isEnabled": true
+            },
+            "claudeCode": {
+              "isEnabled": true
+            },
+            "vscode": {
+              "isEnabled": true
+            }
+          }
+        },
+        "go_generic_lib": {
+          "aiIntegration": {
+            "cursor": {
+              "isEnabled": true
+            },
+            "claudeCode": {
+              "isEnabled": true
+            },
+            "vscode": {
+              "isEnabled": true
+            }
+          }
+        }
+      },
+      "initialPlatform": "ts_generic_lib"
+    },
+    "baseUrl": "http://localhost:23513"
+  },
+  "apiCopilotConfig": {
+    "isEnabled": true,
+    "key": "f1dfff58-81b4-4eb5-8d6a-ab33eeeed7c0",
+    "welcomeMessage": "Hi there! I'm your API Integration Assistant, here to help you learn and integrate with this API.\n\nAsk me anything about this API or try one of these example prompts:\n\n- `What authentication methods does this API support?`\n- `What endpoints are available in this API?`\n"
+  }
+}

@@ -8,7 +8,7 @@
  * test-builds/README.md for how to refresh one.
  *
  * `pnpm generate-docs -- --customer-build <dir>` turns a build into
- * `apps/docs/generated/docs/**` (.mdx + meta.json), and `pnpm run dev` serves it.
+ * `apps/docs/generated/docs/**` (.mdx + meta.json), and the portal serves it.
  * Routes below are the URLs those generated files end up at — every page is
  * served under `/docs/<slug>` (`/` just redirects to `/docs`).
  *
@@ -28,21 +28,36 @@ export type PortalConfig = {
 };
 
 export const portals = {
-  slack: {
-    buildDir: "test-builds/slack",
-    label: "Slack for Developers",
+  petstore: {
+    buildDir: "test-builds/petstore",
+    label: "My First Portal",
     routes: {
-      // Landing page generated from the `generate: Quickstart / from: getting-started`
+      // Landing page from the `generate: Quickstart / from: getting-started`
       // directive in the build's content/toc.yml.
       quickstart: "/docs/getting-started/quickstart",
-      // Hand-authored markdown pages from content/guides/.
-      guideQuickstart: "/docs/documentation/quickstart",
-      guideCredentials: "/docs/documentation/get-api-credentials",
-      // An operation page — renders the interactive playground via fumadocs-openapi.
-      endpoint: "/docs/api-reference/endpoints/chat/chat-postmessage",
-      // Directive-driven sections.
-      sdks: "/docs/sdks/sdks-overview",
-      mcp: "/docs/mcp/mcp-overview",
+
+      // Hand-authored markdown from content/why-apimatic/.
+      whyApimatic: "/docs/why-apimatic/what-apimatic-offers",
+
+      // `generate:` directives at the ROOT of toc.yml are loose nodes, so the
+      // portal sweeps them into a trailing "More" section — hence /more/ here
+      // rather than a top-level slug. Nest them in a `group:` to change that.
+      //
+      // The spec declares pet/store/user tags but defines a single operation,
+      // so API Endpoints is this one page. That's the spec, not a generation bug.
+      endpoint: "/docs/more/api-endpoints/user/deleteuser",
+
+      // Models is the richest part of this build — 16 pages. `pet` is an object
+      // with $refs and an example; `petstatus` is an enum, which renders as an
+      // allowed-values list rather than a property table.
+      modelObject: "/docs/more/models/pet",
+      modelEnum: "/docs/more/models/petstatus",
+
+      // Section landing page. It's EMPTY on purpose: the build asks for
+      // `from: callbacks` and `from: webhooks`, which this portal version
+      // doesn't implement, so the section generates with no pages. Worth a
+      // snapshot precisely because an empty section is easy to regress.
+      events: "/docs/events",
     },
   },
 } satisfies Record<string, PortalConfig>;

@@ -8,8 +8,8 @@ name: dxV2 Visual Regression
 #   3. pnpm test:visual             (Playwright starts `next start` and tests it)
 #
 # Stage 2 prerenders rather than relying on `next dev`, which compiles routes on
-# demand — the first hit on the 182-page SSG route is slow and variable, which is
-# no basis for pixel comparison. `next build` does that work once, up front, and
+# demand — the first hit on the SSG route is slow and variable, which is no basis
+# for pixel comparison. `next build` does that work once, up front, and
 # then pages answer in milliseconds. It renders identically: moving the suite
 # from dev to production changed zero baselines.
 #
@@ -34,7 +34,7 @@ on:
       build:
         description: Which build under test-builds/ to render
         required: false
-        default: slack
+        default: petstore
         type: string
 
 # A newer push supersedes an in-flight run on the same ref.
@@ -51,8 +51,8 @@ jobs:
       PORTAL_PORT: '3000'
       # Keeps the first-run telemetry notice out of the server's cold start.
       NEXT_TELEMETRY_DISABLED: '1'
-      PORTAL: ${{ inputs.build || 'slack' }}
-      BUILD_DIR: ./test-builds/${{ inputs.build || 'slack' }}
+      PORTAL: ${{ inputs.build || 'petstore' }}
+      BUILD_DIR: ./test-builds/${{ inputs.build || 'petstore' }}
       # Must match the cache path above, and applies to install and test alike.
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}\.playwright-browsers
 
@@ -130,7 +130,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-${{ inputs.build || 'slack' }}
+          name: playwright-report-${{ inputs.build || 'petstore' }}
           path: playwright-report/
           retention-days: 30
 
@@ -140,7 +140,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: failed-snapshots-${{ inputs.build || 'slack' }}
+          name: failed-snapshots-${{ inputs.build || 'petstore' }}
           path: test-results/
           retention-days: 30
 

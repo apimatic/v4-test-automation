@@ -8,10 +8,10 @@
  *   2. build           next build — prerenders every page
  *   3. start           next start — serves the prerendered output
  *
- * It's a production build on purpose. `next dev` compiles routes on demand, and
- * the first request to `/docs/[[...slug]]` — an SSG route spanning 182 pages —
- * takes many minutes on a cold machine, which made CI unusable. `next build`
- * does that work once, up front, and then every page answers in milliseconds.
+ * It's a production build on purpose. `next dev` compiles routes on demand, so
+ * the first hit on the `/docs/[[...slug]]` SSG route is slow and variable, which
+ * is no basis for pixel comparison. `next build` does that work once, up front,
+ * and then every page answers in milliseconds.
  * The rendering is identical: switching the suite from dev to production moved
  * zero baselines.
  *
@@ -19,7 +19,7 @@
  * Run it directly to keep a portal up across several test runs:
  *
  *   pnpm portal:serve      # all three stages
- *   pnpm generate-docs -- --customer-build ./test-builds/slack
+ *   pnpm generate-docs -- --customer-build ./test-builds/petstore
  *   pnpm build             # stage 2 only
  *   pnpm start             # stage 3 only
  *   pnpm dev               # next dev instead, for poking at the portal by hand

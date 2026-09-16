@@ -14,7 +14,7 @@ fetches the portal app itself, at a version it pins:
 
 ```
 config/portal-source.json        ← the portal app + the commit we pin to
-test-builds/slack/               ← the build fixture
+test-builds/petstore/            ← the build fixture
 tests/ + dxv2-portal-snapshots/  ← the specs and their baselines
         │
         │  pnpm setup:portal  clones the pinned portal app into .portal/ (gitignored)
@@ -29,9 +29,9 @@ this repo's Playwright tests
 ```
 
 **Why a production build and not `next dev`:** `next dev` compiles routes on
-demand, and the first request to `/docs/[[...slug]]` — an SSG route spanning 182
-pages — never finished inside a 12-minute budget on a CI runner. `next build`
-does that work once (~30s) and then every page answers in milliseconds. It
+demand, so the first hit on the `/docs/[[...slug]]` SSG route is slow and
+variable — no basis for pixel comparison. `next build` does that work once and
+then every page answers in milliseconds. It
 renders identically: moving the suite from dev to production moved zero
 baselines. `pnpm dev` is still there for poking at the portal by hand.
 
@@ -91,7 +91,7 @@ This is also how the portal repo tests a pull request against its own code — s
 
 | Variable | What it does |
 |---|---|
-| `PORTAL` | Which build to test — a key in `config/portals.ts`, generated from `test-builds/`. Defaults to `slack`. |
+| `PORTAL` | Which build to test — a key in `config/portals.ts`, generated from `test-builds/`. Defaults to `petstore`. |
 | `PORTAL_PORT` | Port for the dev server. Defaults to `3000`. |
 | `PORTAL_REPO` | Use a portal clone you already have instead of `.portal/`. |
 | `PORTAL_REF` | Set up a portal ref other than the pinned one, without editing `config/portal-source.json`. |
@@ -115,7 +115,7 @@ because the portal's own scripts are mirrored here:
 
 ```bash
 # Terminal 1 — generate, prerender, then serve on :3000
-pnpm generate-docs -- --customer-build ./test-builds/slack
+pnpm generate-docs -- --customer-build ./test-builds/petstore
 pnpm build
 pnpm start
 
@@ -138,7 +138,7 @@ in `config/portals.ts` yet. Omit it and it uses `PORTAL` from `.env`.
 Testing a different build — copy it into `test-builds/` first, then:
 
 ```bash
-$env:PORTAL="petstore"; pnpm test:visual   # after adding petstore to config/portals.ts
+$env:PORTAL="maxio1"; pnpm test:visual   # after adding maxio1 to config/portals.ts
 ```
 
 See [`test-builds/README.md`](./test-builds/README.md) for adding and refreshing
@@ -207,7 +207,7 @@ utils/visual.ts            snapshot stability helpers (settle, snapshotOptions)
 pages/                     page objects — all locators live here, never in tests
   BasePage.ts
   DocsPage.ts              one class covers every portal page (same chrome everywhere)
-tests/visual/slack/        visual specs for the Slack build
+tests/visual/petstore/     visual specs for the petstore build
 tests/functional/          empty for now — functional suite goes here
 scripts/setup-portal.mts   clone the pinned portal app into .portal/
 scripts/serve-portal.mts   generate + serve a portal out of it

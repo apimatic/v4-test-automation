@@ -32,7 +32,7 @@ export const MAX_DIFF_PIXEL_RATIO = 0.03;
  * Regions that change between runs for reasons unrelated to the portal's looks.
  * Playwright paints a solid box over each one instead of comparing it.
  *
- * Empty for now — the slack portal's chrome renders deterministically. Add a
+ * Empty for now — the petstore portal's chrome renders deterministically. Add a
  * selector here the moment a snapshot starts failing on churn rather than a
  * real change, and say in a comment what churns.
  */

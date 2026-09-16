@@ -29,7 +29,7 @@ export function managedPortalDir(): string {
 }
 
 export function portalName(): string {
-  return process.env.PORTAL?.trim() || "slack";
+  return process.env.PORTAL?.trim() || "petstore";
 }
 
 export function portalConfig(): PortalConfig {
