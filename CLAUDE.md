@@ -30,7 +30,7 @@ utils/env.ts         → reads .env; resolves portal repo / build / baseURL
 utils/visual.ts      → snapshot stability helpers
 pages/               → Page Object classes (locators + actions)
 tests/visual/<build>/ → visual specs, one folder per portal build
-tests/functional/    → functional specs (empty for now)
+tests/functional/<build>/ → functional specs, one folder per portal build
 scripts/             → setup-portal.mts (clone the pinned portal app)
                        serve-portal.mts (generate + dev inside it)
 .portal/             → the portal app, gitignored, managed by setup:portal
@@ -81,6 +81,26 @@ responsive variants of the same control with all but one hidden. **Verify a
 locator against the running portal before committing a test that depends on it** —
 `page.getByRole(...)` skips elements that aren't in the accessibility tree, so a
 control you can see in the DOM may resolve to zero matches.
+
+### Visual or functional?
+- **Visual** for anything whose value is how it looks: layout, theming, a
+  rendered table, a populated overlay, a responsive breakpoint
+- **Functional** for anything whose value is what it does: navigation
+  destinations, search actually matching, a language tab changing the sample,
+  state surviving a reload, an HTTP route still serving
+- A screenshot of a link proves it rendered, never that it goes anywhere. When
+  both matter, write both — they share page objects and the route registry
+
+### Functional tests (`tests/functional/`)
+- Same page-object rule as the visual suite: no raw locators in test files
+- Assert the destination, not merely that something happened
+  (`expect(heading).toHaveText("ApiResponse")`, not just a URL change)
+- Use the `request` fixture for the machine-facing routes (`llms.txt`,
+  `/api/search`, `/static/**`) — no browser needed, and they're the parts that
+  rot silently because nothing on screen changes when they break
+- Wait on the app's own signal, never a fixed delay. Where a page satisfies the
+  ready check both before and after a navigation, wait for the URL to change
+  first — otherwise the assertion reads the old page
 
 ## When Writing New Tests
 1. Add the route to `config/portals.ts` if it isn't there

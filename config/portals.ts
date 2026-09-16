@@ -53,11 +53,12 @@ export const portals = {
       modelObject: "/docs/more/models/pet",
       modelEnum: "/docs/more/models/petstatus",
 
-      // Section landing page. It's EMPTY on purpose: the build asks for
-      // `from: callbacks` and `from: webhooks`, which this portal version
-      // doesn't implement, so the section generates with no pages. Worth a
-      // snapshot precisely because an empty section is easy to regress.
-      events: "/docs/events",
+      // No `events` route on purpose. The build asks for `from: callbacks` and
+      // `from: webhooks`, which this portal version doesn't implement (generation
+      // warns "unknown generate directive"), so the section is generated with no
+      // pages: /docs/events 404s and it appears nowhere in the navigation. If
+      // those directives ever start working, add the route here and the
+      // registry check in tests/functional will start covering it.
     },
   },
 } satisfies Record<string, PortalConfig>;

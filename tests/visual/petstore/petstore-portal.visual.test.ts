@@ -137,6 +137,51 @@ test.describe("Petstore portal — visual @petstore", () => {
     await expect(page).toHaveScreenshot("model-pet-sidebar-collapsed.png", snapshotOptions(page));
   });
 
+  test("Table of contents", async ({ page }) => {
+    const docs = new DocsPage(page);
+    await docs.open(routes.modelObject);
+
+    // Element-scoped: the ToC is built from the page's headings, so it breaks
+    // independently of how the article body renders.
+    await expect(docs.toc).toBeVisible();
+    await expect(docs.toc).toHaveScreenshot("toc-model-pet.png", {
+      maxDiffPixelRatio: 0.03,
+      animations: "disabled",
+    });
+  });
+
+  test("Endpoint code sample — Python selected", async ({ page }) => {
+    const docs = new DocsPage(page);
+    await docs.open(routes.endpoint);
+    await docs.selectCodeLanguage("Python");
+
+    // The build ships 7 language tabs; this covers the non-default render path
+    // and proves the selection survives into the pixels.
+    expect(await docs.selectedCodeLanguage()).toBe("Python");
+    await expect(page).toHaveScreenshot("endpoint-code-python.png", snapshotOptions(page));
+  });
+
+  test("Search overlay with results", async ({ page }) => {
+    const docs = new DocsPage(page);
+    await docs.open(routes.quickstart);
+    await docs.searchFor("Pet");
+
+    // An empty overlay is already covered below — this is the populated state,
+    // including the result rows and the Ask AI row beneath them.
+    expect(await docs.searchResultsMatching("Pet").count()).toBeGreaterThan(1);
+    await expect(page).toHaveScreenshot("search-results.png", snapshotOptions(page));
+  });
+
+  test("Mobile viewport", async ({ page }) => {
+    const docs = new DocsPage(page);
+    // The header swaps to its icon-only variants below `md` and the sidebar
+    // collapses behind a trigger — a different layout, not just a narrower one.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await docs.open(routes.modelObject);
+
+    await expect(page).toHaveScreenshot("model-pet-mobile.png", snapshotOptions(page));
+  });
+
   test("Search overlay", async ({ page }) => {
     const docs = new DocsPage(page);
     await docs.open(routes.quickstart);

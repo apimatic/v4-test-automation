@@ -5,7 +5,8 @@ name: dxV2 Visual Regression
 #
 #   1. pnpm generate-docs -- --customer-build ./test-builds/<build>
 #   2. pnpm build                   (next build — prerenders every page)
-#   3. pnpm test:visual             (Playwright starts `next start` and tests it)
+#   3. pnpm test                    (Playwright starts `next start`, then runs the
+#                                    visual and functional suites against it)
 #
 # Stage 2 prerenders rather than relying on `next dev`, which compiles routes on
 # demand — the first hit on the SSG route is slow and variable, which is no basis
@@ -121,10 +122,14 @@ jobs:
       # way was already gone by the time the tests ran — it logged "Ready in
       # 169ms" and then every request was refused. Playwright keeps it as a child
       # of the test run, waits for it properly, and cleans up after.
-      - name: Run visual tests
+      # Both projects, against one server: the visual suite compares pixels, the
+      # functional suite checks the behaviour pixels can't judge — navigation,
+      # search, code-sample language switching, and the llms.*/search/static
+      # endpoints.
+      - name: Run visual and functional tests
         env:
           PORTAL_PREBUILT: '1'
-        run: pnpm test:visual
+        run: pnpm test
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}

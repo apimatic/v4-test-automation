@@ -45,9 +45,13 @@ export function dynamicRegions(_page: Page): Locator[] {
  * web fonts, and React committing the highlighted code blocks.
  */
 export async function settle(page: Page): Promise<void> {
-  await page.waitForLoadState("networkidle").catch(() => {
-    // networkidle never arrives if something long-polls; the waits below are
-    // the ones that actually decide whether the pixels have settled.
+  // Bounded on purpose. networkidle sometimes never arrives — this build pulls
+  // Inter and Courier Prime from Google Fonts, and after a reload the wait ran
+  // the full default 30s before being swallowed, turning a 2s test into a 31s
+  // one. The font and paint waits below are what actually decide whether the
+  // pixels have settled, so a short cap costs nothing.
+  await page.waitForLoadState("networkidle", { timeout: 5_000 }).catch(() => {
+    // Expected when something keeps a connection open; not a failure.
   });
   await page.evaluate(async () => {
     await document.fonts.ready;

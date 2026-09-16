@@ -3,7 +3,9 @@
 Visual and functional test automation for **dx-portal V2** — the docs portal built
 by [apimatic/apimatic-dx-portal-v2](https://github.com/apimatic/apimatic-dx-portal-v2).
 
-The visual suite is up and running; the functional suite comes next.
+Two suites, both running: a visual suite that compares screenshots against
+committed baselines, and a functional suite that checks the behaviour pixels
+can't judge.
 
 ## How this works
 
@@ -100,10 +102,25 @@ This is also how the portal repo tests a pull request against its own code — s
 ## Running the tests
 
 ```bash
-pnpm test:visual              # generate the portal, serve it, compare against baselines
+pnpm test                     # both suites
+pnpm test:visual              # screenshots only
+pnpm test:functional          # behaviour only
 pnpm test:visual:update       # accept the current rendering as the new baselines
 pnpm report                   # open the HTML report
 ```
+
+**What each suite is for.** The visual suite proves the portal *looks* right; the
+functional suite proves it *works*. A sidebar link that renders perfectly and
+404s passes every screenshot, and a search box that matches nothing still draws a
+beautifully stable overlay — those are the regressions the functional tests
+catch. They share the page objects and the route registry, so neither duplicates
+the other's setup.
+
+| Functional file | Covers |
+|---|---|
+| `navigation.test.ts` | footer prev/next, sidebar links, `/` and `/docs` redirects |
+| `portal-features.test.ts` | search → result → navigate, code-sample language switching across every advertised platform, copy-page to clipboard, theme persistence across reload, the request builder |
+| `content-endpoints.test.ts` | `llms.txt`, `llms-full.txt`, `llms.mdx`, the search API, static assets, and a guard that every route in the registry still serves |
 
 From a clean slate that's about 60s end to end: ~2s to generate, ~30s to build,
 ~4s to start, ~25s of tests.
@@ -208,7 +225,7 @@ pages/                     page objects — all locators live here, never in tes
   BasePage.ts
   DocsPage.ts              one class covers every portal page (same chrome everywhere)
 tests/visual/petstore/     visual specs for the petstore build
-tests/functional/          empty for now — functional suite goes here
+tests/functional/petstore/ functional specs — navigation, features, endpoints
 scripts/setup-portal.mts   clone the pinned portal app into .portal/
 scripts/serve-portal.mts   generate + serve a portal out of it
 .portal/                   the portal app (gitignored — setup:portal manages it)
@@ -295,7 +312,6 @@ a deliberate visual change should be reviewed, not absorbed silently.
 
 ## Still to do
 
-- Functional suite under `tests/functional/`.
 - More portal builds — there are ~18 upstream under
   `apps/docs/test-specs/customer-build/`; vendor the ones worth testing into
   `test-builds/`.

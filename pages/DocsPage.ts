@@ -59,6 +59,23 @@ export class DocsPage extends BasePage {
    * is a strict-mode violation there.
    */
   readonly pageHeading: Locator;
+  /** The "On this page" table of contents. Absent on pages with no headings. */
+  readonly toc: Locator;
+  /** Copies the page as markdown. Sits beside the page title. */
+  readonly copyPageButton: Locator;
+  /** Previous / Next links at the foot of the article. */
+  readonly footerPrevious: Locator;
+  readonly footerNext: Locator;
+  /** Language tabs over an endpoint's code sample (cURL, Python, Go, …). */
+  readonly codeSampleTabs: Locator;
+  /** The code sample itself — whichever language tab is selected. */
+  readonly codeSample: Locator;
+  /**
+   * Rows in the search overlay. They're buttons, not links, and they sit among
+   * other buttons — the ESC hint, the category pills, and the Ask AI row — so
+   * prefer `searchResultsMatching()` when you mean "results for this query".
+   */
+  readonly searchResults: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -74,6 +91,75 @@ export class DocsPage extends BasePage {
     this.searchDialog = page.locator("#fd-search-dialog-content");
     this.searchInput = this.searchDialog.getByPlaceholder("Search");
     this.pageHeading = this.pageContent.locator("h1.portal-page-title");
+    this.toc = page.locator("#nd-toc");
+    this.copyPageButton = this.pageContent.getByRole("button", { name: /Copy page/i }).first();
+    this.footerPrevious = this.pageContent.locator("a[href]").filter({ hasText: "Previous" });
+    this.footerNext = this.pageContent.locator("a[href]").filter({ hasText: "Next" });
+    this.codeSampleTabs = this.pageContent.getByRole("tablist");
+    this.codeSample = this.pageContent.locator("pre").first();
+    this.searchResults = this.searchDialog.getByRole("button");
+  }
+
+  /**
+   * Switch the endpoint code sample to a language and wait for the sample to
+   * actually change — the tab going `aria-selected` fires before the new
+   * snippet renders, so asserting on the tab alone would pass on stale code.
+   */
+  async selectCodeLanguage(language: string): Promise<void> {
+    const before = await this.codeSample.textContent();
+    await this.pageContent.getByRole("tab", { name: language, exact: true }).click();
+    await expect.poll(() => this.codeSample.textContent(), { timeout: 15_000 }).not.toBe(before);
+    await settle(this.page);
+  }
+
+  /** Which code-sample language is currently selected. */
+  async selectedCodeLanguage(): Promise<string> {
+    return (
+      (await this.pageContent.locator('[role="tab"][aria-selected="true"]').first().textContent())
+        ?.trim() ?? ""
+    );
+  }
+
+  /**
+   * Result rows matching `text`.
+   *
+   * The Ask AI row echoes the query back ("Ask about “PetStatus”"), so a
+   * plain `hasText` filter matches it too — and since the list re-renders while
+   * results stream in, `.first()` on that filter can land on Ask AI and open the
+   * assistant instead of navigating. Excluding it by its label is what makes
+   * this deterministic.
+   */
+  searchResultsMatching(text: string): Locator {
+    return this.searchDialog
+      .getByRole("button")
+      .filter({ hasText: text })
+      .filter({ hasNotText: "Ask AI" });
+  }
+
+  /** Type a query into the search overlay and wait for real results to arrive. */
+  async searchFor(query: string): Promise<void> {
+    await this.openSearch();
+    await this.searchInput.fill(query);
+    // Wait for an actual result row rather than a fixed delay — and not merely
+    // for any button, or we'd race the Ask AI row that renders immediately.
+    await this.searchResultsMatching(query)
+      .first()
+      .waitFor({ state: "visible", timeout: 30_000 });
+    await settle(this.page);
+  }
+
+  /**
+   * Open the first search row whose label contains `text`.
+   *
+   * Waits for the URL to actually change before settling: the page we came from
+   * satisfies `waitUntilReady()` just as well as the one we're going to, so
+   * without this the caller can read the old URL and think navigation failed.
+   */
+  async openSearchResult(text: string): Promise<void> {
+    const from = this.page.url();
+    await this.searchResultsMatching(text).first().click();
+    await expect.poll(() => this.page.url(), { timeout: 30_000 }).not.toBe(from);
+    await this.waitUntilReady();
   }
 
   /**
