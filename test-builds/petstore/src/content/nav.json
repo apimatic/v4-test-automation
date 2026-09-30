@@ -1,0 +1,12 @@
+{
+  "pages": [
+    "index",
+    "components",
+    "guides",
+    "gfm",
+    "apimatic:sdks",
+    "apimatic:plugin",
+    "apimatic:api",
+    "..."
+  ]
+}

@@ -1,0 +1,86 @@
+---
+title: Code blocks
+description: "Long lines, many languages and long output"
+---
+
+## One block per language
+
+```ts
+import { SwaggerPetstoreOpenApi30Client, ApiError } from "@acme/petstore-sdk";
+
+const client = new SwaggerPetstoreOpenApi30Client({ apiKey: process.env.PETSTORE_API_KEY });
+
+export async function listAvailablePets(limit = 100): Promise<Pet[]> {
+  try {
+    const { result } = await client.petController.findPetsByStatus({ status: "available", limit });
+    return result;
+  } catch (error) {
+    if (error instanceof ApiError && error.statusCode === 429) {
+      const retryAfterSeconds = Number(error.headers["retry-after"] ?? 1);
+      await new Promise((resolve) => setTimeout(resolve, retryAfterSeconds * 1000));
+      return listAvailablePets(limit);
+    }
+    throw error;
+  }
+}
+```
+
+```python
+import os
+from petstore_sdk import SwaggerPetstoreOpenApi30Client, ApiException
+
+client = SwaggerPetstoreOpenApi30Client(api_key=os.environ["PETSTORE_API_KEY"])
+
+def list_available_pets(limit: int = 100):
+    try:
+        return client.pet.find_pets_by_status(status="available", limit=limit)
+    except ApiException as exc:
+        if exc.status_code == 429:
+            raise RuntimeError("rate limited; let the SDK retry policy handle this") from exc
+        raise
+```
+
+```csharp
+using Acme.Petstore.Sdk;
+
+var client = new SwaggerPetstoreOpenApi30Client(
+    apiKey: Environment.GetEnvironmentVariable("PETSTORE_API_KEY"));
+
+var pets = await client.PetController.FindPetsByStatusAsync(status: "available", limit: 100);
+```
+
+## A line far wider than the page
+
+```bash
+curl -X GET "https://api.petstore.example.com/v3/pet/findByStatus?status=available&limit=100&offset=0&sort=name&order=ascending&include=category,tags,photoUrls" -H "api_key: $PETSTORE_API_KEY" -H "Accept: application/json" --compressed --retry 3 --retry-delay 2 --max-time 30
+```
+
+## A block with no language
+
+```
+GET /v3/pet/findByStatus?status=available HTTP/1.1
+Host: api.petstore.example.com
+api_key: ****************************
+Accept: application/json
+```
+
+## A long response body
+
+```json
+{
+  "pets": [
+    { "id": 1, "name": "Kitty", "status": "available", "category": { "id": 1, "name": "Cats" }, "tags": [{ "id": 1, "name": "indoor" }] },
+    { "id": 2, "name": "Rex", "status": "pending", "category": { "id": 2, "name": "Dogs" }, "tags": [{ "id": 2, "name": "large" }, { "id": 3, "name": "trained" }] },
+    { "id": 3, "name": "Whiskers", "status": "sold", "category": { "id": 1, "name": "Cats" }, "tags": [] }
+  ],
+  "nextCursor": "eyJvZmZzZXQiOjEwMCwibGltaXQiOjEwMH0",
+  "total": 1284
+}
+```
+
+## Inline code of unusual length
+
+A parameter named `includeCategoryAndTagsAndPhotoUrlsInTheResponsePayload` inside a sentence,
+followed by a bare URL that cannot break: https://api.petstore.example.com/v3/pet/findByStatus?status=available&limit=100&offset=0&sort=name&order=ascending&include=category,tags,photoUrls
+
+Errors carry a machine-readable `code` alongside the human-readable `message`. Match on `code` in your own error handling: the `message` is written for a developer reading a log and may be reworded between releases, while `code` is part of the contract and changes only with a major version bump.

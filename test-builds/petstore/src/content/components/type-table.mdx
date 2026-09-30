@@ -1,0 +1,38 @@
+---
+title: Type Table
+description: "A parameter reference with types and defaults"
+---
+
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+## ClientOptions
+
+<TypeTable
+  type={{
+    apiKey: {
+      description: 'The API key sent as the api_key header on every request.',
+      type: 'string',
+      default: 'undefined',
+    },
+    timeout: {
+      description: 'Per-attempt timeout in milliseconds. Applies to each retry, not to the call as a whole.',
+      type: 'number',
+      default: '30000',
+    },
+    maxRetries: {
+      description: 'How many times a failed request is retried before the error is thrown.',
+      type: 'number',
+      default: '3',
+    },
+    environment: {
+      description: 'Which declared server the client talks to.',
+      type: '"production" | "staging"',
+      default: '"production"',
+    },
+    fetch: {
+      description: 'A replacement fetch implementation, used as the seam in tests.',
+      type: 'typeof fetch',
+      default: 'globalThis.fetch',
+    },
+  }}
+/>

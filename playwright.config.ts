@@ -5,11 +5,17 @@ import { baseURL, portalPort, usingExternalPortal } from "./utils/env.ts";
 dotenv.config({ quiet: true });
 
 /**
- * dxV2 test automation — visual and (later) functional tests for the
- * apimatic-dx-portal-v2 docs portal.
+ * v4 test automation — three suites over a portal produced by
+ * `apimatic portal generate`.
  *
- * The portal under test is generated and served out of a local clone of
- * apimatic/apimatic-dx-portal-v2; see .env.example and scripts/serve-portal.mts.
+ *   artifacts   what the CLI PRODUCED vs what src/apimatic.json DECLARED.
+ *               Filesystem only, no browser, no server.
+ *   visual      how the served portal LOOKS, against committed baselines.
+ *   functional  what the served portal DOES — navigation, search, downloads.
+ *
+ * The split matters: artifacts catch a portal built wrong (an SDK missing, a
+ * version that didn't take), visual catches one that renders wrong, functional
+ * catches one that renders fine and behaves wrong. None substitutes for another.
  *
  * https://playwright.dev/docs/test-configuration
  */
@@ -20,24 +26,21 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
 
   /**
-   * No retries, anywhere. A visual test that only passes on a second attempt is
-   * telling you the snapshot is unstable, and a retry hides exactly the signal
-   * this suite exists to surface. The portal is served from a prerendered build,
-   * so there's no cold-compile flakiness left to paper over either.
+   * No retries, anywhere. A test that only passes on a second attempt is
+   * telling you it's unstable, and retrying hides the signal these suites
+   * exist to surface.
    */
   retries: 0,
 
-  /* Visual tests share one dev server; running them serially keeps the
-     screenshots stable and avoids compile-storming the server. */
+  /* The browser suites share one server; serially keeps snapshots stable. */
   workers: 1,
 
   reporter: process.env.CI ? [["html"], ["github"]] : "html",
 
-  /* Baselines live in the repo, grouped by project and by portal (the test's
-     own folder), e.g. dxv2-portal-snapshots/dxv2-visual/petstore/quickstart-light.png */
-  snapshotPathTemplate: "dxv2-portal-snapshots/{projectName}/{testFileDir}/{arg}{ext}",
+  /* Baselines live in the repo, grouped by project and by build (the test's own
+     folder), e.g. portal-snapshots/visual/petstore/home-light.png */
+  snapshotPathTemplate: "portal-snapshots/{projectName}/{testFileDir}/{arg}{ext}",
 
-  /* The dev server compiles routes on demand, so first hits are slow. */
   timeout: 120_000,
   expect: { timeout: 30_000 },
 
@@ -48,7 +51,16 @@ export default defineConfig({
 
   projects: [
     {
-      name: "dxv2-visual",
+      /**
+       * Reads the generated bundle off disk. It needs the portal generated but
+       * not served — it runs happily before the web server is up, and doesn't
+       * launch a browser at all.
+       */
+      name: "artifacts",
+      testDir: "./tests/artifacts",
+    },
+    {
+      name: "visual",
       testDir: "./tests/visual",
       use: {
         ...devices["Desktop Chrome"],
@@ -58,37 +70,38 @@ export default defineConfig({
       },
     },
     {
-      /* Placeholder for the functional suite — tests/functional/ is empty for now. */
-      name: "dxv2-functional",
+      name: "functional",
       testDir: "./tests/functional",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        /* Same viewport as the visual project. Desktop Chrome's default 1280
+           pushes the theme control off-canvas, so a behaviour test would fail
+           on layout rather than on behaviour. */
+        viewport: { width: 1920, height: 1080 },
+      },
     },
   ],
 
   /**
-   * Generate, build and serve the portal, unless PORTAL_BASE_URL points at
-   * something already up.
+   * Generate the portal and serve it, unless PORTAL_BASE_URL points at one
+   * that's already hosted.
    *
-   * Playwright owns the server process on purpose. Starting it in its own CI
-   * step and polling for it does not work: the Windows runner tears down a
-   * step's process tree when the step ends, so the server was gone before the
-   * tests ran — it reported "Ready", then every request was refused. Playwright
-   * keeps the server as a child of the test run and shuts it down afterwards.
+   * Playwright owns the server process on purpose: a server started in its own
+   * CI step doesn't survive, because the Windows runner tears down a step's
+   * process tree when the step ends.
    *
-   * PORTAL_PREBUILT is for CI, where generate and build are their own steps (so
-   * their logs and timings stand alone); this then only has to serve.
+   * PORTAL_PREBUILT is for CI, where generation is its own step so its log and
+   * timing stand alone; this then only has to serve.
    */
   webServer: usingExternalPortal()
     ? undefined
     : {
         command: process.env.PORTAL_PREBUILT
-          ? "node scripts/serve-portal.mts --no-generate --no-build"
+          ? "node scripts/serve-portal.mts --no-generate"
           : "node scripts/serve-portal.mts",
-        /* 127.0.0.1 to match --hostname 0.0.0.0; `localhost` can be ::1-only. */
-        url: `http://127.0.0.1:${portalPort()}/docs/getting-started/quickstart`,
-        /* Generate + next build + server start, from cold. */
-        timeout: 600_000,
-        /* Locally, reuse a portal you already have running. */
+        url: `http://127.0.0.1:${portalPort()}/`,
+        /* CLI generation plus http-server coming up, from cold. */
+        timeout: 300_000,
         reuseExistingServer: !process.env.CI,
         stdout: "pipe",
         stderr: "pipe",

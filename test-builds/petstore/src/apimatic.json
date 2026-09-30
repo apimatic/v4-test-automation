@@ -1,0 +1,165 @@
+{
+  "$schema": "../apimatic.schema.json",
+  "schemaVersion": 1,
+  "portal": {
+    "site": {
+      "name": "Swagger Petstore - OpenAPI 3.0",
+      "description": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification. You can find out more about Swagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach! You can now help us improve the API whether it's by making"
+    },
+    "brand": {
+      "logo": {
+        "light": "static/images/logo-light.png",
+        "dark": "static/images/logo-dark.png"
+      },
+      "favicon": "static/images/favicon.ico",
+      "colors": {
+        "primary": {
+          "light": "#b91c1c",
+          "dark": "#34d399"
+        }
+      },
+      "colorMode": "both"
+    },
+    "navigation": {
+      "links": [
+        {
+          "label": "Developer Guides",
+          "url": "/guides"
+        },
+        {
+          "label": "SDK Downloads",
+          "url": "/sdks"
+        },
+        {
+          "label": "API Keys",
+          "url": "/guides/authentication"
+        },
+        {
+          "label": "Status Page",
+          "url": "https://status.example.com"
+        },
+        {
+          "label": "Source Code",
+          "url": "https://github.com/acme/petstore"
+        },
+        {
+          "label": "Release Notes",
+          "url": "/guides/webhooks"
+        },
+        {
+          "label": "Support Center",
+          "url": "https://support.example.com"
+        }
+      ]
+    },
+    "ai": {
+      "pageActions": true
+    }
+  },
+  "languages": {
+    "typescript": {
+      "publishing": {
+        "source": {
+          "repositoryUrl": "https://github.com/acme/petstore-typescript"
+        },
+        "package": {
+          "version": "2.4.0"
+        },
+        "packageConfiguration": {
+          "name": "@acme/petstore-sdk",
+          "description": "Client library for the Swagger Petstore API",
+          "homepage": "https://docs.example.com",
+          "keywords": [
+            "petstore",
+            "sdk",
+            "openapi"
+          ],
+          "author": {
+            "name": "Acme Engineering",
+            "email": "dev@acme.test"
+          },
+          "bugs": {
+            "url": "https://github.com/acme/petstore-typescript/issues"
+          },
+          "repository": {
+            "type": "git",
+            "url": "https://github.com/acme/petstore-typescript"
+          },
+          "contributors": [
+            {
+              "name": "Dev One",
+              "email": "one@acme.test"
+            }
+          ]
+        }
+      }
+    },
+    "python": {
+      "publishing": {
+        "source": {
+          "repositoryUrl": "https://github.com/acme/petstore-python",
+          "branch": "release/1.x"
+        },
+        "package": {
+          "version": "1.0.3"
+        },
+        "packageConfiguration": {
+          "name": "acme-petstore-sdk",
+          "description": "Client library for the Swagger Petstore API",
+          "authors": [
+            {
+              "name": "Acme Engineering",
+              "email": "dev@acme.test"
+            }
+          ],
+          "maintainers": [
+            {
+              "name": "Acme Support"
+            }
+          ],
+          "keywords": [
+            "petstore",
+            "sdk"
+          ],
+          "classifiers": [
+            "Programming Language :: Python :: 3",
+            "License :: OSI Approved :: MIT License"
+          ],
+          "urls": {
+            "Homepage": "https://docs.example.com",
+            "Source": "https://github.com/acme/petstore-python"
+          }
+        }
+      }
+    },
+    "csharp": {
+      "publishing": {
+        "source": {
+          "repositoryUrl": "https://github.com/acme/petstore-csharp",
+          "branch": "main"
+        },
+        "package": {
+          "version": "3.1.2"
+        },
+        "packageConfiguration": {
+          "packageId": "Acme.Petstore.Sdk",
+          "authors": "Acme Engineering",
+          "description": "Client library for the Swagger Petstore API",
+          "title": "Acme Petstore SDK",
+          "packageTags": "petstore sdk openapi",
+          "repositoryUrl": "https://github.com/acme/petstore-csharp",
+          "repositoryType": "git",
+          "packageProjectUrl": "https://docs.example.com",
+          "packageReleaseNotes": "Initial public release.",
+          "copyright": "(c) Acme"
+        }
+      }
+    }
+  },
+  "plugin": {
+    "pluginId": "my-api-plugin",
+    "pluginName": "My API Plugin",
+    "pluginVersion": "0.1.0",
+    "license": "MIT"
+  }
+}

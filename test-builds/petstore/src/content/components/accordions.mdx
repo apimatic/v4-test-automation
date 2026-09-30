@@ -1,0 +1,61 @@
+---
+title: Accordions
+description: "Collapsible sections holding tables and code"
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+
+## Frequently asked
+
+<Accordions type="single">
+  <Accordion title="Why am I getting 429 responses?">
+    Requests are rate limited per API key rather than per IP address. When you exceed the limit the API answers `429 Too Many Requests` and sets `Retry-After` to the number of seconds remaining in the current window. The generated SDKs read that header and back off for you, so you only need to handle it directly if you are calling the API without an SDK.
+  </Accordion>
+  <Accordion title="Which endpoints accept an idempotency key?">
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
+
+  </Accordion>
+  <Accordion title="How do I retry safely from TypeScript?">
+```ts
+import { SwaggerPetstoreOpenApi30Client, ApiError } from "@acme/petstore-sdk";
+
+const client = new SwaggerPetstoreOpenApi30Client({ apiKey: process.env.PETSTORE_API_KEY });
+
+export async function listAvailablePets(limit = 100): Promise<Pet[]> {
+  try {
+    const { result } = await client.petController.findPetsByStatus({ status: "available", limit });
+    return result;
+  } catch (error) {
+    if (error instanceof ApiError && error.statusCode === 429) {
+      const retryAfterSeconds = Number(error.headers["retry-after"] ?? 1);
+      await new Promise((resolve) => setTimeout(resolve, retryAfterSeconds * 1000));
+      return listAvailablePets(limit);
+    }
+    throw error;
+  }
+}
+```
+  </Accordion>
+  <Accordion title="What is the difference between code and message?">
+    Errors carry a machine-readable `code` alongside the human-readable `message`. Match on `code` in your own error handling: the `message` is written for a developer reading a log and may be reworded between releases, while `code` is part of the contract and changes only with a major version bump.
+  </Accordion>
+</Accordions>
+
+## Several open at once
+
+<Accordions type="multiple">
+  <Accordion title="A section that starts closed">
+    The Petstore API exposes pets, store orders and user accounts over HTTPS. Every request is authenticated, every response is JSON, and every list endpoint is paginated. This page walks through the parts of that contract you are most likely to need on your first integration, and points at the reference pages for the rest.
+  </Accordion>
+  <Accordion title="A section with a very long title that will need to wrap on a narrow viewport because it keeps going">
+    Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.
+  </Accordion>
+</Accordions>

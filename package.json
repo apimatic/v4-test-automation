@@ -1,25 +1,22 @@
 {
-  "name": "dxv2-test-automation",
+  "name": "v4-test-automation",
   "version": "1.0.0",
   "private": true,
-  "description": "Visual and functional test automation for the apimatic-dx-portal-v2 docs portal",
+  "description": "Artifact, visual and functional test automation for APIMatic v4 generated portals",
   "packageManager": "pnpm@11.1.1",
   "engines": {
     "node": ">=24.14.0"
   },
   "type": "module",
   "scripts": {
-    "setup:portal": "node scripts/setup-portal.mts",
-    "generate-docs": "node scripts/serve-portal.mts --generate-only",
-    "build": "node scripts/serve-portal.mts --no-generate --build-only",
-    "start": "node scripts/serve-portal.mts --no-generate --no-build",
-    "dev": "node scripts/serve-portal.mts --no-generate --dev",
+    "portal:generate": "node scripts/serve-portal.mts --generate-only",
     "portal:serve": "node scripts/serve-portal.mts",
     "test": "playwright test",
-    "test:visual": "playwright test --project=dxv2-visual",
-    "test:visual:headed": "playwright test --project=dxv2-visual --headed",
-    "test:visual:update": "playwright test --project=dxv2-visual --update-snapshots",
-    "test:functional": "playwright test --project=dxv2-functional",
+    "test:artifacts": "playwright test --project=artifacts",
+    "test:visual": "playwright test --project=visual",
+    "test:visual:headed": "playwright test --project=visual --headed",
+    "test:visual:update": "playwright test --project=visual --update-snapshots",
+    "test:functional": "playwright test --project=functional",
     "report": "playwright show-report",
     "types:check": "tsc --noEmit"
   },

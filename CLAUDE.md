@@ -1,40 +1,47 @@
-# dxV2 Test Automation — Project Conventions
+# v4 Test Automation — Project Conventions
 
-Visual and functional tests for dx-portal V2 (apimatic/apimatic-dx-portal-v2).
-See README.md for setup and how the portal gets built and served.
+Tests for APIMatic v4 portals — the static bundles `apimatic portal generate`
+produces. See README.md for the pipeline and how to run it.
 
 ## Tech Stack
-- **Playwright** with TypeScript, ESM (`"type": "module"` — internal imports need
-  explicit `.ts` extensions)
-- **Page Object Model (POM)**, following the conventions of the V1
-  `platform-test-automation` repo
+- **Playwright** with TypeScript, ESM (`"type": "module"` — internal imports
+  need explicit `.ts` extensions)
+- **Page Object Model (POM)**
+- **APIMatic CLI** for generation, **http-server** for serving
 - **dotenv** for local config
 
-## Self-contained by design
-This repo is the one that goes to GitHub and takes all future changes, so it
-must stand on its own: no machine-specific paths in committed config, and
-`pnpm install && pnpm setup:portal && pnpm test:visual` works on a fresh clone.
+## The three stages
+The repo is ordered by when things happen, and each stage catches what the next
+one can't:
 
-The portal app can't be a dependency — `apps/docs` is `"private": true`, no image
-is published, and `generate-docs` lives in its source. So `pnpm setup:portal`
-clones it into `.portal/` (gitignored) at the commit pinned in
-`config/portal-source.json`. **Don't reintroduce a required `PORTAL_REPO`** —
-it's an optional override for people hacking on the portal itself.
+1. **artifacts** — generated bundle vs `src/apimatic.json`. Filesystem only, no
+   browser, no server. A portal built wrong is not worth screenshotting.
+2. **visual** — how the served portal looks, against committed baselines.
+3. **functional** — what it does. Structure in place, cases still to come.
+
+Don't put a filesystem check in the browser suites, and don't screenshot
+something whose value is behavioural.
+
+## Self-contained by design
+Everything resolves inside this repo: the build fixture, the generated output,
+the baselines. There is no portal app to clone, pin, install or patch — v4 is a
+static bundle, so `apimatic portal generate` plus `http-server` is the whole
+toolchain. **Don't reintroduce a required path to anything outside the repo.**
 
 ## Project Structure
 ```
-config/portals.ts    → registry of portal builds + their routes
-config/portal-source.json → the portal app + the pinned commit
-test-builds/         → the build fixtures the portals are generated from
-utils/env.ts         → reads .env; resolves portal repo / build / baseURL
-utils/visual.ts      → snapshot stability helpers
-pages/               → Page Object classes (locators + actions)
-tests/visual/<build>/ → visual specs, one folder per portal build
-tests/functional/<build>/ → functional specs, one folder per portal build
-scripts/             → setup-portal.mts (clone the pinned portal app)
-                       serve-portal.mts (generate + dev inside it)
-.portal/             → the portal app, gitignored, managed by setup:portal
-dxv2-portal-snapshots/ → committed baselines
+config/portals.ts          → registry of builds + their named routes
+test-builds/<name>/src/    → build input: apimatic.json, content/, spec/, static/
+test-builds/<name>/portal/ → generated output, gitignored, rebuilt every run
+utils/env.ts               → build dir, generated dir, port, baseURL
+utils/artifacts.ts         → declared-vs-produced helpers, zip manifest reading
+utils/visual.ts            → snapshot stability helpers
+pages/                     → Page Object classes (locators + actions)
+tests/artifacts/<build>/   → stage 1
+tests/visual/<build>/      → stage 2
+tests/functional/          → stage 3
+scripts/serve-portal.mts   → generate + serve
+portal-snapshots/          → committed visual baselines
 ```
 
 ## Coding Conventions
@@ -43,68 +50,56 @@ dxv2-portal-snapshots/ → committed baselines
 - Every page class extends `BasePage`, which holds the `page` instance
 - **All locators are class properties** set in the constructor — never inline a
   locator in a test file
-- **All interactions are methods** on the page class (`openSearch()`,
-  `toggleColorMode()`, `collapseSidebar()`)
-- Prefer the portal's own stable ids (`#nd-portal-header`, `#nd-sidebar`,
-  `#nd-page`, `#fd-search-dialog-content`) and roles/labels. **Never key off a
-  Tailwind utility class** — those churn on every restyle
-- Verification methods return `Promise<boolean>` and `waitFor` before returning
-- Methods that wait for a UI state change should wait on the app's own signal
-  (e.g. the collapse button's label flipping to "Expand sidebar"), not a
-  `waitForTimeout`
+- **All interactions are methods** on the page class
+- Prefer the portal's own stable hooks — `#nd-subnav`, `#nd-sidebar`,
+  `#nd-page`, `#fd-search-list`, `[data-theme-toggle]` — and roles/labels.
+  **Never key off a Tailwind utility class**; those churn on every restyle
+- Note what the v4 chrome does differently: the search overlay's dialog carries
+  a generated Radix id (match it by role), search rows are
+  `button[role="option"]` rather than links, and the theme control is one
+  button holding two decorative icons — clicking the button itself does nothing
 
 ### Routes and builds (`config/portals.ts`, `test-builds/`)
-- Tests never hardcode a URL slug — they read named routes off `portalConfig()`
-- Adding a portal build = copy it into `test-builds/`, add an entry here, add a
-  folder under `tests/visual/`
-- Build fixtures are vendored on purpose, so a snapshot failure always means the
-  portal changed. **Editing a file under `test-builds/` is editing a fixture** —
-  it will move baselines. See `test-builds/README.md`
+- Tests never hardcode a URL — they read named routes off `portalConfig()`
+- Adding a build = drop it in `test-builds/`, add an entry here, add spec
+  folders under each stage you want to cover
+- Build fixtures are vendored on purpose, so a failure means the generator
+  changed, never that someone edited a build out from under us
+- A route that exists but doesn't work belongs out of the registry with a
+  comment saying why, not in it and failing
+
+### Artifact tests (`tests/artifacts/`)
+- Compare against what `apimatic.json` **declares**, never against hardcoded
+  expected values — the config is the contract, and a test that restates it
+  will pass when both drift together
+- Collect mismatches and assert once, so a run reports every problem rather
+  than stopping at the first
+- Distinguish "wrong value" from "value absent entirely" in the message; they
+  are different defects
+- Skip rather than fail when a block isn't declared at all — a build that omits
+  `packageConfiguration` is entitled to the generator's defaults
 
 ### Visual tests (`tests/visual/`)
-- One file per portal build, in a folder named after the build. The snapshot path
-  template keys off the test's folder, so baselines group themselves
-- Always go through `snapshotOptions(page)` — it sets `maxDiffPixelRatio`,
-  disables animations and hides the caret consistently
-- Pair a screenshot with at least one real assertion where you can
-  (`await expect(docs.searchDialog).toBeVisible()`). A screenshot alone can pass
-  on a page that rendered the wrong thing but rendered it stably
-- Prefer element-scoped snapshots (`expect(docs.header).toHaveScreenshot()`) for
-  chrome, so page-content changes don't fail them
+- Always go through `snapshotOptions(page)` — consistent `maxDiffPixelRatio`,
+  animations disabled, caret hidden
+- Pair a screenshot with at least one real assertion. A screenshot alone can
+  pass on a page that rendered the wrong thing but rendered it stably
+- Prefer element-scoped snapshots for chrome, so page-content changes don't
+  fail them
 - If a snapshot starts failing on churn rather than a real change, add the
   selector to `dynamicRegions()` in `utils/visual.ts` **with a comment saying
-  what churns** — don't widen `maxDiffPixelRatio`
+  what churns** — don't widen the tolerance
 
 ### Before adding a locator
-The portal has no `data-testid` attributes, and its header renders several
-responsive variants of the same control with all but one hidden. **Verify a
-locator against the running portal before committing a test that depends on it** —
-`page.getByRole(...)` skips elements that aren't in the accessibility tree, so a
-control you can see in the DOM may resolve to zero matches.
-
-### Visual or functional?
-- **Visual** for anything whose value is how it looks: layout, theming, a
-  rendered table, a populated overlay, a responsive breakpoint
-- **Functional** for anything whose value is what it does: navigation
-  destinations, search actually matching, a language tab changing the sample,
-  state surviving a reload, an HTTP route still serving
-- A screenshot of a link proves it rendered, never that it goes anywhere. When
-  both matter, write both — they share page objects and the route registry
-
-### Functional tests (`tests/functional/`)
-- Same page-object rule as the visual suite: no raw locators in test files
-- Assert the destination, not merely that something happened
-  (`expect(heading).toHaveText("ApiResponse")`, not just a URL change)
-- Use the `request` fixture for the machine-facing routes (`llms.txt`,
-  `/api/search`, `/static/**`) — no browser needed, and they're the parts that
-  rot silently because nothing on screen changes when they break
-- Wait on the app's own signal, never a fixed delay. Where a page satisfies the
-  ready check both before and after a navigation, wait for the URL to change
-  first — otherwise the assertion reads the old page
+The portal has no `data-testid` attributes and renders responsive variants of
+the same control with all but one hidden. **Verify a locator against the
+running portal before committing a test that depends on it** — `getByRole` skips
+elements that aren't in the accessibility tree, so a control you can see in the
+DOM may resolve to zero matches.
 
 ## When Writing New Tests
 1. Add the route to `config/portals.ts` if it isn't there
-2. Add any new locators and actions to `pages/DocsPage.ts`
+2. Add any new locators and actions to the page object
 3. Write the test using only page class methods and named routes
-4. Run it, look at the resulting PNG, and confirm it shows what you meant
-5. Run it a second time to confirm it's stable before committing the baseline
+4. Run it and confirm it shows what you meant
+5. Run it a second time to confirm it's stable before committing a baseline

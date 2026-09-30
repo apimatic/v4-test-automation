@@ -10,12 +10,10 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 
-# Portal app, cloned by `pnpm setup:portal`
-.portal/
+# Generated portal output — `apimatic portal generate` writes it, and it is
+# rebuilt from test-builds/<name>/src on every run. Never commit it.
+test-builds/*/portal/
 
-# CI portal server logs
-portal-server.log
-portal-server.err.log
 
 # Scratch probe scripts used while verifying locators
 probe.tmp.*

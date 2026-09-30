@@ -1,0 +1,63 @@
+---
+title: Twoslash
+description: "Twoslash code blocks, which need the fumadocs-twoslash transformer"
+---
+
+Twoslash needs `fumadocs-twoslash` and a Shiki transformer wired into `mdxOptions`. This page
+uses twoslash syntax with none of that in place, to see whether the markers render as hover
+type information or leak into the page as literal comments.
+
+## The full example
+
+````ts twoslash lineNumbers
+type Player = {
+  /**
+   * The player name
+   * ```php
+   * $a = "60"
+   * ```
+   *
+   * @default 'user'
+   */
+  name: string;
+};
+
+/**
+ * A custom function.
+ *
+ * @example
+ *
+ * ```ts
+ * const str = fn("hello world")
+ * console.log(str)
+ * ```
+ */
+function fn<const T extends string>(s: T): T {
+  return s;
+}
+
+// ---cut---
+// @noErrors
+console.g;
+//       ^|
+
+const player: Player = { name: 'Hello World' };
+//    ^?
+
+fn('test');
+````
+
+## A minimal twoslash block
+
+```ts twoslash
+const greeting = "hello";
+//    ^?
+```
+
+## The same code with no twoslash flag
+
+```ts
+const greeting = "hello";
+```
+
+Anything below this line should still render, whichever way the blocks above resolve.

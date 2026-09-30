@@ -1,0 +1,77 @@
+---
+title: Callouts
+description: "Every callout type, including callouts that hold other content"
+---
+
+Callouts come from the default component set, so they need no import.
+
+## The four types
+
+<Callout type="info">
+  An informational callout. Use it for context a reader can skip.
+</Callout>
+
+<Callout type="warn" title="Rate limits apply">
+  A warning callout with an explicit title. Use it for something that will bite later.
+</Callout>
+
+<Callout type="error" title="Breaking change in v3.3">
+  An error callout. `GET /user/login` is removed in v3.3. Move to `POST /auth/token` before upgrading.
+</Callout>
+
+<Callout>
+  A callout with no type at all, which should fall back to the default styling.
+</Callout>
+
+## A callout holding real content
+
+<Callout type="warn" title="Read this before enabling retries">
+  Retrying a non-idempotent request can create duplicate orders. Before you turn on
+  automatic retries, check that every endpoint you call accepts an idempotency key:
+
+  | Endpoint | Idempotent | Key header |
+  | --- | --- | --- |
+  | `POST /pet` | Yes | `Idempotency-Key` |
+  | `POST /store/order` | Yes | `Idempotency-Key` |
+  | `DELETE /pet/petId` | No | not accepted |
+
+  The SDKs send the header for you when you pass `idempotencyKey` to the call.
+</Callout>
+
+<Callout type="info" title="Example">
+  The TypeScript SDK reads `Retry-After` and backs off without any configuration:
+
+```ts
+import { SwaggerPetstoreOpenApi30Client, ApiError } from "@acme/petstore-sdk";
+
+const client = new SwaggerPetstoreOpenApi30Client({ apiKey: process.env.PETSTORE_API_KEY });
+
+export async function listAvailablePets(limit = 100): Promise<Pet[]> {
+  try {
+    const { result } = await client.petController.findPetsByStatus({ status: "available", limit });
+    return result;
+  } catch (error) {
+    if (error instanceof ApiError && error.statusCode === 429) {
+      const retryAfterSeconds = Number(error.headers["retry-after"] ?? 1);
+      await new Promise((resolve) => setTimeout(resolve, retryAfterSeconds * 1000));
+      return listAvailablePets(limit);
+    }
+    throw error;
+  }
+}
+```
+
+  Set `maxRetries: 0` in `ClientOptions` if you would rather handle it yourself.
+</Callout>
+
+Errors carry a machine-readable `code` alongside the human-readable `message`. Match on `code` in your own error handling: the `message` is written for a developer reading a log and may be reworded between releases, while `code` is part of the contract and changes only with a major version bump.
+
+## Callouts in sequence
+
+<Callout type="info">First of three consecutive callouts, to check vertical rhythm.</Callout>
+
+<Callout type="warn">Second of three.</Callout>
+
+<Callout type="error">Third of three.</Callout>
+
+Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.

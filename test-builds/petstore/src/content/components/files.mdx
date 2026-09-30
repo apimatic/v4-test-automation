@@ -1,0 +1,41 @@
+---
+title: Files
+description: "A project tree rendered as nested folders"
+---
+
+import { File, Files, Folder } from 'fumadocs-ui/components/files';
+
+## What the CLI writes
+
+<Files>
+  <Folder name="src" defaultOpen>
+    <File name="apimatic.json" />
+    <Folder name="spec">
+      <File name="petstore.json" />
+    </Folder>
+    <Folder name="content" defaultOpen>
+      <File name="index.md" />
+      <File name="nav.json" />
+      <Folder name="guides">
+        <File name="index.md" />
+        <File name="authentication.md" />
+        <Folder name="webhooks">
+          <File name="index.md" />
+          <File name="delivery.md" />
+        </Folder>
+      </Folder>
+    </Folder>
+    <Folder name="static">
+      <File name="logo.png" />
+    </Folder>
+  </Folder>
+  <Folder name="portal">
+    <File name="index.html" />
+    <File name="llms.txt" />
+  </Folder>
+  <Folder name="sdk">
+    <File name="typescript.zip" />
+    <File name="python.zip" />
+    <File name="csharp.zip" />
+  </Folder>
+</Files>

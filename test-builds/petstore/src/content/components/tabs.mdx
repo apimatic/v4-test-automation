@@ -1,0 +1,102 @@
+---
+title: Tabs
+description: "Tab groups, including one with more tabs than fit on a phone"
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+Tabs are not in the default component set, so this page imports them.
+
+## Three tabs, one per language
+
+<Tabs items={['TypeScript', 'Python', 'C#']}>
+  <Tab value="TypeScript">
+```ts
+import { SwaggerPetstoreOpenApi30Client, ApiError } from "@acme/petstore-sdk";
+
+const client = new SwaggerPetstoreOpenApi30Client({ apiKey: process.env.PETSTORE_API_KEY });
+
+export async function listAvailablePets(limit = 100): Promise<Pet[]> {
+  try {
+    const { result } = await client.petController.findPetsByStatus({ status: "available", limit });
+    return result;
+  } catch (error) {
+    if (error instanceof ApiError && error.statusCode === 429) {
+      const retryAfterSeconds = Number(error.headers["retry-after"] ?? 1);
+      await new Promise((resolve) => setTimeout(resolve, retryAfterSeconds * 1000));
+      return listAvailablePets(limit);
+    }
+    throw error;
+  }
+}
+```
+  </Tab>
+  <Tab value="Python">
+```python
+import os
+from petstore_sdk import SwaggerPetstoreOpenApi30Client, ApiException
+
+client = SwaggerPetstoreOpenApi30Client(api_key=os.environ["PETSTORE_API_KEY"])
+
+def list_available_pets(limit: int = 100):
+    try:
+        return client.pet.find_pets_by_status(status="available", limit=limit)
+    except ApiException as exc:
+        if exc.status_code == 429:
+            raise RuntimeError("rate limited; let the SDK retry policy handle this") from exc
+        raise
+```
+  </Tab>
+  <Tab value="C#">
+```csharp
+using Acme.Petstore.Sdk;
+
+var client = new SwaggerPetstoreOpenApi30Client(
+    apiKey: Environment.GetEnvironmentVariable("PETSTORE_API_KEY"));
+
+var pets = await client.PetController.FindPetsByStatusAsync(status: "available", limit: 100);
+```
+  </Tab>
+</Tabs>
+
+Requests are rate limited per API key rather than per IP address. When you exceed the limit the API answers `429 Too Many Requests` and sets `Retry-After` to the number of seconds remaining in the current window. The generated SDKs read that header and back off for you, so you only need to handle it directly if you are calling the API without an SDK.
+
+## Tabs holding prose and tables
+
+<Tabs items={['Overview', 'Limits', 'Errors']}>
+  <Tab value="Overview">
+    The Petstore API exposes pets, store orders and user accounts over HTTPS. Every request is authenticated, every response is JSON, and every list endpoint is paginated. This page walks through the parts of that contract you are most likely to need on your first integration, and points at the reference pages for the rest.
+  </Tab>
+  <Tab value="Limits">
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
+
+  </Tab>
+  <Tab value="Errors">
+    Errors carry a machine-readable `code` alongside the human-readable `message`. Match on `code` in your own error handling: the `message` is written for a developer reading a log and may be reworded between releases, while `code` is part of the contract and changes only with a major version bump.
+  </Tab>
+</Tabs>
+
+## More tabs than fit on a narrow screen
+
+<Tabs items={['TypeScript', 'Python', 'C#', 'Java', 'PHP', 'Ruby', 'Go', 'curl', 'HTTPie', 'PowerShell']}>
+  <Tab value="TypeScript">The tab strip should scroll or wrap rather than overflow the page.</Tab>
+  <Tab value="Python">Second tab.</Tab>
+  <Tab value="C#">Third tab.</Tab>
+  <Tab value="Java">Fourth tab.</Tab>
+  <Tab value="PHP">Fifth tab.</Tab>
+  <Tab value="Ruby">Sixth tab.</Tab>
+  <Tab value="Go">Seventh tab.</Tab>
+  <Tab value="curl">Eighth tab.</Tab>
+  <Tab value="HTTPie">Ninth tab.</Tab>
+  <Tab value="PowerShell">Tenth tab, the one most likely to be cut off.</Tab>
+</Tabs>
+
+

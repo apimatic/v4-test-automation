@@ -1,0 +1,18 @@
+{
+  "title": "Components",
+  "pages": [
+    "callouts",
+    "cards",
+    "tabs",
+    "steps",
+    "accordions",
+    "files",
+    "type-table",
+    "banner",
+    "mermaid",
+    "twoslash",
+    "code-blocks",
+    "typography",
+    "..."
+  ]
+}

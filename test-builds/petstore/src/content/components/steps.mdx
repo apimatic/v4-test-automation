@@ -1,0 +1,75 @@
+---
+title: Steps
+description: "A numbered procedure with code in each step"
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+## Integrating the SDK
+
+<Steps>
+<Step>
+### Create an API key
+
+Open the dashboard, create a key scoped to the environment you are integrating, and store it
+outside your source tree. The examples below read it from `PETSTORE_API_KEY`.
+</Step>
+
+<Step>
+### Install the package
+
+```bash
+curl -X GET "https://api.petstore.example.com/v3/pet/findByStatus?status=available&limit=100&offset=0&sort=name&order=ascending&include=category,tags,photoUrls" -H "api_key: $PETSTORE_API_KEY" -H "Accept: application/json" --compressed --retry 3 --retry-delay 2 --max-time 30
+```
+</Step>
+
+<Step>
+### Construct one client
+
+Construct the client once and reuse it. It owns a connection pool, and building one per request
+exhausts sockets under load.
+
+```ts
+import { SwaggerPetstoreOpenApi30Client, ApiError } from "@acme/petstore-sdk";
+
+const client = new SwaggerPetstoreOpenApi30Client({ apiKey: process.env.PETSTORE_API_KEY });
+
+export async function listAvailablePets(limit = 100): Promise<Pet[]> {
+  try {
+    const { result } = await client.petController.findPetsByStatus({ status: "available", limit });
+    return result;
+  } catch (error) {
+    if (error instanceof ApiError && error.statusCode === 429) {
+      const retryAfterSeconds = Number(error.headers["retry-after"] ?? 1);
+      await new Promise((resolve) => setTimeout(resolve, retryAfterSeconds * 1000));
+      return listAvailablePets(limit);
+    }
+    throw error;
+  }
+}
+```
+</Step>
+
+<Step>
+### Handle rate limits
+
+Requests are rate limited per API key rather than per IP address. When you exceed the limit the API answers `429 Too Many Requests` and sets `Retry-After` to the number of seconds remaining in the current window. The generated SDKs read that header and back off for you, so you only need to handle it directly if you are calling the API without an SDK.
+</Step>
+
+<Step>
+### Go to production
+
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
+
+</Step>
+</Steps>
+
+Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.

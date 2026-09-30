@@ -1,0 +1,58 @@
+---
+title: Cards
+description: "Card grids at several widths, with and without descriptions"
+---
+
+Cards reflow by viewport width, so this page is the one to resize.
+
+## Three cards with descriptions
+
+<Cards>
+  <Card title="Authentication" href="/guides" description="API keys, OAuth 2 and which endpoints accept which" />
+  <Card title="Pagination" href="/guides" description="Cursor paging, offset paging and the limits of each" />
+  <Card title="Webhooks" href="/guides" description="Delivery, retries and signature verification" />
+</Cards>
+
+## Cards with no description
+
+<Cards>
+  <Card title="Changelog" href="/guides" />
+  <Card title="Status page" href="https://status.example.com" />
+  <Card title="Support" href="/guides" />
+</Cards>
+
+## Cards outside a Cards wrapper
+
+A `Card` used on its own, without a surrounding `Cards` grid.
+
+<Card title="Pets" href="/components/cards" description="Create, read, update and delete pet records" />
+<Card title="Store" href="/components/cards" description="Place orders and read inventory counts" />
+
+## Nine cards in one grid
+
+<Cards>
+  <Card title="Pets" href="/components/cards" description="Create, read, update and delete pet records" />
+  <Card title="Store" href="/components/cards" description="Place orders and read inventory counts" />
+  <Card title="Users" href="/components/cards" description="Account creation and session management" />
+  <Card title="Webhooks" href="/components/cards" description="Subscribe to events rather than polling for them" />
+  <Card title="Rate limits" href="/components/cards" description="Per-key windows, headers and backoff guidance" />
+  <Card title="Idempotency" href="/components/cards" description="Safe retries for every mutating endpoint" />
+  <Card title="Pagination" href="/components/cards" description="Cursor and offset paging across list endpoints" />
+  <Card title="Errors" href="/components/cards" description="Machine-readable codes and what each one means" />
+  <Card title="Versioning" href="/components/cards" description="How breaking changes are introduced and announced" />
+</Cards>
+
+Requests are rate limited per API key rather than per IP address. When you exceed the limit the API answers `429 Too Many Requests` and sets `Retry-After` to the number of seconds remaining in the current window. The generated SDKs read that header and back off for you, so you only need to handle it directly if you are calling the API without an SDK.
+
+## One card alone
+
+<Cards>
+  <Card title="A single card, which should not stretch oddly" href="/guides" description="A lone card in a grid that can hold three" />
+</Cards>
+
+## A card with a very long title and description
+
+<Cards>
+  <Card title="Configuring exponential backoff with jitter for webhook delivery retries" href="/guides" description="A deliberately long description that runs past the width of a single card at most viewport sizes, so that wrapping, clamping and overflow behaviour are all visible on this page rather than only in production." />
+  <Card title="Short" href="/guides" description="Short." />
+</Cards>

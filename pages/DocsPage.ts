@@ -3,172 +3,64 @@ import { BasePage } from "./BasePage.ts";
 import { settle } from "../utils/visual.ts";
 
 /**
- * Page object for any page of a generated dxV2 portal.
+ * Page object for any page of a v4 portal — the static bundle
+ * `apimatic portal generate` produces.
  *
- * Every route renders the same chrome — header, sidebar, article — so one class
- * covers guide pages, endpoint/playground pages, generated Models pages and the
- * generated Quickstart alike. Locators key off the portal's own stable ids
- * (`nd-*` / `fd-*`, inherited from fumadocs) and off `portal-page-title`, which
- * the portal applies deliberately and its generated theme.css styles. Never off
- * a Tailwind utility class — those churn on every restyle.
+ * Every route renders the same chrome, so one class covers the landing page,
+ * authored guides, the component showcase, the generated SDK and plugin pages
+ * and the API reference alike.
  *
- * Two things are build-dependent rather than universal, so check before
- * asserting: the section-tab nav (absent when a build has no top-level groups)
- * and the sidebar (rendered but hidden on a page whose section holds one entry).
- *
- * Careful with the header: it renders several responsive variants of the same
- * control, and only one of them is ever displayed. The icon-only buttons
- * (`Open Search`, `Open Sidebar`) are the small-screen variants and are
- * `display: none` at desktop widths — hence the search locator scoping to the
- * visible pill rather than the icon button.
+ * Locators key off the portal's own stable ids (`nd-*` / `fd-*`, inherited from
+ * fumadocs) and off roles and aria-labels. Never off a Tailwind utility class —
+ * those churn on every restyle. Note the dialog Radix renders carries a
+ * generated id (`radix-_R_6j6_`), so the search overlay is matched by role.
  */
 export class DocsPage extends BasePage {
-  /** Sticky top bar: portal title, version, search, Ask AI, theme toggle. */
-  readonly header: Locator;
-  /**
-   * Top-level section tabs. Build-dependent: a build whose toc.yml has several
-   * top-level groups renders them here, but the petstore build has none and the
-   * element is absent entirely. Check `count()` before asserting on it.
-   */
-  readonly portalNav: Locator;
+  /** Top bar: portal title, search, theme toggle. */
+  readonly subnav: Locator;
   /** Left navigation tree. */
   readonly sidebar: Locator;
   /** The article body — page content without the surrounding chrome. */
   readonly pageContent: Locator;
-  /** Fixed "Ask AI" bar pinned to the bottom of the viewport. */
-  readonly askAiBar: Locator;
-  /** Light/dark switch. Its label names the mode it switches *to*. */
-  readonly themeToggle: Locator;
-  /** The "Search  Ctrl K" pill in the header — the desktop search control. */
-  readonly searchButton: Locator;
+  /** "On this page" — only rendered for pages with enough headings. */
+  readonly toc: Locator;
   /**
-   * Collapses the desktop sidebar. Only rendered where the sidebar itself is —
-   * present on the Models and endpoint pages, absent on the petstore Quickstart,
-   * whose section holds a single entry.
+   * Light/dark switch: one button holding two icons, sun then moon.
+   *
+   * Clicking the button itself lands between the icons and does nothing, so
+   * `setColorMode()` clicks the icon for the mode you want. Matched on
+   * `[data-theme-toggle]`, which the portal puts there deliberately.
    */
-  readonly collapseSidebarButton: Locator;
-  readonly expandSidebarButton: Locator;
+  readonly themeToggle: Locator;
+  /** The "Search  Ctrl K" pill in the top bar. */
+  readonly searchButton: Locator;
   /** The search overlay, once opened. */
   readonly searchDialog: Locator;
   readonly searchInput: Locator;
-  /**
-   * The portal's own page title. Scoped to `.portal-page-title` — the class the
-   * portal puts on it (components/page-header, and the generated theme.css
-   * targets it for typography) — because a generated Models page renders TWO
-   * h1s: this one and the MDX content's own heading. Matching on level alone
-   * is a strict-mode violation there.
-   */
+  /** Result rows live in this list. */
+  readonly searchList: Locator;
+  /** Copies the page as markdown — part of the AI page actions. */
+  readonly copyMarkdownButton: Locator;
   readonly pageHeading: Locator;
-  /** The "On this page" table of contents. Absent on pages with no headings. */
-  readonly toc: Locator;
-  /** Copies the page as markdown. Sits beside the page title. */
-  readonly copyPageButton: Locator;
-  /** Previous / Next links at the foot of the article. */
-  readonly footerPrevious: Locator;
-  readonly footerNext: Locator;
-  /** Language tabs over an endpoint's code sample (cURL, Python, Go, …). */
-  readonly codeSampleTabs: Locator;
-  /** The code sample itself — whichever language tab is selected. */
-  readonly codeSample: Locator;
-  /**
-   * Rows in the search overlay. They're buttons, not links, and they sit among
-   * other buttons — the ESC hint, the category pills, and the Ask AI row — so
-   * prefer `searchResultsMatching()` when you mean "results for this query".
-   */
-  readonly searchResults: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.header = page.locator("#nd-portal-header");
-    this.portalNav = page.getByRole("navigation", { name: "Portal sections" });
+    this.subnav = page.locator("#nd-subnav");
     this.sidebar = page.locator("#nd-sidebar");
     this.pageContent = page.locator("#nd-page");
-    this.askAiBar = page.locator("#nd-ask-ai-bar");
-    this.themeToggle = page.getByRole("button", { name: /Switch to (dark|light) theme/ });
-    this.searchButton = this.header.getByRole("button", { name: /Search/ });
-    this.collapseSidebarButton = this.header.getByRole("button", { name: "Collapse sidebar" });
-    this.expandSidebarButton = this.header.getByRole("button", { name: "Expand sidebar" });
-    this.searchDialog = page.locator("#fd-search-dialog-content");
+    this.toc = page.locator("#nd-toc-placeholder");
+    this.themeToggle = page.locator("[data-theme-toggle]").first();
+    this.searchButton = this.subnav.getByRole("button", { name: /Search/ }).first();
+    this.searchDialog = page.getByRole("dialog");
     this.searchInput = this.searchDialog.getByPlaceholder("Search");
-    this.pageHeading = this.pageContent.locator("h1.portal-page-title");
-    this.toc = page.locator("#nd-toc");
-    this.copyPageButton = this.pageContent.getByRole("button", { name: /Copy page/i }).first();
-    this.footerPrevious = this.pageContent.locator("a[href]").filter({ hasText: "Previous" });
-    this.footerNext = this.pageContent.locator("a[href]").filter({ hasText: "Next" });
-    this.codeSampleTabs = this.pageContent.getByRole("tablist");
-    this.codeSample = this.pageContent.locator("pre").first();
-    this.searchResults = this.searchDialog.getByRole("button");
+    this.searchList = page.locator("#fd-search-list");
+    this.copyMarkdownButton = page.getByRole("button", { name: /Copy Markdown/i }).first();
+    this.pageHeading = this.pageContent.locator("h1").first();
   }
 
-  /**
-   * Switch the endpoint code sample to a language and wait for the sample to
-   * actually change — the tab going `aria-selected` fires before the new
-   * snippet renders, so asserting on the tab alone would pass on stale code.
-   */
-  async selectCodeLanguage(language: string): Promise<void> {
-    const before = await this.codeSample.textContent();
-    await this.pageContent.getByRole("tab", { name: language, exact: true }).click();
-    await expect.poll(() => this.codeSample.textContent(), { timeout: 15_000 }).not.toBe(before);
-    await settle(this.page);
-  }
-
-  /** Which code-sample language is currently selected. */
-  async selectedCodeLanguage(): Promise<string> {
-    return (
-      (await this.pageContent.locator('[role="tab"][aria-selected="true"]').first().textContent())
-        ?.trim() ?? ""
-    );
-  }
-
-  /**
-   * Result rows matching `text`.
-   *
-   * The Ask AI row echoes the query back ("Ask about “PetStatus”"), so a
-   * plain `hasText` filter matches it too — and since the list re-renders while
-   * results stream in, `.first()` on that filter can land on Ask AI and open the
-   * assistant instead of navigating. Excluding it by its label is what makes
-   * this deterministic.
-   */
-  searchResultsMatching(text: string): Locator {
-    return this.searchDialog
-      .getByRole("button")
-      .filter({ hasText: text })
-      .filter({ hasNotText: "Ask AI" });
-  }
-
-  /** Type a query into the search overlay and wait for real results to arrive. */
-  async searchFor(query: string): Promise<void> {
-    await this.openSearch();
-    await this.searchInput.fill(query);
-    // Wait for an actual result row rather than a fixed delay — and not merely
-    // for any button, or we'd race the Ask AI row that renders immediately.
-    await this.searchResultsMatching(query)
-      .first()
-      .waitFor({ state: "visible", timeout: 30_000 });
-    await settle(this.page);
-  }
-
-  /**
-   * Open the first search row whose label contains `text`.
-   *
-   * Waits for the URL to actually change before settling: the page we came from
-   * satisfies `waitUntilReady()` just as well as the one we're going to, so
-   * without this the caller can read the old URL and think navigation failed.
-   */
-  async openSearchResult(text: string): Promise<void> {
-    const from = this.page.url();
-    await this.searchResultsMatching(text).first().click();
-    await expect.poll(() => this.page.url(), { timeout: 30_000 }).not.toBe(from);
-    await this.waitUntilReady();
-  }
-
-  /**
-   * Navigate to a portal route and wait until the page is stable enough to
-   * screenshot. The dev server compiles routes on first request, so the first
-   * visit to a page can take a while.
-   */
+  /** Navigate to a portal route and wait until it's stable enough to screenshot. */
   async open(route: string): Promise<void> {
-    await this.page.goto(route, { waitUntil: "domcontentloaded", timeout: 90_000 });
+    await this.page.goto(route, { waitUntil: "domcontentloaded", timeout: 60_000 });
     await this.waitUntilReady();
   }
 
@@ -179,21 +71,36 @@ export class DocsPage extends BasePage {
     await settle(this.page);
   }
 
-  /** "light" or "dark", read off the <html> class next-themes maintains. */
+  /** "light" or "dark", read off the <html> class. */
   async colorMode(): Promise<"light" | "dark"> {
     const classes = (await this.page.locator("html").getAttribute("class")) ?? "";
     return classes.split(/\s+/).includes("dark") ? "dark" : "light";
   }
 
-  /** Flip the theme and wait for the class swap to land. */
-  async toggleColorMode(): Promise<void> {
-    const before = await this.colorMode();
-    await this.themeToggle.click();
-    await expect.poll(() => this.colorMode(), { timeout: 10_000 }).not.toBe(before);
+  /**
+   * Choose a colour mode and wait for the class swap to land.
+   *
+   * The icons are decorative (`aria-hidden`), so they're addressed by position
+   * inside the control — sun first, moon second — rather than by role.
+   */
+  async setColorMode(mode: "light" | "dark"): Promise<void> {
+    if ((await this.colorMode()) === mode) return;
+    const icon = this.themeToggle.locator("svg");
+    // `force` because the icons are decorative (`aria-hidden`) children of the
+    // button, so Playwright's actionability checks never settle on them. The
+    // button itself is the real control and is checked by the poll below —
+    // if the click missed, the mode wouldn't change and this would still fail.
+    await (mode === "dark" ? icon.last() : icon.first()).click({ force: true });
+    await expect.poll(() => this.colorMode(), { timeout: 10_000 }).toBe(mode);
     await settle(this.page);
   }
 
-  /** Open the search overlay and wait for its input to be focusable. */
+  /** Flip to the other colour mode. */
+  async toggleColorMode(): Promise<void> {
+    await this.setColorMode((await this.colorMode()) === "light" ? "dark" : "light");
+  }
+
+  /** Open the search overlay and wait for its input to be ready. */
   async openSearch(): Promise<void> {
     await this.searchButton.click();
     await this.searchDialog.waitFor({ state: "visible", timeout: 30_000 });
@@ -202,32 +109,43 @@ export class DocsPage extends BasePage {
   }
 
   /**
-   * Collapse the sidebar and wait for the header control to flip to "Expand",
-   * which is the portal's own signal that the collapse finished.
+   * Result rows matching `text`, scoped to the results list.
+   *
+   * The rows are `button[role="option"]`, not links — a combobox listbox rather
+   * than a list of anchors, so `getByRole("link")` finds nothing here.
    */
-  async collapseSidebar(): Promise<void> {
-    await this.collapseSidebarButton.click();
-    await this.expandSidebarButton.waitFor({ state: "visible", timeout: 15_000 });
+  searchResultsMatching(text: string): Locator {
+    return this.searchList.getByRole("option").filter({ hasText: text });
+  }
+
+  /** Type a query and wait for real results rather than a fixed delay. */
+  async searchFor(query: string): Promise<void> {
+    await this.openSearch();
+    await this.searchInput.fill(query);
+    await this.searchResultsMatching(query)
+      .first()
+      .waitFor({ state: "visible", timeout: 30_000 });
     await settle(this.page);
   }
 
   /**
-   * True when the portal chrome rendered — cheap smoke check.
+   * Open the first search row containing `text`.
    *
-   * Header and article only: the sidebar is not universal. On a page whose
-   * section holds a single entry (the petstore Quickstart) it renders but stays
-   * hidden, so asserting on it here would fail for reasons that have nothing to
-   * do with the chrome being broken. Use `isSidebarDisplayed()` where it matters.
+   * Waits for the URL to change first: the page we came from satisfies
+   * `waitUntilReady()` just as well as the one we're going to, so without this
+   * the caller can read the old URL and think navigation failed.
    */
-  async isPortalChromeDisplayed(): Promise<boolean> {
-    await this.header.waitFor({ state: "visible", timeout: 30_000 });
-    await this.pageContent.waitFor({ state: "visible", timeout: 30_000 });
-    return true;
+  async openSearchResult(text: string): Promise<void> {
+    const from = this.page.url();
+    await this.searchResultsMatching(text).first().click();
+    await expect.poll(() => this.page.url(), { timeout: 30_000 }).not.toBe(from);
+    await this.waitUntilReady();
   }
 
-  /** True once the navigation tree is on screen. */
-  async isSidebarDisplayed(): Promise<boolean> {
-    await this.sidebar.waitFor({ state: "visible", timeout: 30_000 });
+  /** True when the portal chrome rendered — cheap smoke check. */
+  async isPortalChromeDisplayed(): Promise<boolean> {
+    await this.subnav.waitFor({ state: "visible", timeout: 30_000 });
+    await this.pageContent.waitFor({ state: "visible", timeout: 30_000 });
     return true;
   }
 }

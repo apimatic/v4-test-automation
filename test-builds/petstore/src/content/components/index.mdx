@@ -1,0 +1,26 @@
+---
+title: Components
+description: "Every Fumadocs component a portal author can use"
+---
+
+The Petstore API exposes pets, store orders and user accounts over HTTPS. Every request is authenticated, every response is JSON, and every list endpoint is paginated. This page walks through the parts of that contract you are most likely to need on your first integration, and points at the reference pages for the rest.
+
+<Callout type="info" title="How to read these pages">
+  Each page below uses one component family, with enough content on it to show how the
+  component behaves when it is full rather than when it holds one line.
+</Callout>
+
+<Cards>
+  <Card title="Callouts" href="/components/callouts" description="info, warn and error, including callouts that hold lists and code" />
+  <Card title="Cards" href="/components/cards" description="Card grids at one, two and three columns, with and without descriptions" />
+  <Card title="Tabs" href="/components/tabs" description="Tab groups, including a group with more tabs than fit on a phone" />
+  <Card title="Steps" href="/components/steps" description="Numbered procedures with code in each step" />
+  <Card title="Accordions" href="/components/accordions" description="Collapsible sections holding tables and code" />
+  <Card title="Files" href="/components/files" description="A project tree rendered as nested folders" />
+  <Card title="Type Table" href="/components/type-table" description="A parameter reference with types and defaults" />
+  <Card title="Banner and InlineTOC" href="/components/banner" description="Page-level banner and an inline table of contents" />
+  <Card title="Code blocks" href="/components/code-blocks" description="Long lines, many languages and long output" />
+  <Card title="Typography" href="/components/typography" description="Headings, wide tables, deep lists and overflow stress" />
+</Cards>
+
+Requests are rate limited per API key rather than per IP address. When you exceed the limit the API answers `429 Too Many Requests` and sets `Retry-After` to the number of seconds remaining in the current window. The generated SDKs read that header and back off for you, so you only need to handle it directly if you are calling the API without an SDK.
