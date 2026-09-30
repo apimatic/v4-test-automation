@@ -16,7 +16,7 @@
     "test:visual": "playwright test --project=visual",
     "test:visual:headed": "playwright test --project=visual --headed",
     "test:visual:update": "playwright test --project=visual --update-snapshots",
-    "test:functional": "playwright test --project=functional",
+    "test:functional": "playwright test --project=functional --pass-with-no-tests",
     "report": "playwright show-report",
     "types:check": "tsc --noEmit"
   },

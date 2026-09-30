@@ -10,6 +10,11 @@ state surviving a reload. The portal is a client-routed SPA, so a broken route
 shows as a blank shell rather than a server error — exactly the failure a
 visual test absorbs and a functional test catches.
 
+While this folder is empty, `pnpm test:functional` runs with
+`--pass-with-no-tests` — Playwright exits 1 on "No tests found", which would
+fail CI for a stage that has nothing to run yet. Drop that flag once there are
+cases, so a mistyped `testDir` can't pass silently.
+
 When adding cases:
 
 ```bash

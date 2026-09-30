@@ -62,7 +62,7 @@ pnpm portal:serve        # generate, then serve on :8080
 pnpm test                # all three projects
 pnpm test:artifacts      # stage 1 — no browser needed
 pnpm test:visual         # stage 2
-pnpm test:functional     # stage 3 (empty for now)
+pnpm test:functional     # stage 3 (empty for now — passes with no tests)
 
 pnpm test:visual:update  # accept the current rendering as the new baselines
 pnpm report              # open the HTML report
@@ -107,7 +107,9 @@ win32/Chromium at a pinned 1920×1080, so CI has to match.
 
 ## Stage 3 — functional
 
-`tests/functional/` is wired up and empty. See its README.
+`tests/functional/` is wired up and empty. See its README — the script runs with
+`--pass-with-no-tests` until there are cases, because Playwright exits 1 on
+"No tests found" and that would fail CI for a stage with nothing to run.
 
 ## Layout
 
