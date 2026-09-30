@@ -101,9 +101,22 @@ test doesn't have to know which language spells its package id how).
 
 `tests/visual/` compares screenshots against baselines in `portal-snapshots/`.
 
-One test for now, deliberately — enough to prove the whole path works before
-committing to coverage. Snapshots are platform-specific: these were captured on
-win32/Chromium at a pinned 1920×1080, so CI has to match.
+14 tests, chosen to cover each distinct render path the build exercises rather
+than to cover many pages:
+
+| Area | Cases |
+|---|---|
+| Shell | landing page, landing page dark, top bar, sidebar tree |
+| Authored content | a guide page, accordions, tabs, GFM tables |
+| Generated from `apimatic.json` | SDKs index, the TypeScript SDK page, the context plugin page |
+| Generated from the spec | an API endpoint page |
+| Interaction and layout | search overlay with results, mobile viewport |
+
+Two are element-scoped — the top bar and the sidebar — so a change in page
+content doesn't fail them. The rest are full viewport.
+
+Snapshots are platform-specific: these were captured on win32/Chromium at a
+pinned 1920×1080, so CI runs `windows-latest` to match.
 
 ## Stage 3 — functional
 
