@@ -1,0 +1,161 @@
+name: v4 Portal Tests
+
+# Runs the pipeline in the order things happen, each stage its own step so its
+# log and timing stand alone:
+#
+#   CLI      install and authenticate the APIMatic CLI
+#   generate apimatic portal generate       src/ -> portal/
+#   1        artifacts   produced vs declared (filesystem, no browser)
+#   2        visual      how the served portal looks
+#   3        functional  what it does
+#
+# The runner is windows-latest on purpose: the committed baselines were
+# captured on win32/Chromium, and font rasterisation differs enough across
+# operating systems that a ubuntu runner would fail every snapshot.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      build:
+        description: Which build under test-builds/ to generate and test
+        required: false
+        default: petstore
+        type: string
+      cli_version:
+        description: >-
+          APIMatic CLI version to install. Leave blank for the pinned version —
+          set it to test the suite against a newer CLI before pinning it.
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    env:
+      PORTAL: ${{ inputs.build || 'petstore' }}
+      PORTAL_PORT: '8080'
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}\.playwright-browsers
+      # Pinned so a new CLI release can't silently change the generated output
+      # and move every baseline. Bump deliberately; the workflow_dispatch input
+      # above lets you try a version without committing to it.
+      APIMATIC_CLI_VERSION: 2.0.0-beta.1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.14.0'
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install test dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Cached into the workspace rather than the user profile, where
+      # actions/cache misses every run and reinstalling costs minutes.
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}\.playwright-browsers
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: playwright-${{ runner.os }}-
+
+      # No --with-deps: that installs OS-level libraries, a Linux concern that
+      # only burns minutes on a Windows runner.
+      - name: Install Chromium
+        run: pnpm exec playwright install chromium
+
+      # ---- CLI flow -------------------------------------------------------
+      - name: Install the APIMatic CLI and http-server
+        shell: bash
+        run: |
+          version="${{ inputs.cli_version || env.APIMATIC_CLI_VERSION }}"
+          echo "installing @apimatic/cli@${version}"
+          npm install -g "@apimatic/cli@${version}" http-server
+          apimatic --version
+          http-server --version
+
+      # Generation is subscription-gated, so a fresh runner has no credentials.
+      # Checked before login so the failure names the missing secret rather than
+      # surfacing as an opaque CLI error several steps later.
+      - name: Check the auth key is configured
+        shell: bash
+        env:
+          AUTH_KEY: ${{ secrets.APIMATIC_AUTH_KEY }}
+        run: |
+          if [ -z "$AUTH_KEY" ]; then
+            echo "::error::APIMATIC_AUTH_KEY is not set. The APIMatic CLI needs it to generate a portal."
+            echo "::error::Add it with: gh secret set APIMATIC_AUTH_KEY --repo apimatic/v4-test-automation"
+            exit 1
+          fi
+          echo "auth key is present"
+
+      - name: Authenticate the CLI
+        shell: bash
+        env:
+          AUTH_KEY: ${{ secrets.APIMATIC_AUTH_KEY }}
+        run: |
+          apimatic auth login --auth-key "$AUTH_KEY"
+          # Prints the account and its allowed languages — worth having in the
+          # log, because a subscription that doesn't cover a declared language
+          # is a plausible cause of a missing SDK artifact.
+          apimatic auth status
+
+      # ---- generate -------------------------------------------------------
+      - name: Generate the portal
+        run: pnpm portal:generate
+
+      # ---- stage 1 --------------------------------------------------------
+      # PORTAL_PREBUILT so the server (which Playwright starts for every
+      # project) serves what we just generated instead of regenerating it.
+      - name: Artifacts — produced vs declared
+        env:
+          PORTAL_PREBUILT: '1'
+        run: pnpm test:artifacts
+
+      # ---- stage 2 --------------------------------------------------------
+      - name: Visual
+        env:
+          PORTAL_PREBUILT: '1'
+        run: pnpm test:visual
+
+      # ---- stage 3 --------------------------------------------------------
+      - name: Functional
+        env:
+          PORTAL_PREBUILT: '1'
+        run: pnpm test:functional
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ inputs.build || 'petstore' }}
+          path: playwright-report/
+          retention-days: 30
+
+      # The expected/actual/diff PNGs — what you need to decide whether a diff
+      # is a regression or an intended change.
+      - name: Upload failure output
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ inputs.build || 'petstore' }}
+          path: test-results/
+          retention-days: 30
+          if-no-files-found: ignore

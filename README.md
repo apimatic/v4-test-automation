@@ -126,6 +126,32 @@ scripts/serve-portal.mts   generate + serve
 portal-snapshots/          committed visual baselines
 ```
 
+## CI
+
+`.github/workflows/portal-tests.yml` runs the same pipeline on
+**windows-latest** (the baselines were captured there), each stage its own step:
+
+```
+install + authenticate the CLI  ->  generate  ->  artifacts  ->  visual  ->  functional
+```
+
+**It needs one secret.** Portal generation is subscription-gated, so a fresh
+runner has no credentials:
+
+```bash
+gh secret set APIMATIC_AUTH_KEY --repo apimatic/v4-test-automation
+```
+
+The workflow checks for it before logging in, so a missing key fails with a
+message naming the secret rather than an opaque CLI error several steps later.
+It also prints `apimatic auth status`, because a subscription that doesn't cover
+a declared language is a plausible cause of a missing SDK artifact.
+
+The CLI version is pinned in the workflow (`APIMATIC_CLI_VERSION`) so a new
+release can't silently change the generated output and move every baseline. The
+`workflow_dispatch` inputs let you try another CLI version, or another build,
+without committing to either.
+
 ## Known issues in the petstore build
 
 - **`/components/mermaid/` crashes at runtime.** It serves HTTP 200, but the
@@ -136,5 +162,6 @@ portal-snapshots/          committed visual baselines
 - **Declared SDK versions don't reach the manifests.** `apimatic.json` declares
   typescript `2.4.0`, python `1.0.3` and csharp `3.1.2`; the archives ship
   `1.0.26`, `1.0.26` and no `<Version>` element at all. Package *names* are
-  correct in all three. The artifacts suite reports this, so it is currently
-  red on purpose.
+  correct in all three. The check is marked `test.fail()` — it keeps reporting
+  the mismatch without turning CI red for everything else, and Playwright flags
+  it the moment it starts passing. Remove that line when it's fixed.
