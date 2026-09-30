@@ -14,10 +14,6 @@ name: v4 Portal Tests
 # operating systems that a ubuntu runner would fail every snapshot.
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
     inputs:
       environment:
@@ -54,7 +50,7 @@ jobs:
       # routine CI never spends against the production account.
       APIMATIC_ENV: ${{ inputs.environment || 'dev' }}
       PORTAL: ${{ inputs.build || 'petstore' }}
-      PORTAL_PORT: '8080'
+      PORTAL_PORT: "8080"
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}\.playwright-browsers
       # Pinned so a new CLI release can't silently change the generated output
       # and move every baseline. Bump deliberately; the workflow_dispatch input
@@ -71,7 +67,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '24.14.0'
+          node-version: "24.14.0"
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
@@ -143,19 +139,19 @@ jobs:
       # project) serves what we just generated instead of regenerating it.
       - name: Artifacts — produced vs declared
         env:
-          PORTAL_PREBUILT: '1'
+          PORTAL_PREBUILT: "1"
         run: pnpm test:artifacts
 
       # ---- stage 2 --------------------------------------------------------
       - name: Visual
         env:
-          PORTAL_PREBUILT: '1'
+          PORTAL_PREBUILT: "1"
         run: pnpm test:visual
 
       # ---- stage 3 --------------------------------------------------------
       - name: Functional
         env:
-          PORTAL_PREBUILT: '1'
+          PORTAL_PREBUILT: "1"
         run: pnpm test:functional
 
       - name: Upload Playwright report
