@@ -20,6 +20,14 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs:
+      environment:
+        description: Which APIMatic environment to generate against
+        required: false
+        default: dev
+        type: choice
+        options:
+          - dev
+          - prod
       build:
         description: Which build under test-builds/ to generate and test
         required: false
@@ -42,6 +50,9 @@ jobs:
     timeout-minutes: 45
 
     env:
+      # dev unless a manual run asks for prod. Pushes and PRs stay on dev so
+      # routine CI never spends against the production account.
+      APIMATIC_ENV: ${{ inputs.environment || 'dev' }}
       PORTAL: ${{ inputs.build || 'petstore' }}
       PORTAL_PORT: '8080'
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}\.playwright-browsers
@@ -94,22 +105,28 @@ jobs:
       # Generation is subscription-gated, so a fresh runner has no credentials.
       # Checked before login so the failure names the missing secret rather than
       # surfacing as an opaque CLI error several steps later.
+      #
+      # The key is chosen by environment: the two accounts have their own
+      # subscriptions, so which one runs decides which languages are allowed —
+      # and therefore which SDK artifacts the generator is even able to produce.
       - name: Check the auth key is configured
         shell: bash
         env:
-          AUTH_KEY: ${{ secrets.APIMATIC_AUTH_KEY }}
+          AUTH_KEY: ${{ (inputs.environment || 'dev') == 'prod' && secrets.APIMATIC_AUTH_KEY_PROD || secrets.APIMATIC_AUTH_KEY_DEV }}
         run: |
+          echo "environment: $APIMATIC_ENV"
           if [ -z "$AUTH_KEY" ]; then
-            echo "::error::APIMATIC_AUTH_KEY is not set. The APIMatic CLI needs it to generate a portal."
-            echo "::error::Add it with: gh secret set APIMATIC_AUTH_KEY --repo apimatic/v4-test-automation"
+            secret="APIMATIC_AUTH_KEY_$(echo "$APIMATIC_ENV" | tr '[:lower:]' '[:upper:]')"
+            echo "::error::${secret} is not set. The APIMatic CLI needs it to generate a portal."
+            echo "::error::Add it with: gh secret set ${secret} --repo apimatic/v4-test-automation"
             exit 1
           fi
-          echo "auth key is present"
+          echo "auth key for $APIMATIC_ENV is present"
 
       - name: Authenticate the CLI
         shell: bash
         env:
-          AUTH_KEY: ${{ secrets.APIMATIC_AUTH_KEY }}
+          AUTH_KEY: ${{ (inputs.environment || 'dev') == 'prod' && secrets.APIMATIC_AUTH_KEY_PROD || secrets.APIMATIC_AUTH_KEY_DEV }}
         run: |
           apimatic auth login --auth-key "$AUTH_KEY"
           # Prints the account and its allowed languages — worth having in the
@@ -145,7 +162,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-${{ inputs.build || 'petstore' }}
+          name: playwright-report-${{ inputs.build || 'petstore' }}-${{ inputs.environment || 'dev' }}
           path: playwright-report/
           retention-days: 30
 
@@ -155,7 +172,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ inputs.build || 'petstore' }}
+          name: test-results-${{ inputs.build || 'petstore' }}-${{ inputs.environment || 'dev' }}
           path: test-results/
           retention-days: 30
           if-no-files-found: ignore

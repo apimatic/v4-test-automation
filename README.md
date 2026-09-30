@@ -135,17 +135,32 @@ portal-snapshots/          committed visual baselines
 install + authenticate the CLI  ->  generate  ->  artifacts  ->  visual  ->  functional
 ```
 
-**It needs one secret.** Portal generation is subscription-gated, so a fresh
-runner has no credentials:
+### Environments
+
+Generation is subscription-gated, so the runner authenticates with an APIMatic
+account. Two are configured, and a manual run picks between them:
+
+| Secret | Used when |
+|---|---|
+| `APIMATIC_AUTH_KEY_DEV` | default — every push and PR, and manual runs left on `dev` |
+| `APIMATIC_AUTH_KEY_PROD` | manual runs with `environment: prod` |
+
+Routine CI stays on dev so it never spends against the production account. The
+choice matters beyond billing: the two accounts have their own subscriptions, so
+which one runs decides which languages are allowed, and therefore which SDK
+artifacts the generator is even able to produce. That's why the workflow prints
+`apimatic auth status` — a subscription that doesn't cover a declared language
+would explain a missing archive.
+
+Run against prod from the Actions tab, or:
 
 ```bash
-gh secret set APIMATIC_AUTH_KEY --repo apimatic/v4-test-automation
+gh workflow run portal-tests.yml --repo apimatic/v4-test-automation -f environment=prod
 ```
 
-The workflow checks for it before logging in, so a missing key fails with a
-message naming the secret rather than an opaque CLI error several steps later.
-It also prints `apimatic auth status`, because a subscription that doesn't cover
-a declared language is a plausible cause of a missing SDK artifact.
+The key is checked before login, so a missing one fails with a message naming
+the exact secret rather than an opaque CLI error several steps later. Reports and
+failure output are named per environment, so a dev and a prod run don't collide.
 
 The CLI version is pinned in the workflow (`APIMATIC_CLI_VERSION`) so a new
 release can't silently change the generated output and move every baseline. The
