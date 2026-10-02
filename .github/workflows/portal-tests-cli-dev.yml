@@ -1,23 +1,5 @@
 name: v4 Portal Tests — unreleased CLI
 
-# The same pipeline as portal-tests.yml, but against a CLI built from source
-# instead of one published to npm:
-#
-#   CLI      check out apimatic/apimatic-cli at a ref (dev by default), build,
-#            pack, install the tarball globally, authenticate
-#   1        artifacts   produced vs declared — each scenario generates its
-#                        own portal from an edited temp copy of src/
-#   generate apimatic portal generate       src/ -> portal/
-#   2        visual      how the served portal looks
-#   3        functional  what it does
-#
-# Use it to see what the next release will do to these suites before it ships,
-# or to check a test change against the CLI's dev branch. The CLI repo's own
-# portal_tests.yml covers every push to its dev; this one is run from here.
-#
-# windows-latest for the same reason as portal-tests.yml: the visual baselines
-# were captured on win32/Chromium.
-
 on:
   workflow_dispatch:
     inputs:
