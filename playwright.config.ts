@@ -5,6 +5,21 @@ import { baseURL, portalPort, usingExternalPortal } from "./utils/env.ts";
 dotenv.config({ quiet: true });
 
 /**
+ * True when this run is only the artifacts project. Those tests generate their
+ * own portals into temp folders, so starting the web server — which generates
+ * and serves the committed build — would be a wasted generation.
+ */
+const artifactsOnly = (() => {
+  const args = process.argv;
+  const projects = args.flatMap((arg, i) =>
+    arg.startsWith("--project=") ? [arg.slice("--project=".length)]
+    : arg === "--project" ? [args[i + 1]]
+    : [],
+  );
+  return projects.length > 0 && projects.every((p) => p === "artifacts");
+})();
+
+/**
  * v4 test automation — three suites over a portal produced by
  * `apimatic portal generate`.
  *
@@ -52,12 +67,15 @@ export default defineConfig({
   projects: [
     {
       /**
-       * Reads the generated bundle off disk. It needs the portal generated but
-       * not served — it runs happily before the web server is up, and doesn't
-       * launch a browser at all.
+       * Each scenario copies the build to a temp folder, edits it, runs
+       * `apimatic portal generate` and reads the output off disk. No server,
+       * no browser.
        */
       name: "artifacts",
       testDir: "./tests/artifacts",
+      /* The scenario's beforeAll runs a real generation (~35s locally, slower
+         on a cold CI runner), and the hook shares the test timeout. */
+      timeout: 300_000,
     },
     {
       name: "visual",
@@ -93,7 +111,7 @@ export default defineConfig({
    * PORTAL_PREBUILT is for CI, where generation is its own step so its log and
    * timing stand alone; this then only has to serve.
    */
-  webServer: usingExternalPortal()
+  webServer: usingExternalPortal() || artifactsOnly
     ? undefined
     : {
         command: process.env.PORTAL_PREBUILT

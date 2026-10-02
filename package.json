@@ -13,6 +13,7 @@
     "portal:serve": "node scripts/serve-portal.mts",
     "test": "playwright test",
     "test:artifacts": "playwright test --project=artifacts",
+    "test:artifacts:update": "playwright test --project=artifacts --update-snapshots",
     "test:visual": "playwright test --project=visual",
     "test:visual:headed": "playwright test --project=visual --headed",
     "test:visual:update": "playwright test --project=visual --update-snapshots",

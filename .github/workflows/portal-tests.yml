@@ -1,18 +1,5 @@
 name: v4 Portal Tests
 
-# Runs the pipeline in the order things happen, each stage its own step so its
-# log and timing stand alone:
-#
-#   CLI      install and authenticate the APIMatic CLI
-#   generate apimatic portal generate       src/ -> portal/
-#   1        artifacts   produced vs declared (filesystem, no browser)
-#   2        visual      how the served portal looks
-#   3        functional  what it does
-#
-# The runner is windows-latest on purpose: the committed baselines were
-# captured on win32/Chromium, and font rasterisation differs enough across
-# operating systems that a ubuntu runner would fail every snapshot.
-
 on:
   workflow_dispatch:
     inputs:
@@ -119,6 +106,25 @@ jobs:
           fi
           echo "auth key for $APIMATIC_ENV is present"
 
+      # The CLI chooses its environment from APIMATIC_BASE_URL — three base
+      # URLs separated by `;`: API, auth, and package publishing. Unset, it
+      # talks to prod, so a dev run would otherwise send the dev key to prod.
+      # Written to GITHUB_ENV so login and every generation in the later steps
+      # hit the same environment. Prod needs nothing: it's the CLI's default.
+      - name: Point the CLI at dev
+        if: ${{ (inputs.environment || 'dev') == 'dev' }}
+        shell: bash
+        env:
+          DEV_BASE_URL: ${{ secrets.DEV_APIMATIC_BASE_URL }}
+        run: |
+          if [ -z "$DEV_BASE_URL" ]; then
+            echo "::error::DEV_APIMATIC_BASE_URL is not set, so the CLI would talk to prod."
+            echo "::error::Add it with: gh secret set DEV_APIMATIC_BASE_URL --repo apimatic/v4-test-automation"
+            exit 1
+          fi
+          echo "APIMATIC_BASE_URL=$DEV_BASE_URL" >> "$GITHUB_ENV"
+          echo "APIMATIC_BASE_URL set for the remaining steps"
+
       - name: Authenticate the CLI
         shell: bash
         env:
@@ -130,17 +136,20 @@ jobs:
           # is a plausible cause of a missing SDK artifact.
           apimatic auth status
 
+      # ---- stage 1 --------------------------------------------------------
+      # Each scenario copies src/ to a temp folder, edits it, and generates its
+      # own portal — so this needs the CLI authenticated, but not the generate
+      # step below, and Playwright skips the web server for it.
+      - name: Artifacts — produced vs declared
+        run: pnpm test:artifacts
+
       # ---- generate -------------------------------------------------------
+      # The committed build, generated once, for the browser stages to serve.
       - name: Generate the portal
         run: pnpm portal:generate
 
-      # ---- stage 1 --------------------------------------------------------
-      # PORTAL_PREBUILT so the server (which Playwright starts for every
-      # project) serves what we just generated instead of regenerating it.
-      - name: Artifacts — produced vs declared
-        env:
-          PORTAL_PREBUILT: "1"
-        run: pnpm test:artifacts
+      # PORTAL_PREBUILT so the server (which Playwright starts for the browser
+      # projects) serves what we just generated instead of regenerating it.
 
       # ---- stage 2 --------------------------------------------------------
       - name: Visual
