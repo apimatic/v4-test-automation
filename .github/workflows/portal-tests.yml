@@ -4,8 +4,9 @@ name: v4 Portal Tests
 # log and timing stand alone:
 #
 #   CLI      install and authenticate the APIMatic CLI
+#   1        artifacts   produced vs declared — each scenario generates its
+#                        own portal from an edited temp copy of src/
 #   generate apimatic portal generate       src/ -> portal/
-#   1        artifacts   produced vs declared (filesystem, no browser)
 #   2        visual      how the served portal looks
 #   3        functional  what it does
 #
@@ -130,17 +131,20 @@ jobs:
           # is a plausible cause of a missing SDK artifact.
           apimatic auth status
 
+      # ---- stage 1 --------------------------------------------------------
+      # Each scenario copies src/ to a temp folder, edits it, and generates its
+      # own portal — so this needs the CLI authenticated, but not the generate
+      # step below, and Playwright skips the web server for it.
+      - name: Artifacts — produced vs declared
+        run: pnpm test:artifacts
+
       # ---- generate -------------------------------------------------------
+      # The committed build, generated once, for the browser stages to serve.
       - name: Generate the portal
         run: pnpm portal:generate
 
-      # ---- stage 1 --------------------------------------------------------
-      # PORTAL_PREBUILT so the server (which Playwright starts for every
-      # project) serves what we just generated instead of regenerating it.
-      - name: Artifacts — produced vs declared
-        env:
-          PORTAL_PREBUILT: "1"
-        run: pnpm test:artifacts
+      # PORTAL_PREBUILT so the server (which Playwright starts for the browser
+      # projects) serves what we just generated instead of regenerating it.
 
       # ---- stage 2 --------------------------------------------------------
       - name: Visual

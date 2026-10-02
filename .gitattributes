@@ -7,3 +7,7 @@
 *.gif binary
 *.ico binary
 *.zip binary
+
+# Text baselines (llms.txt, llms-full.txt) are compared byte-for-byte too. The
+# generator writes LF, so a CRLF checkout would fail every line.
+portal-snapshots/**/*.txt -text

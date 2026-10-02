@@ -14,8 +14,9 @@ produces. See README.md for the pipeline and how to run it.
 The repo is ordered by when things happen, and each stage catches what the next
 one can't:
 
-1. **artifacts** — generated bundle vs `src/apimatic.json`. Filesystem only, no
-   browser, no server. A portal built wrong is not worth screenshotting.
+1. **artifacts** — each scenario copies `src/` to a temp folder, changes it,
+   generates, and checks the bundle against the copy's `apimatic.json`.
+   Filesystem only, no browser, no server. A portal built wrong is not worth screenshotting.
 2. **visual** — how the served portal looks, against committed baselines.
 3. **functional** — what it does. Structure in place, cases still to come.
 
@@ -34,6 +35,7 @@ config/portals.ts          → registry of builds + their named routes
 test-builds/<name>/src/    → build input: apimatic.json, content/, spec/, static/
 test-builds/<name>/portal/ → generated output, gitignored, rebuilt every run
 utils/env.ts               → build dir, generated dir, port, baseURL
+utils/scenario.ts          → copy src/ to temp, apply changes, generate
 utils/artifacts.ts         → declared-vs-produced helpers, zip manifest reading
 utils/visual.ts            → snapshot stability helpers
 pages/                     → Page Object classes (locators + actions)
@@ -69,6 +71,13 @@ portal-snapshots/          → committed visual baselines
   comment saying why, not in it and failing
 
 ### Artifact tests (`tests/artifacts/`)
+- Every scenario goes through `generateScenario()` — never edit the committed
+  build, and never read the shared `test-builds/<name>/portal/` output
+- One `test.describe` per scenario: generate in `beforeAll`, `cleanup()` in
+  `afterAll`, and put every check on that output inside it. Each generation is
+  a real CLI run (~35s), so don't generate per test
+- Read the declared side off `portal.config()` — the scenario's edited copy —
+  not the committed `apimatic.json`
 - Compare against what `apimatic.json` **declares**, never against hardcoded
   expected values — the config is the contract, and a test that restates it
   will pass when both drift together

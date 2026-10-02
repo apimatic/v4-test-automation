@@ -3,21 +3,22 @@
 Test automation for **APIMatic v4 portals** — the static documentation portals
 produced by `apimatic portal generate`.
 
-The repo is structured around the order things happen: a portal is generated
-from a build, the generated artifacts are checked against what the build
-declared, and only then is the portal served and tested in a browser.
+The repo is structured around the order things happen: portals are generated
+from a build and checked against what the build declared, and only then is the
+portal served and tested in a browser.
 
 ## The pipeline
 
 ```
 test-builds/petstore/src/         the build: apimatic.json, content/, spec/, static/
         │
+        ├──▶ 1. ARTIFACTS   per scenario: copy src/ to a temp folder, change it,
+        │                   generate, compare produced vs declared
+        │                   filesystem only — no browser, no server
+        │
         │  apimatic portal generate --input test-builds/petstore
         ▼
-test-builds/petstore/portal/      the generated artifacts (gitignored)
-        │
-        ├──▶ 1. ARTIFACTS   what was produced vs what apimatic.json declared
-        │                   filesystem only — no browser, no server
+test-builds/petstore/portal/      the generated portal (gitignored)
         │
         │  http-server -c-1 --cors
         ▼
@@ -60,7 +61,7 @@ pnpm portal:generate     # apimatic portal generate, nothing else
 pnpm portal:serve        # generate, then serve on :8080
 
 pnpm test                # all three projects
-pnpm test:artifacts      # stage 1 — no browser needed
+pnpm test:artifacts      # stage 1 — generates its own portals, no server
 pnpm test:visual         # stage 2
 pnpm test:functional     # stage 3 (empty for now — passes with no tests)
 
@@ -84,18 +85,51 @@ mysteriously refuses to change.
 
 ## Stage 1 — artifacts
 
-`tests/artifacts/` compares the generated bundle to `src/apimatic.json`.
+`tests/artifacts/` compares a generated bundle to the `apimatic.json` it was
+built from.
 
 The config is a set of promises: `languages` promises a downloadable archive, a
 portal page and a package manifest carrying the identity you asked for;
 `plugin` promises a context-plugin page; `brand` and `navigation` promise assets
-and links. The artifact suite is where those promises get checked, and it needs
-no browser, so it runs the moment generation finishes.
+and links. The artifact suite is where those promises get checked.
 
-`utils/artifacts.ts` has the helpers: read the declared config, walk the
-generated tree, and read a package manifest out of an SDK archive without
-extracting it (`package.json`, `pyproject.toml` or `.csproj`, normalised so a
-test doesn't have to know which language spells its package id how).
+Each scenario generates its own portal. `generateScenario()` in
+`utils/scenario.ts` copies the build's `src/` to a temp folder, applies the
+scenario's changes, runs `apimatic portal generate` on the copy and hands back
+the output. The committed build is never edited:
+
+```ts
+test.describe("the plugin block removed from apimatic.json", () => {
+  let portal: GeneratedPortal;
+
+  test.beforeAll(async () => {
+    portal = await generateScenario("without plugin", {
+      config: (config) => { delete config.plugin; },  // edit apimatic.json
+      // files:  { "content/guides/new.md": "# New" }, // add or overwrite files
+      // remove: ["spec/APIMATIC-META.json"],          // delete files or folders
+    });
+  });
+  test.afterAll(() => portal?.cleanup());
+
+  test("no context-plugin page is generated", () => {
+    expect(portal.exists("context-plugin", "index.html")).toBe(false);
+  });
+});
+```
+
+One `describe` is one scenario and one generation (~35s, ~13 MB), shared by
+every test inside it — so group related checks under one scenario. Temp folders
+are deleted afterwards; set `KEEP_SCENARIOS=1` to keep them for a look. A
+scenario whose generation fails reports the tail of the CLI's output.
+
+Because the suite generates for itself, a run of only `--project=artifacts`
+doesn't start the web server.
+
+`utils/artifacts.ts` has the reading side: `GeneratedPortal` (the declared
+config of the copy, and the generated tree), and reading a package manifest out
+of an SDK archive without extracting it (`package.json`, `pyproject.toml` or
+`.csproj`, normalised so a test doesn't have to know which language spells its
+package id how).
 
 ## Stage 2 — visual
 
@@ -131,6 +165,7 @@ config/portals.ts          which builds we test + their named routes
 test-builds/<name>/src/    the build input (apimatic.json, content, spec, static)
 test-builds/<name>/portal/ generated output — gitignored, rebuilt every run
 utils/env.ts               resolves build dir, generated dir, port, baseURL
+utils/scenario.ts          copy src/ to a temp folder, change it, generate
 utils/artifacts.ts         declared-vs-produced helpers, zip manifest reading
 utils/visual.ts            snapshot stability helpers
 pages/                     page objects — locators live here, never in tests
@@ -147,7 +182,7 @@ portal-snapshots/          committed visual baselines
 **windows-latest** (the baselines were captured there), each stage its own step:
 
 ```
-install + authenticate the CLI  ->  generate  ->  artifacts  ->  visual  ->  functional
+install + authenticate the CLI  ->  artifacts  ->  generate  ->  visual  ->  functional
 ```
 
 ### Environments

@@ -1,0 +1,76 @@
+# Docs
+
+- Home
+  - [TT Status Codes](/): Migration test 1 of 10 - postnl, HTML table plus a style block
+- Components
+  - [Components](/components): Every Fumadocs component a portal author can use
+  - [Callouts](/components/callouts): Every callout type, including callouts that hold other content
+  - [Cards](/components/cards): Card grids at several widths, with and without descriptions
+  - [Tabs](/components/tabs): Tab groups, including one with more tabs than fit on a phone
+  - [Steps](/components/steps): A numbered procedure with code in each step
+  - [Accordions](/components/accordions): Collapsible sections holding tables and code
+  - [Files](/components/files): A project tree rendered as nested folders
+  - [Type Table](/components/type-table): A parameter reference with types and defaults
+  - [Banner and InlineTOC](/components/banner): Page-level banner and an inline table of contents
+  - [Mermaid](/components/mermaid): Mermaid diagrams, which Fumadocs does not ship as a built-in component
+  - [Twoslash](/components/twoslash): Twoslash code blocks, which need the fumadocs-twoslash transformer
+  - [Code blocks](/components/code-blocks): Long lines, many languages and long output
+  - [Typography](/components/typography): Headings, wide tables, deep lists and overflow stress
+- Guides
+  - [Guides](/guides): Task-based guides for the Petstore API
+  - [Authentication](/guides/authentication): API keys, OAuth 2 and which endpoints accept which
+  - Webhooks
+    - [Webhooks](/guides/webhooks): Receiving events instead of polling for them
+    - [Signatures](/guides/webhooks/signatures): Verifying that an event really came from the API
+    - Delivery
+      - [Delivery](/guides/webhooks/delivery): How an event gets from the API to your endpoint
+      - [Ordering](/guides/webhooks/delivery/ordering): Why events can arrive out of order
+      - Retries
+        - [Retries](/guides/webhooks/delivery/retries): What happens when your endpoint does not answer
+        - [Dead letter](/guides/webhooks/delivery/retries/dead-letter): Where an event goes after the last attempt
+        - Backoff
+          - [Backoff](/guides/webhooks/delivery/retries/backoff): The schedule retries follow
+          - [Schedule](/guides/webhooks/delivery/retries/backoff/schedule): The exact intervals between attempts
+          - Jitter
+            - [Jitter](/guides/webhooks/delivery/retries/backoff/jitter): Spreading retries so they do not arrive together
+            - [Algorithms](/guides/webhooks/delivery/retries/backoff/jitter/algorithms): Full, equal and decorrelated jitter compared
+            - Tuning
+              - [Tuning](/guides/webhooks/delivery/retries/backoff/jitter/tuning): Choosing values for your own traffic shape
+              - [Reference](/guides/webhooks/delivery/retries/backoff/jitter/tuning/reference): Every knob, its default and its safe range
+- GFM
+  - [Task lists](/gfm/task-lists): GFM task list items, section 5.3 of the spec
+  - [Autolinks](/gfm/autolinks): GFM extended autolinks, section 6.9 of the spec
+  - [Tables](/gfm/tables): GFM tables with column alignment, section 4.10 of the spec
+  - [Text formatting](/gfm/text-formatting): Strikethrough, emphasis, escapes and entity references
+  - [Block structure](/gfm/blocks): Setext headings, rules, quotes, lists and indented code
+  - [Links and images](/gfm/links-images): Reference links, titles and images
+- SDKs
+  - [SDKs](/sdks): Client libraries for this API.
+  - [TypeScript SDK](/sdks/typescript): Install and start using the TypeScript SDK.
+  - [Python SDK](/sdks/python): Install and start using the Python SDK.
+  - [C# SDK](/sdks/csharp): Install and start using the C# SDK.
+- Context Plugin
+  - [Context Plugin](/context-plugin): Give your AI coding assistant working knowledge of this API's SDKs.
+- API Reference
+  - Pet: Everything about your Pets
+    - [Add a new pet to the store.](/api/petstore/pet/addPet): Add a new pet to the store.
+    - [Update an existing pet.](/api/petstore/pet/updatePet): Update an existing pet by Id.
+    - [Finds Pets by status.](/api/petstore/pet/findPetsByStatus): Multiple status values can be provided with comma separated strings.
+    - [Finds Pets by tags.](/api/petstore/pet/findPetsByTags): Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
+    - [Find pet by ID.](/api/petstore/pet/getPetById): Returns a single pet.
+    - [Updates a pet in the store with form data.](/api/petstore/pet/updatePetWithForm): Updates a pet resource based on the form data.
+    - [Deletes a pet.](/api/petstore/pet/deletePet): Delete a pet.
+    - [Uploads an image.](/api/petstore/pet/uploadFile): Upload image of the pet.
+  - Store: Access to Petstore orders
+    - [Returns pet inventories by status.](/api/petstore/store/getInventory): Returns a map of status codes to quantities.
+    - [Place an order for a pet.](/api/petstore/store/placeOrder): Place a new order in the store.
+    - [Find purchase order by ID.](/api/petstore/store/getOrderById): For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
+    - [Delete purchase order by identifier.](/api/petstore/store/deleteOrder): For valid response try integer IDs with value < 1000. Anything above 1000 or non-integers will generate API errors.
+  - User: Operations about user
+    - [Create user.](/api/petstore/user/createUser): This can only be done by the logged in user.
+    - [Creates list of users with given input array.](/api/petstore/user/createUsersWithListInput): Creates list of users with given input array.
+    - [Logs user into the system.](/api/petstore/user/loginUser): Log into the system.
+    - [Logs out current logged in user session.](/api/petstore/user/logoutUser): Log user out of the system.
+    - [Get user by user name.](/api/petstore/user/getUserByName): Get user detail based on username.
+    - [Delete user resource.](/api/petstore/user/deleteUser): This can only be done by the logged in user.
+    - [Update user resource.](/api/petstore/user/updateUser): This can only be done by the logged in user.
