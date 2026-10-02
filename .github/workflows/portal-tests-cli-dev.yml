@@ -1,0 +1,221 @@
+name: v4 Portal Tests — unreleased CLI
+
+# The same pipeline as portal-tests.yml, but against a CLI built from source
+# instead of one published to npm:
+#
+#   CLI      check out apimatic/apimatic-cli at a ref (dev by default), build,
+#            pack, install the tarball globally, authenticate
+#   1        artifacts   produced vs declared — each scenario generates its
+#                        own portal from an edited temp copy of src/
+#   generate apimatic portal generate       src/ -> portal/
+#   2        visual      how the served portal looks
+#   3        functional  what it does
+#
+# Use it to see what the next release will do to these suites before it ships,
+# or to check a test change against the CLI's dev branch. The CLI repo's own
+# portal_tests.yml covers every push to its dev; this one is run from here.
+#
+# windows-latest for the same reason as portal-tests.yml: the visual baselines
+# were captured on win32/Chromium.
+
+on:
+  workflow_dispatch:
+    inputs:
+      cli_ref:
+        description: Branch, tag or SHA of apimatic/apimatic-cli to build
+        required: false
+        default: dev
+        type: string
+      environment:
+        description: Which APIMatic environment to generate against
+        required: false
+        default: dev
+        type: choice
+        options:
+          - dev
+          - prod
+      build:
+        description: Which build under test-builds/ to generate and test
+        required: false
+        default: petstore
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.cli_ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    env:
+      APIMATIC_ENV: ${{ inputs.environment }}
+      PORTAL: ${{ inputs.build }}
+      PORTAL_PORT: "8080"
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}\.playwright-browsers
+
+    steps:
+      - name: Checkout tests
+        uses: actions/checkout@v4
+
+      # Into a subfolder of the workspace (checkout won't write outside it).
+      # Nothing in the test suite looks in here.
+      - name: Checkout the CLI at ${{ inputs.cli_ref }}
+        uses: actions/checkout@v4
+        with:
+          repository: apimatic/apimatic-cli
+          ref: ${{ inputs.cli_ref }}
+          path: .cli-src
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.14.0"
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            .cli-src/pnpm-lock.yaml
+
+      # ---- build the CLI ----------------------------------------------------
+      - name: Install CLI dependencies
+        working-directory: .cli-src
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the CLI
+        working-directory: .cli-src
+        run: pnpm build
+
+      # `pnpm pack` runs the CLI's `prepack` script, which writes
+      # oclif.manifest.json — without it the installed CLI can't resolve its
+      # own commands. The tarball name carries the version, so it's globbed.
+      - name: Pack the CLI
+        id: pack
+        shell: bash
+        working-directory: .cli-src
+        run: |
+          pnpm pack
+          tarball=$(ls -1 ./*.tgz | head -n 1)
+          if [ -z "$tarball" ]; then
+            echo "::error::pnpm pack produced no tarball"
+            exit 1
+          fi
+          echo "tarball=$(pwd)/${tarball#./}" >> "$GITHUB_OUTPUT"
+          echo "packed ${tarball#./} from $(git rev-parse --short HEAD)"
+
+      # Installed globally from the tarball, the way a user installs a release,
+      # so `apimatic` on PATH — which utils/scenario.ts and serve-portal.mts
+      # both call — is this build.
+      - name: Install the packed CLI and http-server
+        shell: bash
+        run: |
+          npm install -g "${{ steps.pack.outputs.tarball }}" http-server
+          echo "apimatic on PATH: $(which apimatic)"
+          apimatic --version
+          http-server --version
+
+      # ---- test dependencies ----------------------------------------------
+      - name: Install test dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}\.playwright-browsers
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: playwright-${{ runner.os }}-
+
+      - name: Install Chromium
+        run: pnpm exec playwright install chromium
+
+      # ---- point at the environment and authenticate ------------------------
+      # Checked before anything uses them, so a missing secret is named plainly
+      # rather than surfacing as an opaque CLI error several steps later.
+      - name: Check the secrets are configured
+        shell: bash
+        env:
+          AUTH_KEY: ${{ inputs.environment == 'prod' && secrets.APIMATIC_AUTH_KEY_PROD || secrets.APIMATIC_AUTH_KEY_DEV }}
+          DEV_BASE_URL: ${{ secrets.DEV_APIMATIC_BASE_URL }}
+        run: |
+          echo "environment: $APIMATIC_ENV"
+          missing=0
+          if [ -z "$AUTH_KEY" ]; then
+            secret="APIMATIC_AUTH_KEY_$(echo "$APIMATIC_ENV" | tr '[:lower:]' '[:upper:]')"
+            echo "::error::${secret} is not set. Add it with: gh secret set ${secret} --repo apimatic/v4-test-automation"
+            missing=1
+          fi
+          if [ "$APIMATIC_ENV" = "dev" ] && [ -z "$DEV_BASE_URL" ]; then
+            echo "::error::DEV_APIMATIC_BASE_URL is not set, so the CLI would talk to prod."
+            echo "::error::Add it with: gh secret set DEV_APIMATIC_BASE_URL --repo apimatic/v4-test-automation"
+            missing=1
+          fi
+          exit $missing
+
+      # The CLI chooses its environment from APIMATIC_BASE_URL — three base
+      # URLs separated by `;`: API, auth, and package publishing. Unset, it
+      # talks to prod. Written to GITHUB_ENV so login and every generation in
+      # the later steps hit the same environment.
+      - name: Point the CLI at dev
+        if: ${{ inputs.environment == 'dev' }}
+        shell: bash
+        env:
+          DEV_BASE_URL: ${{ secrets.DEV_APIMATIC_BASE_URL }}
+        run: |
+          echo "APIMATIC_BASE_URL=$DEV_BASE_URL" >> "$GITHUB_ENV"
+          echo "APIMATIC_BASE_URL set for the remaining steps"
+
+      - name: Authenticate the CLI
+        shell: bash
+        env:
+          AUTH_KEY: ${{ inputs.environment == 'prod' && secrets.APIMATIC_AUTH_KEY_PROD || secrets.APIMATIC_AUTH_KEY_DEV }}
+        run: |
+          apimatic auth login --auth-key "$AUTH_KEY"
+          # The account's allowed languages land in this log — a subscription
+          # that doesn't cover a declared language would explain a missing SDK.
+          apimatic auth status
+
+      # ---- stage 1 --------------------------------------------------------
+      # Each scenario generates its own portal, so this needs the CLI
+      # authenticated but not the generate step below.
+      - name: Artifacts — produced vs declared
+        run: pnpm test:artifacts
+
+      # ---- generate -------------------------------------------------------
+      - name: Generate the portal
+        run: pnpm portal:generate
+
+      # PORTAL_PREBUILT so the server serves what we just generated instead of
+      # regenerating it.
+
+      # ---- stage 2 --------------------------------------------------------
+      - name: Visual
+        env:
+          PORTAL_PREBUILT: "1"
+        run: pnpm test:visual
+
+      # ---- stage 3 --------------------------------------------------------
+      - name: Functional
+        env:
+          PORTAL_PREBUILT: "1"
+        run: pnpm test:functional
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ inputs.build }}-${{ inputs.environment }}-cli-${{ github.run_id }}
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload failure output
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ inputs.build }}-${{ inputs.environment }}-cli-${{ github.run_id }}
+          path: test-results/
+          retention-days: 30
+          if-no-files-found: ignore

@@ -120,6 +120,25 @@ jobs:
           fi
           echo "auth key for $APIMATIC_ENV is present"
 
+      # The CLI chooses its environment from APIMATIC_BASE_URL — three base
+      # URLs separated by `;`: API, auth, and package publishing. Unset, it
+      # talks to prod, so a dev run would otherwise send the dev key to prod.
+      # Written to GITHUB_ENV so login and every generation in the later steps
+      # hit the same environment. Prod needs nothing: it's the CLI's default.
+      - name: Point the CLI at dev
+        if: ${{ (inputs.environment || 'dev') == 'dev' }}
+        shell: bash
+        env:
+          DEV_BASE_URL: ${{ secrets.DEV_APIMATIC_BASE_URL }}
+        run: |
+          if [ -z "$DEV_BASE_URL" ]; then
+            echo "::error::DEV_APIMATIC_BASE_URL is not set, so the CLI would talk to prod."
+            echo "::error::Add it with: gh secret set DEV_APIMATIC_BASE_URL --repo apimatic/v4-test-automation"
+            exit 1
+          fi
+          echo "APIMATIC_BASE_URL=$DEV_BASE_URL" >> "$GITHUB_ENV"
+          echo "APIMATIC_BASE_URL set for the remaining steps"
+
       - name: Authenticate the CLI
         shell: bash
         env:
