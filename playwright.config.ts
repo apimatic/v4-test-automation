@@ -73,6 +73,10 @@ export default defineConfig({
        */
       name: "artifacts",
       testDir: "./tests/artifacts",
+      /* One output folder per project: Playwright clears only the folders of
+         the projects it's running, so CI's later visual and functional steps
+         leave this stage's failure output (and build logs) in place. */
+      outputDir: "test-results/artifacts",
       /* The scenario's beforeAll runs a real generation (~35s locally, slower
          on a cold CI runner), and the hook shares the test timeout. */
       timeout: 300_000,
@@ -80,6 +84,7 @@ export default defineConfig({
     {
       name: "visual",
       testDir: "./tests/visual",
+      outputDir: "test-results/visual",
       use: {
         ...devices["Desktop Chrome"],
         /* Pinned so snapshots don't shift with whatever window the runner has. */
@@ -90,6 +95,7 @@ export default defineConfig({
     {
       name: "functional",
       testDir: "./tests/functional",
+      outputDir: "test-results/functional",
       use: {
         ...devices["Desktop Chrome"],
         /* Same viewport as the visual project. Desktop Chrome's default 1280

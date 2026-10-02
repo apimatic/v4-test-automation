@@ -2,6 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
+import { test } from "@playwright/test";
 import { buildDir, portalName } from "./env.ts";
 import { GeneratedPortal, type ApimaticConfig } from "./artifacts.ts";
 
@@ -50,8 +51,10 @@ export async function generateScenario(
     applyChanges(src, changes);
     await runGenerate(root);
   } catch (error) {
+    const saved = saveBuildLog(root, name);
     // The test never gets a portal to clean up, so do it here.
     if (!process.env.KEEP_SCENARIOS) fs.rmSync(root, { recursive: true, force: true });
+    if (saved && error instanceof Error) error.message += `\n\nFull build log saved to ${saved}`;
     throw error;
   }
   return new GeneratedPortal(root);
@@ -119,6 +122,22 @@ function runGenerate(input: string): Promise<void> {
       );
     });
   });
+}
+
+/**
+ * When a build fails, the CLI writes its full log to
+ * `<input>/portal/apimatic-debug/build.log`. That folder is temp and about to
+ * be deleted, so copy the log into the project's output folder, where CI
+ * uploads it. Returns where it went, or undefined if the CLI wrote no log.
+ */
+function saveBuildLog(root: string, name: string): string | undefined {
+  const log = path.join(root, "portal", "apimatic-debug", "build.log");
+  if (!fs.existsSync(log)) return undefined;
+
+  const dest = path.join(test.info().project.outputDir, "build-logs", `${slug(name)}.log`);
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  fs.copyFileSync(log, dest);
+  return dest;
 }
 
 /** The last `lines` lines of CLI output, with colour codes and spinner frames stripped. */

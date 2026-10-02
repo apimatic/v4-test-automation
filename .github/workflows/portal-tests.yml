@@ -141,11 +141,19 @@ jobs:
       # own portal — so this needs the CLI authenticated, but not the generate
       # step below, and Playwright skips the web server for it.
       - name: Artifacts — produced vs declared
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/artifacts
         run: pnpm test:artifacts
 
       # ---- generate -------------------------------------------------------
       # The committed build, generated once, for the browser stages to serve.
+      # The stages are independent, so a failure in one doesn't skip the
+      # rest: generate and the browser stages still run after a failed
+      # artifacts step. !cancelled() rather than always(), so cancelling the
+      # run still stops them.
       - name: Generate the portal
+        id: generate
+        if: ${{ !cancelled() }}
         run: pnpm portal:generate
 
       # PORTAL_PREBUILT so the server (which Playwright starts for the browser
@@ -153,14 +161,18 @@ jobs:
 
       # ---- stage 2 --------------------------------------------------------
       - name: Visual
+        if: ${{ !cancelled() && steps.generate.outcome == 'success' }}
         env:
           PORTAL_PREBUILT: "1"
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/visual
         run: pnpm test:visual
 
       # ---- stage 3 --------------------------------------------------------
       - name: Functional
+        if: ${{ !cancelled() && steps.generate.outcome == 'success' }}
         env:
           PORTAL_PREBUILT: "1"
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/functional
         run: pnpm test:functional
 
       - name: Upload Playwright report
@@ -173,6 +185,20 @@ jobs:
 
       # The expected/actual/diff PNGs — what you need to decide whether a diff
       # is a regression or an intended change.
+      # The CLI's full log from a failed portal build — the terminal only shows
+      # its tail. Scenario builds are saved under the artifacts output folder
+      # (utils/scenario.ts); the main build leaves its log in the portal folder.
+      - name: Upload build logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-${{ inputs.build || 'petstore' }}-${{ inputs.environment || 'dev' }}
+          path: |
+            test-results/artifacts/build-logs/
+            test-builds/${{ env.PORTAL }}/portal/apimatic-debug/build.log
+          retention-days: 30
+          if-no-files-found: ignore
+
       - name: Upload failure output
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
