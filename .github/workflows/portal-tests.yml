@@ -146,6 +146,7 @@ jobs:
       # ---- generate -------------------------------------------------------
       # The committed build, generated once, for the browser stages to serve.
       - name: Generate the portal
+        id: portal-generate
         run: pnpm portal:generate
 
       # PORTAL_PREBUILT so the server (which Playwright starts for the browser
@@ -153,6 +154,7 @@ jobs:
 
       # ---- stage 2 --------------------------------------------------------
       - name: Visual
+        if: ${{ !cancelled() && steps.portal-generate.outcome == 'success' }}
         env:
           PORTAL_PREBUILT: "1"
         run: pnpm test:visual
@@ -164,11 +166,13 @@ jobs:
       # because a server started in its own step doesn't outlive that step.
 
       - name: Generate the auth portal
+        id: auth-portal
         env:
           PORTAL: auth
         run: pnpm portal:generate
 
       - name: Functional
+        if: ${{ !cancelled() && steps.auth-portal.outcome == 'success' }}
         shell: bash
         env:
           PORTAL: auth
