@@ -1,0 +1,393 @@
+openapi: 3.0.3
+info:
+  title: Auth Tester
+  version: 1.0.0
+  description: |
+    One operation per auth type, backed by the routes of APIMatic's API Tester
+    (`node api-tester/bin/www`, port 3000). Every validated route answers
+    `200 You've passed the test!` with the right credentials and a `401` naming
+    what failed without them. See test-builds/auth/README.md for the mapping.
+
+servers:
+  - url: http://localhost:3000
+
+tags:
+  - name: Single
+    description: One security scheme (or one AND-pair the server requires together).
+  - name: Combination
+    description: AND / OR combinations of schemes.
+  - name: OAuth 2
+    description: OAuth 2 flows. Tokens are issued by the API Tester and held in memory.
+  - name: Unvalidated
+    description: |
+      Schemes the API Tester has no checker for. These hit the echo catch-all,
+      which returns 200 with whatever it received, so they show rendering and
+      what was sent, not whether the credential was right.
+
+paths:
+  /auth/skipAuthentication:
+    get:
+      tags: [Single]
+      operationId: noAuth
+      summary: No auth
+      description: Declares no security. Passes only when no `token` query param is sent.
+      security: []
+      responses:
+        "200": { $ref: "#/components/responses/Passed" }
+        "400":
+          description: A `token` query param was sent ("Authentication is not skipped.").
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /auth/basic:
+    get:
+      tags: [Single]
+      operationId: basic
+      summary: Basic auth
+      description: "Expects username `Zeeshan` and password `bhai_99`."
+      security:
+        - basicAuth: []
+      responses:
+        "200": { $ref: "#/components/responses/Passed" }
+        "401": { $ref: "#/components/responses/Failed" }
+
+  /auth/oauth2:
+    get:
+      tags: [Single]
+      operationId: bearer
+      summary: Bearer token
+      description: "Expects `Authorization: Bearer 0b79bab50daca910b000d4f1a2b675d604257e42`."
+      security:
+        - bearerAuth: []
+      responses:
+        "200": { $ref: "#/components/responses/Passed" }
+        "401": { $ref: "#/components/responses/Failed" }
+
+  /auth/customAuthentication:
+    get:
+      tags: [Single]
+      operationId: apiKeyHeader
+      summary: API key in header
+      description: "Expects header `accesstoken: azHmdOe09EdchxeWsdnplkQbv76sJH`."
+      security:
+        - customHeader: []
+      responses:
+        "200": { $ref: "#/components/responses/Passed" }
+        "401": { $ref: "#/components/responses/Failed" }
+
+  /auth/customQueryParam:
+    get:
+      tags: [Single]
+      operationId: apiKeyQuery
+      summary: API key in query
+      description: |
+        Expects query `token=asdqwaxr2gSdhasWSDbdAgdA637sdAhde7Adysi23` and
+        `api-key=api-key`. The server needs both, so they are declared as one
+        AND-pair.
+      security:
+        - queryToken: []
+          queryApiKey: []
+      responses:
+        "200": { $ref: "#/components/responses/Passed" }
+        "401": { $ref: "#/components/responses/Failed" }
+
+  /auth/customHeaderSignature:
+    get:
+      tags: [Single]
+      operationId: apiKeyHeaderPair
+      summary: API key pair in headers
+      description: |
+        Expects headers `token: Qaws2W233WedeRe4T56G6Vref2` and
+        `api-key: api-key`. The server needs both, so they are declared as one
+        AND-pair.
+      security:
+        - headerToken: []
+          headerApiKey: []
+      responses:
+        "200": { $ref: "#/components/responses/Passed" }
+        "401": { $ref: "#/components/responses/Failed" }
+
+  /auth/customQueryOrHeaderParam:
+    get:
+      tags: [Combination]
+      operationId: orAuth
+      summary: Query keys OR header keys
+      description: Passes with either the query key pair or the header key pair.
+      security:
+        - queryToken: []
+          queryApiKey: []
+        - headerToken: []
+          headerApiKey: []
+      responses:
+        "200": { $ref: "#/components/responses/Passed" }
+        "401": { $ref: "#/components/responses/Failed" }
+
+  /auth/basicAndApiKeyAndApiHeader:
+    get:
+      tags: [Combination]
+      operationId: andAuth
+      summary: Basic AND query keys AND header keys
+      description: Needs Basic auth, the query key pair and the header key pair together.
+      security:
+        - basicAuth: []
+          queryToken: []
+          queryApiKey: []
+          headerToken: []
+          headerApiKey: []
+      responses:
+        "200": { $ref: "#/components/responses/Passed" }
+        "401": { $ref: "#/components/responses/Failed" }
+
+  /auth/multipleAuthCombination:
+    get:
+      tags: [Combination]
+      operationId: orOfAnds
+      summary: Custom header OR bearer OR (Basic AND keys)
+      description: |
+        Passes with the `accesstoken` header, or the static bearer token, or
+        Basic auth together with the query and header key pairs.
+      security:
+        - customHeader: []
+        - bearerAuth: []
+        - basicAuth: []
+          queryToken: []
+          queryApiKey: []
+          headerToken: []
+          headerApiKey: []
+      responses:
+        "200": { $ref: "#/components/responses/Passed" }
+        "401": { $ref: "#/components/responses/Failed" }
+
+  /oauth2/auth-server:
+    get:
+      tags: [OAuth 2]
+      operationId: clientCredentials
+      summary: OAuth 2 client credentials
+      description: |
+        Token from `POST /oauth2/auth-server/request_token` with client `23`.
+        The API Tester only accepts the client credentials as a Basic
+        `Authorization` header, not in the request body.
+      security:
+        - oauthClientCredentials: []
+      responses:
+        "200": { $ref: "#/components/responses/Passed" }
+        "401": { $ref: "#/components/responses/Failed" }
+
+  /oauth2/non-auth-server/user:
+    get:
+      tags: [OAuth 2]
+      operationId: authorizationCode
+      summary: OAuth 2 authorization code
+      description: |
+        Authorize at `/oauth2/auth-server/oauth/authorize` (client `24`), which
+        redirects back with `code=910b000d4f`, then exchange it at
+        `/oauth2/non-auth-server/token`.
+      security:
+        - oauthAuthCode: []
+      responses:
+        "200": { $ref: "#/components/responses/PassedJson" }
+        "401": { $ref: "#/components/responses/Failed" }
+
+  /oauth2/non-auth-server/status:
+    get:
+      tags: [OAuth 2]
+      operationId: password
+      summary: OAuth 2 password
+      description: |
+        Token from `/oauth2/non-auth-server/token` with client `25`, username
+        `apimatic` and password `api-d604257e42-matic`.
+      security:
+        - oauthPassword: []
+      responses:
+        "200": { $ref: "#/components/responses/PassedJson" }
+        "401": { $ref: "#/components/responses/Failed" }
+
+  /oauth2/oauthOrCombination:
+    get:
+      tags: [OAuth 2]
+      operationId: oauthOrBearer
+      summary: OAuth 2 client credentials OR bearer
+      description: Passes with an issued client-credentials token or the static bearer token.
+      security:
+        - oauthClientCredentials: []
+        - bearerAuth: []
+      responses:
+        "200": { $ref: "#/components/responses/Passed" }
+        "401": { $ref: "#/components/responses/Failed" }
+
+  /unvalidated/apiKeyCookie:
+    get:
+      tags: [Unvalidated]
+      operationId: apiKeyCookie
+      summary: API key in cookie
+      description: Echo only — the API Tester has no cookie checker.
+      parameters:
+        - $ref: "#/components/parameters/Echo"
+      security:
+        - cookieKey: []
+      responses:
+        "200": { $ref: "#/components/responses/Echo" }
+
+  /unvalidated/implicit:
+    get:
+      tags: [Unvalidated]
+      operationId: implicit
+      summary: OAuth 2 implicit
+      description: Echo only — the API Tester has no implicit flow.
+      parameters:
+        - $ref: "#/components/parameters/Echo"
+      security:
+        - oauthImplicit: []
+      responses:
+        "200": { $ref: "#/components/responses/Echo" }
+
+  /unvalidated/openIdConnect:
+    get:
+      tags: [Unvalidated]
+      operationId: openIdConnect
+      summary: OpenID Connect
+      description: Echo only — the API Tester has no OpenID Connect support.
+      parameters:
+        - $ref: "#/components/parameters/Echo"
+      security:
+        - openId: []
+      responses:
+        "200": { $ref: "#/components/responses/Echo" }
+
+  /unvalidated/digest:
+    get:
+      tags: [Unvalidated]
+      operationId: digest
+      summary: Digest auth
+      description: Echo only — the API Tester has no Digest checker.
+      parameters:
+        - $ref: "#/components/parameters/Echo"
+      security:
+        - digestAuth: []
+      responses:
+        "200": { $ref: "#/components/responses/Echo" }
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: "Username `Zeeshan`, password `bhai_99`."
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: "Static token `0b79bab50daca910b000d4f1a2b675d604257e42`."
+    customHeader:
+      type: apiKey
+      in: header
+      name: accesstoken
+      description: "`azHmdOe09EdchxeWsdnplkQbv76sJH`"
+    headerToken:
+      type: apiKey
+      in: header
+      name: token
+      description: "`Qaws2W233WedeRe4T56G6Vref2`"
+    headerApiKey:
+      type: apiKey
+      in: header
+      name: api-key
+      description: "`api-key`"
+    queryToken:
+      type: apiKey
+      in: query
+      name: token
+      description: "`asdqwaxr2gSdhasWSDbdAgdA637sdAhde7Adysi23`"
+    queryApiKey:
+      type: apiKey
+      in: query
+      name: api-key
+      description: "`api-key`"
+    oauthClientCredentials:
+      type: oauth2
+      description: "Client `23` / `tQNSqQlXBIwZcY9auoujQ57ckDcoh3t8UPbBRkSF`."
+      flows:
+        clientCredentials:
+          tokenUrl: http://localhost:3000/oauth2/auth-server/request_token
+          scopes: {}
+    oauthAuthCode:
+      type: oauth2
+      description: "Client `24` / `Y9auoujQ57ckDtQNSqQlXBIwZccoh3t8UPbBRkSF`."
+      flows:
+        authorizationCode:
+          authorizationUrl: http://localhost:3000/oauth2/auth-server/oauth/authorize
+          tokenUrl: http://localhost:3000/oauth2/non-auth-server/token
+          refreshUrl: http://localhost:3000/oauth2/non-auth-server/token
+          scopes: {}
+    oauthPassword:
+      type: oauth2
+      description: "Client `25` / `ckDcoh3t8UPbBRkSFtQNSqQlXBIwZcY9auoujQ57`; user `apimatic` / `api-d604257e42-matic`."
+      flows:
+        password:
+          tokenUrl: http://localhost:3000/oauth2/non-auth-server/token
+          refreshUrl: http://localhost:3000/oauth2/non-auth-server/token
+          scopes: {}
+    cookieKey:
+      type: apiKey
+      in: cookie
+      name: session
+    oauthImplicit:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: http://localhost:3000/unvalidated/authorize
+          scopes: {}
+    openId:
+      type: openIdConnect
+      openIdConnectUrl: http://localhost:3000/unvalidated/.well-known/openid-configuration
+    digestAuth:
+      type: http
+      scheme: digest
+
+  parameters:
+    Echo:
+      name: echo
+      in: query
+      required: true
+      description: Makes the API Tester's catch-all echo the request back.
+      schema:
+        type: boolean
+        enum: [true]
+        default: true
+
+  responses:
+    Passed:
+      description: Credentials accepted.
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: You've passed the test!
+    PassedJson:
+      description: Token accepted.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: passed
+    Failed:
+      description: Credentials missing or wrong; the body names which check failed.
+      content:
+        text/plain:
+          schema:
+            type: string
+    Echo:
+      description: The request as the API Tester received it.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              path: { type: string }
+              method: { type: string }
+              query: { type: object, additionalProperties: true }
+              headers: { type: object, additionalProperties: { type: string } }

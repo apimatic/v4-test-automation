@@ -17,3 +17,4 @@ test-builds/*/portal/
 
 # Scratch probe scripts used while verifying locators
 probe.tmp.*
+.claude/
