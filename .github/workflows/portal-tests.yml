@@ -146,6 +146,7 @@ jobs:
       # ---- generate -------------------------------------------------------
       # The committed build, generated once, for the browser stages to serve.
       - name: Generate the portal
+        id: portal-generate
         run: pnpm portal:generate
 
       # PORTAL_PREBUILT so the server (which Playwright starts for the browser
@@ -153,13 +154,28 @@ jobs:
 
       # ---- stage 2 --------------------------------------------------------
       - name: Visual
+        if: ${{ !cancelled() && steps.portal-generate.outcome == 'success' }}
         env:
           PORTAL_PREBUILT: "1"
         run: pnpm test:visual
 
       # ---- stage 3 --------------------------------------------------------
-      - name: Functional
+      # Functional runs against the auth build, whose playground calls the API
+      # Tester (api-tester/, trimmed from the private repo) on localhost:3000.
+      # Playwright starts the API Tester itself (webServer in playwright.config.ts),
+      # because a server started in its own step doesn't outlive that step.
+
+      - name: Generate the auth portal
+        id: auth-portal
         env:
+          PORTAL: auth
+        run: pnpm portal:generate
+
+      - name: Functional
+        if: ${{ !cancelled() && steps.auth-portal.outcome == 'success' }}
+        shell: bash
+        env:
+          PORTAL: auth
           PORTAL_PREBUILT: "1"
         run: pnpm test:functional
 
@@ -178,6 +194,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ inputs.build || 'petstore' }}-${{ inputs.environment || 'dev' }}
-          path: test-results/
+          path: |
+            test-results/
           retention-days: 30
           if-no-files-found: ignore

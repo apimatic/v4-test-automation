@@ -1,0 +1,28 @@
+{
+  "$schema": "../apimatic.schema.json",
+  "schemaVersion": 1,
+  "portal": {
+    "site": {
+      "name": "Auth Tester",
+      "description": "One operation per auth type, backed by the APIMatic API Tester."
+    },
+    "brand": {
+      "logo": {
+        "light": "static/images/logo-light.png",
+        "dark": "static/images/logo-dark.png"
+      },
+      "favicon": "static/images/favicon.ico",
+      "colors": {
+        "primary": {
+          "light": "#b91c1c",
+          "dark": "#34d399"
+        }
+      },
+      "colorMode": "both"
+    }
+  },
+  "languages": {
+    "typescript": {},
+    "python": {}
+  }
+}

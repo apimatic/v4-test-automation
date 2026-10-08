@@ -4,20 +4,30 @@ import { baseURL, portalPort, usingExternalPortal } from "./utils/env.ts";
 
 dotenv.config({ quiet: true });
 
+/** The projects named with --project on this run. Empty means all of them. */
+const requestedProjects = (() => {
+  const args = process.argv;
+  return args.flatMap((arg, i) =>
+    arg.startsWith("--project=") ? [arg.slice("--project=".length)]
+    : arg === "--project" ? [args[i + 1]]
+    : [],
+  );
+})();
+
 /**
  * True when this run is only the artifacts project. Those tests generate their
  * own portals into temp folders, so starting the web server — which generates
  * and serves the committed build — would be a wasted generation.
  */
-const artifactsOnly = (() => {
-  const args = process.argv;
-  const projects = args.flatMap((arg, i) =>
-    arg.startsWith("--project=") ? [arg.slice("--project=".length)]
-    : arg === "--project" ? [args[i + 1]]
-    : [],
-  );
-  return projects.length > 0 && projects.every((p) => p === "artifacts");
-})();
+const artifactsOnly =
+  requestedProjects.length > 0 && requestedProjects.every((p) => p === "artifacts");
+
+/**
+ * True when this run includes the functional project. Its playground calls go
+ * to the API Tester, so it's started only then.
+ */
+const runsFunctional =
+  requestedProjects.length === 0 || requestedProjects.includes("functional");
 
 /**
  * v4 test automation — three suites over a portal produced by
@@ -102,26 +112,43 @@ export default defineConfig({
 
   /**
    * Generate the portal and serve it, unless PORTAL_BASE_URL points at one
-   * that's already hosted.
+   * that's already hosted. For functional runs, also start the API Tester
+   * (api-tester/) on localhost:3000, which the auth build's playground calls.
    *
-   * Playwright owns the server process on purpose: a server started in its own
-   * CI step doesn't survive, because the Windows runner tears down a step's
+   * Playwright owns both server processes on purpose: a server started in its
+   * own CI step doesn't survive, because the Windows runner tears down a step's
    * process tree when the step ends.
    *
    * PORTAL_PREBUILT is for CI, where generation is its own step so its log and
    * timing stand alone; this then only has to serve.
    */
-  webServer: usingExternalPortal() || artifactsOnly
-    ? undefined
-    : {
-        command: process.env.PORTAL_PREBUILT
-          ? "node scripts/serve-portal.mts --no-generate"
-          : "node scripts/serve-portal.mts",
-        url: `http://127.0.0.1:${portalPort()}/`,
-        /* CLI generation plus http-server coming up, from cold. */
-        timeout: 300_000,
-        reuseExistingServer: !process.env.CI,
-        stdout: "pipe",
-        stderr: "pipe",
-      },
+  webServer: [
+    ...(usingExternalPortal() || artifactsOnly
+      ? []
+      : [
+          {
+            command: process.env.PORTAL_PREBUILT
+              ? "node scripts/serve-portal.mts --no-generate"
+              : "node scripts/serve-portal.mts",
+            url: `http://127.0.0.1:${portalPort()}/`,
+            /* CLI generation plus http-server coming up, from cold. */
+            timeout: 300_000,
+            reuseExistingServer: !process.env.CI,
+            stdout: "pipe" as const,
+            stderr: "pipe" as const,
+          },
+        ]),
+    ...(runsFunctional
+      ? [
+          {
+            command: "node api-tester/bin/www",
+            url: "http://localhost:3000/auth/skipAuthentication",
+            timeout: 30_000,
+            reuseExistingServer: !process.env.CI,
+            stdout: "pipe" as const,
+            stderr: "pipe" as const,
+          },
+        ]
+      : []),
+  ],
 });

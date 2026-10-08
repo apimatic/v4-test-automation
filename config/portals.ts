@@ -76,6 +76,44 @@ export const portals = {
       llmsFull: "/llms-full.txt",
     },
   },
+
+  // One operation per auth type, served by APIMatic's API Tester on
+  // localhost:3000 — start it before running anything that calls the API.
+  // test-builds/auth/README.md maps each operation to its route and credentials.
+  auth: {
+    buildDir: "test-builds/auth",
+    label: "Auth Tester",
+    routes: {
+      home: "/",
+      apiReference: "/api/auth/",
+
+      // One scheme, or one AND-pair the server needs together.
+      authNone: "/api/auth/single/noAuth/",
+      authBasic: "/api/auth/single/basic/",
+      authBearer: "/api/auth/single/bearer/",
+      authApiKeyHeader: "/api/auth/single/apiKeyHeader/",
+      authApiKeyQuery: "/api/auth/single/apiKeyQuery/",
+      authApiKeyHeaderPair: "/api/auth/single/apiKeyHeaderPair/",
+
+      // AND / OR combinations.
+      authOr: "/api/auth/combination/orAuth/",
+      authAnd: "/api/auth/combination/andAuth/",
+      authOrOfAnds: "/api/auth/combination/orOfAnds/",
+
+      // OAuth 2 flows — tokens are issued by the API Tester.
+      authOAuthClientCredentials: "/api/auth/oauth-2/clientCredentials/",
+      authOAuthAuthorizationCode: "/api/auth/oauth-2/authorizationCode/",
+      authOAuthPassword: "/api/auth/oauth-2/password/",
+      authOAuthOrBearer: "/api/auth/oauth-2/oauthOrBearer/",
+
+      // No checker in the API Tester — these hit its echo catch-all, so they
+      // show rendering and what was sent, not whether it was accepted.
+      authApiKeyCookie: "/api/auth/unvalidated/apiKeyCookie/",
+      authOAuthImplicit: "/api/auth/unvalidated/implicit/",
+      authOpenIdConnect: "/api/auth/unvalidated/openIdConnect/",
+      authDigest: "/api/auth/unvalidated/digest/",
+    },
+  },
 } satisfies Record<string, PortalConfig>;
 
 export type PortalName = keyof typeof portals;

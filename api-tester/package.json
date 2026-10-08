@@ -1,0 +1,9 @@
+{
+  "name": "api-tester",
+  "private": true,
+  "description": "Auth routes trimmed from APIMatic's API Tester. Dependencies live in the root package.json.",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node ./bin/www"
+  }
+}
