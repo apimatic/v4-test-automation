@@ -158,10 +158,46 @@ jobs:
         run: pnpm test:visual
 
       # ---- stage 3 --------------------------------------------------------
-      - name: Functional
+      # Functional runs against the auth build, whose playground calls the API
+      # Tester (api-tester/, trimmed from the private repo) on localhost:3000.
+
+      # Start-Process detaches the server from this step, so it's still
+      # running when the Functional step needs it. Its output goes to
+      # api-tester*.log, which is uploaded if anything fails.
+      - name: Start the API Tester
+        shell: pwsh
+        run: |
+          Start-Process -FilePath node -ArgumentList "api-tester/bin/www" `
+            -RedirectStandardOutput api-tester.log -RedirectStandardError api-tester.err.log
+          for ($i = 0; $i -lt 30; $i++) {
+            try {
+              Invoke-WebRequest http://localhost:3000/auth/skipAuthentication -UseBasicParsing | Out-Null
+              Write-Host "API Tester is up on port 3000"
+              exit 0
+            } catch { Start-Sleep -Seconds 1 }
+          }
+          Get-Content api-tester.log, api-tester.err.log
+          throw "API Tester did not start on port 3000"
+
+      - name: Generate the auth portal
         env:
+          PORTAL: auth
+        run: pnpm portal:generate
+
+      - name: Functional
+        shell: bash
+        env:
+          PORTAL: auth
           PORTAL_PREBUILT: "1"
-        run: pnpm test:functional
+        run: |
+          # Fail with a clear message if the API Tester didn't outlive its step,
+          # rather than as a playground call that never got an answer.
+          if ! curl -sf http://localhost:3000/auth/skipAuthentication > /dev/null; then
+            echo "::error::The API Tester is not running on localhost:3000."
+            cat api-tester.log api-tester.err.log
+            exit 1
+          fi
+          pnpm test:functional
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
@@ -178,6 +214,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ inputs.build || 'petstore' }}-${{ inputs.environment || 'dev' }}
-          path: test-results/
+          path: |
+            test-results/
+            api-tester*.log
           retention-days: 30
           if-no-files-found: ignore

@@ -18,3 +18,6 @@ test-builds/*/portal/
 # Scratch probe scripts used while verifying locators
 probe.tmp.*
 .claude/
+
+# API Tester output, written by the CI step that starts it
+api-tester*.log
