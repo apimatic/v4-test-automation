@@ -2,6 +2,11 @@
 # Without this, the CRLF the Windows runner writes shows up as a whole-file diff.
 * text=auto
 
+# Build inputs are LF on every machine. The generator copies some content
+# verbatim (twoslash code blocks, for one), so a CRLF checkout on the Windows
+# runner leaks carriage returns into llms-full.txt and fails its baseline.
+test-builds/** text=auto eol=lf
+
 # Snapshot baselines are compared byte-for-byte — never let git touch them.
 *.png binary
 *.gif binary
