@@ -112,6 +112,14 @@ export class GeneratedPortal {
     return fs.readFileSync(this.path(...segments), "utf-8");
   }
 
+  /**
+   * A text file read for comparison against a baseline, with the formatting
+   * noise taken out — see `normalizeText()`.
+   */
+  readNormalized(...segments: string[]): string {
+    return normalizeText(this.read(...segments));
+  }
+
   /** Every file under the generated portal, as POSIX-style relative paths. */
   files(subdir = ""): string[] {
     const root = this.path(subdir);
@@ -148,6 +156,21 @@ export class GeneratedPortal {
     }
     fs.rmSync(this.root, { recursive: true, force: true });
   }
+}
+
+/**
+ * Takes the formatting noise out of generated text before it's compared.
+ *
+ * - Line endings: the generator copies the inputs' line endings into its
+ *   output, so a build checked out as CRLF (any Windows clone made before
+ *   .gitattributes pinned test-builds/ to LF) yields a CRLF file.
+ * - Runs of blank lines: generator releases add or drop a blank line around
+ *   stripped frontmatter and imports without changing any content.
+ *
+ * What's left is content, so a diff after this is a real change.
+ */
+export function normalizeText(text: string): string {
+  return text.replace(/\r\n?/g, "\n").replace(/\n{3,}/g, "\n\n");
 }
 
 // ---------------------------------------------------------------------------

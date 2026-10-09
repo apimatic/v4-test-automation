@@ -1,9 +1,5 @@
 # Accordions (/components/accordions)
 
-
-
-
-
 ## Frequently asked [#frequently-asked]
 
 <Accordions type="single">
@@ -62,12 +58,7 @@
   </Accordion>
 </Accordions>
 
-
 # Banner and InlineTOC (/components/banner)
-
-
-
-
 
 <Banner variant="rainbow">
   Petstore API v3.3 is now generally available.
@@ -95,10 +86,7 @@ Requests are rate limited per API key rather than per IP address. When you excee
 
 Errors carry a machine-readable `code` alongside the human-readable `message`. Match on `code` in your own error handling: the `message` is written for a developer reading a log and may be reworded between releases, while `code` is part of the contract and changes only with a major version bump.
 
-
 # Callouts (/components/callouts)
-
-
 
 Callouts come from the default component set, so they need no import.
 
@@ -179,10 +167,7 @@ Errors carry a machine-readable `code` alongside the human-readable `message`. M
 
 Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.
 
-
 # Cards (/components/cards)
-
-
 
 Cards reflow by viewport width, so this page is the one to resize.
 
@@ -252,10 +237,7 @@ Requests are rate limited per API key rather than per IP address. When you excee
   <Card title="Short" href="/guides" description="Short." />
 </Cards>
 
-
 # Code blocks (/components/code-blocks)
-
-
 
 ## One block per language [#one-block-per-language]
 
@@ -339,12 +321,7 @@ followed by a bare URL that cannot break: [https://api.petstore.example.com/v3/p
 
 Errors carry a machine-readable `code` alongside the human-readable `message`. Match on `code` in your own error handling: the `message` is written for a developer reading a log and may be reworded between releases, while `code` is part of the contract and changes only with a major version bump.
 
-
 # Files (/components/files)
-
-
-
-
 
 ## What the CLI writes [#what-the-cli-writes]
 
@@ -394,10 +371,7 @@ Errors carry a machine-readable `code` alongside the human-readable `message`. M
   </Folder>
 </Files>
 
-
 # Components (/components)
-
-
 
 The Petstore API exposes pets, store orders and user accounts over HTTPS. Every request is authenticated, every response is JSON, and every list endpoint is paginated. This page walks through the parts of that contract you are most likely to need on your first integration, and points at the reference pages for the rest.
 
@@ -430,10 +404,7 @@ The Petstore API exposes pets, store orders and user accounts over HTTPS. Every 
 
 Requests are rate limited per API key rather than per IP address. When you exceed the limit the API answers `429 Too Many Requests` and sets `Retry-After` to the number of seconds remaining in the current window. The generated SDKs read that header and back off for you, so you only need to handle it directly if you are calling the API without an SDK.
 
-
 # Mermaid (/components/mermaid)
-
-
 
 <Mermaid
   chart="
@@ -474,12 +445,7 @@ sequenceDiagram
 
 Anything below this line should still render, whichever way the two diagrams above resolve.
 
-
 # Steps (/components/steps)
-
-
-
-
 
 ## Integrating the SDK [#integrating-the-sdk]
 
@@ -549,12 +515,7 @@ Anything below this line should still render, whichever way the two diagrams abo
 
 Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.
 
-
 # Tabs (/components/tabs)
-
-
-
-
 
 Tabs are not in the default component set, so this page imports them.
 
@@ -682,10 +643,7 @@ Requests are rate limited per API key rather than per IP address. When you excee
   </Tab>
 </Tabs>
 
-
 # Twoslash (/components/twoslash)
-
-
 
 Twoslash needs `fumadocs-twoslash` and a Shiki transformer wired into `mdxOptions`. This page
 uses twoslash syntax with none of that in place, to see whether the markers render as hover
@@ -746,12 +704,7 @@ const greeting = "hello";
 
 Anything below this line should still render, whichever way the blocks above resolve.
 
-
 # Type Table (/components/type-table)
-
-
-
-
 
 ## ClientOptions [#clientoptions]
 
@@ -785,10 +738,7 @@ Anything below this line should still render, whichever way the blocks above res
 }"
 />
 
-
 # Typography (/components/typography)
-
-
 
 The Petstore API exposes pets, store orders and user accounts over HTTPS. Every request is authenticated, every response is JSON, and every list endpoint is paginated. This page walks through the parts of that contract you are most likely to need on your first integration, and points at the reference pages for the rest.
 
@@ -862,10 +812,7 @@ A horizontal rule sits above this paragraph.
 
 Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.
 
-
 # Autolinks (/gfm/autolinks)
-
-
 
 GFM turns bare URLs into links without any angle brackets or link syntax.
 
@@ -899,10 +846,7 @@ Inside a code span: `https://example.com/not-a-link`
 
 A bare domain with no www and no scheme: example.com/petstore
 
-
 # Block structure (/gfm/blocks)
-
-
 
 # Setext heading level one [#setext-heading-level-one]
 
@@ -981,14 +925,7 @@ curl https://api.petstore.example.com/v3/pet/1 \
 { "id": 1, "name": "Kitty", "status": "available" }
 ```
 
-
 # Links and images (/gfm/links-images)
-
-
-
-
-
-
 
 ## Inline links [#inline-links]
 
@@ -1020,18 +957,15 @@ An inline image with a title:
 
 A reference image:
 
-![Dark logo][darklogo]
+<img alt="Dark logo" src="__img1" />
 
 [darklogo]: /images/logo-dark.png
 
 An image inside a link:
 
-[<img alt="Clickable logo" src="__img1" />](/sdks)
-
+[<img alt="Clickable logo" src="__img2" />](/sdks)
 
 # Tables (/gfm/tables)
-
-
 
 ## Every alignment [#every-alignment]
 
@@ -1075,10 +1009,7 @@ GFM pads a short row and drops cells beyond the header count.
 | pending   |
 | sold      |
 
-
 # Task lists (/gfm/task-lists)
-
-
 
 GFM adds task list items to ordinary lists. Each should render as a checkbox.
 
@@ -1110,10 +1041,7 @@ GFM adds task list items to ordinary lists. Each should render as a checkbox.
 
   This paragraph belongs to the checked item above.
 
-
 # Text formatting (/gfm/text-formatting)
-
-
 
 ## Strikethrough [#strikethrough]
 
@@ -1157,10 +1085,7 @@ Simple `code`, with backticks `` ` `` inside, and ``a span with a `nested` backt
 
 A code span preserving   multiple   spaces: `a   b`
 
-
 # Authentication (/guides/authentication)
-
-
 
 Requests are rate limited per API key rather than per IP address. When you exceed the limit the API answers `429 Too Many Requests` and sets `Retry-After` to the number of seconds remaining in the current window. The generated SDKs read that header and back off for you, so you only need to handle it directly if you are calling the API without an SDK.
 
@@ -1210,10 +1135,7 @@ def list_available_pets(limit: int = 100):
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
-
 # Guides (/guides)
-
-
 
 Requests are rate limited per API key rather than per IP address. When you exceed the limit the API answers `429 Too Many Requests` and sets `Retry-After` to the number of seconds remaining in the current window. The generated SDKs read that header and back off for you, so you only need to handle it directly if you are calling the API without an SDK.
 
@@ -1274,10 +1196,7 @@ export async function listAvailablePets(limit = 100): Promise<Pet[]> {
 > immediately. There is no draft state, and no soft delete: a `DELETE` removes
 > the record and its photo attachments in the same transaction.
 
-
 # Delivery (/guides/webhooks/delivery)
-
-
 
 Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.
 
@@ -1338,10 +1257,7 @@ export async function listAvailablePets(limit = 100): Promise<Pet[]> {
 > immediately. There is no draft state, and no soft delete: a `DELETE` removes
 > the record and its photo attachments in the same transaction.
 
-
 # Ordering (/guides/webhooks/delivery/ordering)
-
-
 
 Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.
 
@@ -1391,10 +1307,7 @@ def list_available_pets(limit: int = 100):
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
-
 # Backoff (/guides/webhooks/delivery/retries/backoff)
-
-
 
 Requests are rate limited per API key rather than per IP address. When you exceed the limit the API answers `429 Too Many Requests` and sets `Retry-After` to the number of seconds remaining in the current window. The generated SDKs read that header and back off for you, so you only need to handle it directly if you are calling the API without an SDK.
 
@@ -1455,10 +1368,7 @@ export async function listAvailablePets(limit = 100): Promise<Pet[]> {
 > immediately. There is no draft state, and no soft delete: a `DELETE` removes
 > the record and its photo attachments in the same transaction.
 
-
 # Algorithms (/guides/webhooks/delivery/retries/backoff/jitter/algorithms)
-
-
 
 Errors carry a machine-readable `code` alongside the human-readable `message`. Match on `code` in your own error handling: the `message` is written for a developer reading a log and may be reworded between releases, while `code` is part of the contract and changes only with a major version bump.
 
@@ -1508,10 +1418,7 @@ def list_available_pets(limit: int = 100):
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
-
 # Jitter (/guides/webhooks/delivery/retries/backoff/jitter)
-
-
 
 Errors carry a machine-readable `code` alongside the human-readable `message`. Match on `code` in your own error handling: the `message` is written for a developer reading a log and may be reworded between releases, while `code` is part of the contract and changes only with a major version bump.
 
@@ -1572,10 +1479,7 @@ export async function listAvailablePets(limit = 100): Promise<Pet[]> {
 > immediately. There is no draft state, and no soft delete: a `DELETE` removes
 > the record and its photo attachments in the same transaction.
 
-
 # Tuning (/guides/webhooks/delivery/retries/backoff/jitter/tuning)
-
-
 
 Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.
 
@@ -1636,10 +1540,7 @@ export async function listAvailablePets(limit = 100): Promise<Pet[]> {
 > immediately. There is no draft state, and no soft delete: a `DELETE` removes
 > the record and its photo attachments in the same transaction.
 
-
 # Reference (/guides/webhooks/delivery/retries/backoff/jitter/tuning/reference)
-
-
 
 Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.
 
@@ -1689,10 +1590,7 @@ def list_available_pets(limit: int = 100):
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
-
 # Schedule (/guides/webhooks/delivery/retries/backoff/schedule)
-
-
 
 Requests are rate limited per API key rather than per IP address. When you exceed the limit the API answers `429 Too Many Requests` and sets `Retry-After` to the number of seconds remaining in the current window. The generated SDKs read that header and back off for you, so you only need to handle it directly if you are calling the API without an SDK.
 
@@ -1742,10 +1640,7 @@ def list_available_pets(limit: int = 100):
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
-
 # Dead letter (/guides/webhooks/delivery/retries/dead-letter)
-
-
 
 The Petstore API exposes pets, store orders and user accounts over HTTPS. Every request is authenticated, every response is JSON, and every list endpoint is paginated. This page walks through the parts of that contract you are most likely to need on your first integration, and points at the reference pages for the rest.
 
@@ -1795,10 +1690,7 @@ def list_available_pets(limit: int = 100):
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
-
 # Retries (/guides/webhooks/delivery/retries)
-
-
 
 The Petstore API exposes pets, store orders and user accounts over HTTPS. Every request is authenticated, every response is JSON, and every list endpoint is paginated. This page walks through the parts of that contract you are most likely to need on your first integration, and points at the reference pages for the rest.
 
@@ -1859,10 +1751,7 @@ export async function listAvailablePets(limit = 100): Promise<Pet[]> {
 > immediately. There is no draft state, and no soft delete: a `DELETE` removes
 > the record and its photo attachments in the same transaction.
 
-
 # Webhooks (/guides/webhooks)
-
-
 
 Errors carry a machine-readable `code` alongside the human-readable `message`. Match on `code` in your own error handling: the `message` is written for a developer reading a log and may be reworded between releases, while `code` is part of the contract and changes only with a major version bump.
 
@@ -1923,10 +1812,7 @@ export async function listAvailablePets(limit = 100): Promise<Pet[]> {
 > immediately. There is no draft state, and no soft delete: a `DELETE` removes
 > the record and its photo attachments in the same transaction.
 
-
 # Signatures (/guides/webhooks/signatures)
-
-
 
 Errors carry a machine-readable `code` alongside the human-readable `message`. Match on `code` in your own error handling: the `message` is written for a developer reading a log and may be reworded between releases, while `code` is part of the contract and changes only with a major version bump.
 
@@ -1976,10 +1862,7 @@ def list_available_pets(limit: int = 100):
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
-
 # TT Status Codes (/)
-
-
 
 <Mermaid
 chart="
@@ -2040,7 +1923,6 @@ const player: Player = { name: 'Hello World' };
 
 fn('test');
 ````
-
 
 # Context Plugin (/context-plugin)
 
