@@ -146,6 +146,7 @@ jobs:
       # ---- generate -------------------------------------------------------
       # The committed build, generated once, for the browser stages to serve.
       - name: Generate the portal
+        if: always()
         id: portal-generate
         run: pnpm portal:generate
 
@@ -167,6 +168,7 @@ jobs:
 
       - name: Generate the auth portal
         id: auth-portal
+        if: always()
         env:
           PORTAL: auth
         run: pnpm portal:generate

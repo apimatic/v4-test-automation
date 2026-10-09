@@ -67,15 +67,18 @@ test.describe("Petstore — generated artifacts @artifacts", () => {
     // portal. They're compared against committed baselines in
     // portal-snapshots/artifacts/petstore/ rather than against apimatic.json,
     // because their content comes from the pages and the spec, not the config.
-    // Both were byte-identical across separate generations, so any diff is the
-    // generator's output changing. Accept an intended change with
+    // Line endings and blank-line runs are normalized first: they vary with
+    // the CLI build without the content changing. Any diff that's left is the
+    // generator's content changing. Accept an intended change with
     // `pnpm test:artifacts:update`, and review the diff before committing.
+    // Don't copy a generated llms-full.txt over the baseline: the baseline
+    // holds the normalized text, so a raw copy fails on its blank lines.
     test("llms.txt matches the baseline", () => {
-      expect(portal.read("llms.txt")).toMatchSnapshot("llms.txt");
+      expect(portal.readNormalized("llms.txt")).toMatchSnapshot("llms.txt");
     });
 
     test("llms-full.txt matches the baseline", () => {
-      expect(portal.read("llms-full.txt")).toMatchSnapshot("llms-full.txt");
+      expect(portal.readNormalized("llms-full.txt")).toMatchSnapshot("llms-full.txt");
     });
   });
 
