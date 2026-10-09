@@ -71,6 +71,8 @@ test.describe("Petstore — generated artifacts @artifacts", () => {
     // the CLI build without the content changing. Any diff that's left is the
     // generator's content changing. Accept an intended change with
     // `pnpm test:artifacts:update`, and review the diff before committing.
+    // Don't copy a generated llms-full.txt over the baseline: the baseline
+    // holds the normalized text, so a raw copy fails on its blank lines.
     test("llms.txt matches the baseline", () => {
       expect(portal.readNormalized("llms.txt")).toMatchSnapshot("llms.txt");
     });
