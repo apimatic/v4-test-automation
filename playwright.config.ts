@@ -30,6 +30,17 @@ const runsFunctional =
   requestedProjects.length === 0 || requestedProjects.includes("functional");
 
 /**
+ * Where this run writes its failure output and HTML report: one folder per
+ * stage, e.g. test-results/artifacts and playwright-report/artifacts.
+ *
+ * CI runs each stage as its own `playwright test`, and every run empties its
+ * output folder and rewrites its report. With one shared folder, the visual and
+ * functional runs deleted the artifacts stage's failures before CI uploaded
+ * them. A run of several projects, or all of them, writes to "all".
+ */
+const runName = requestedProjects.length === 1 ? requestedProjects[0] : "all";
+
+/**
  * v4 test automation — three suites over a portal produced by
  * `apimatic portal generate`.
  *
@@ -60,7 +71,11 @@ export default defineConfig({
   /* The browser suites share one server; serially keeps snapshots stable. */
   workers: 1,
 
-  reporter: process.env.CI ? [["html"], ["github"]] : "html",
+  outputDir: `test-results/${runName}`,
+
+  reporter: process.env.CI
+    ? [["html", { outputFolder: `playwright-report/${runName}` }], ["github"]]
+    : [["html", { outputFolder: `playwright-report/${runName}` }]],
 
   /* Baselines live in the repo, grouped by project and by build (the test's own
      folder), e.g. portal-snapshots/visual/petstore/home-light.png */

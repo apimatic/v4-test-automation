@@ -66,8 +66,12 @@ pnpm test:visual         # stage 2
 pnpm test:functional     # stage 3 (empty for now — passes with no tests)
 
 pnpm test:visual:update  # accept the current rendering as the new baselines
-pnpm report              # open the HTML report
+pnpm report playwright-report/visual   # open a stage's HTML report
 ```
+
+Each stage writes to its own `test-results/<stage>/` and
+`playwright-report/<stage>/` (a run of several stages writes to `all`), so one
+stage's run can't wipe another's failures.
 
 `webServer` uses `reuseExistingServer` locally, so if a portal is already up on
 `PORTAL_PORT` the tests attach to it. To drive the two commands yourself:
