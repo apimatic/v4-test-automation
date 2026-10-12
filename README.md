@@ -25,7 +25,8 @@ test-builds/petstore/portal/      the generated portal (gitignored)
    http://127.0.0.1:8080
         │
         ├──▶ 2. VISUAL      how it looks, against committed baselines
-        └──▶ 3. FUNCTIONAL  what it does (structure in place, cases to come)
+        └──▶ 3. FUNCTIONAL  what it does — runs against the auth build, whose
+                            playground calls the API Tester on :3000
 ```
 
 Each stage catches something the next one can't. Artifacts catch a portal built
@@ -63,7 +64,7 @@ pnpm portal:serve        # generate, then serve on :8080
 pnpm test                # all three projects
 pnpm test:artifacts      # stage 1 — generates its own portals, no server
 pnpm test:visual         # stage 2
-pnpm test:functional     # stage 3 (empty for now — passes with no tests)
+PORTAL=auth pnpm test:functional   # stage 3 — also starts the API Tester
 
 pnpm test:visual:update  # accept the current rendering as the new baselines
 pnpm report playwright-report/visual   # open a stage's HTML report
@@ -158,9 +159,44 @@ pinned 1920×1080, so CI runs `windows-latest` to match.
 
 ## Stage 3 — functional
 
-`tests/functional/` is wired up and empty. See its README — the script runs with
-`--pass-with-no-tests` until there are cases, because Playwright exits 1 on
-"No tests found" and that would fail CI for a stage with nothing to run.
+`tests/functional/` checks what the portal *does*, which a screenshot can't
+judge: a playground call sending the right credentials, navigation landing
+where it should, search actually matching, downloads being served. The portal
+is a client-routed SPA, so a broken route shows as a blank shell rather than a
+server error — exactly the failure a visual test absorbs and a functional test
+catches.
+
+The suite runs against the **auth build** (`test-builds/auth`), which has one
+operation per auth type. Each operation points at a route of APIMatic's **API
+Tester** — the trimmed copy in `api-tester/`, which checks credentials against
+hardcoded values. `test-builds/auth/README.md` maps every operation to its
+route and credentials.
+
+A functional run needs two servers, and Playwright starts both (`webServer` in
+`playwright.config.ts`):
+
+| Server | Port | Started by |
+|---|---|---|
+| the generated auth portal | `8080` | `scripts/serve-portal.mts` |
+| the API Tester | `3000` | `node api-tester/bin/www` |
+
+The API Tester's dependencies are in the root `package.json`, so `pnpm install`
+covers it. Locally both servers are reused if already up, so you can also start
+them yourself:
+
+```bash
+PORTAL=auth pnpm portal:serve   # the portal, on 8080
+node api-tester/bin/www         # the API it calls, on 3000
+```
+
+Tests that only make sense on the auth build skip themselves unless
+`PORTAL=auth`. Where the response panel's look matters, a test pairs its
+wire-level assertions (headers sent, status returned) with an element-scoped
+screenshot of the playground.
+
+When adding cases, use the page objects in `pages/` and the named routes in
+`config/portals.ts`; don't put raw locators in test files. A case for another
+build goes in its own folder under `tests/functional/`.
 
 ## Layout
 
@@ -176,6 +212,7 @@ pages/                     page objects — locators live here, never in tests
 tests/artifacts/<build>/   stage 1
 tests/visual/<build>/      stage 2
 tests/functional/          stage 3
+api-tester/                trimmed API Tester the auth build's playground calls
 scripts/serve-portal.mts   generate + serve
 portal-snapshots/          committed visual baselines
 ```
@@ -186,7 +223,7 @@ portal-snapshots/          committed visual baselines
 **windows-latest** (the baselines were captured there), each stage its own step:
 
 ```
-install + authenticate the CLI  ->  artifacts  ->  generate  ->  visual  ->  functional
+install + authenticate the CLI  ->  artifacts  ->  generate  ->  visual  ->  generate auth  ->  functional
 ```
 
 ### Environments
