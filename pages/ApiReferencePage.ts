@@ -1,6 +1,17 @@
 import { type Locator, type Page, type Response } from "@playwright/test";
 import { DocsPage } from "./DocsPage.ts";
 
+/** Where an API key or header credential goes, as the playground labels it. */
+export type AuthFieldLocation = "header" | "query" | "cookie";
+
+/** What the OAuth "Authorize" dialog asks for. Username/password only for the password flow. */
+export type OAuthCredentials = {
+  clientId: string;
+  clientSecret?: string;
+  username?: string;
+  password?: string;
+};
+
 /**
  * An endpoint page of the API reference, with its "try it" playground.
  *
@@ -16,6 +27,28 @@ export class ApiReferencePage extends DocsPage {
   readonly responseStatus: Locator;
   /** The response body's code block. The only region in the form. */
   readonly responseBody: Locator;
+  /** Collapsible holding the operation's auth inputs. Closed on load. */
+  readonly authorizationToggle: Locator;
+  /**
+   * Picks which security requirement to fill — one option per OR alternative
+   * in the spec, named by its scheme ids joined with spaces. It's the first
+   * combobox in the form; the Query section's comboboxes come after it.
+   */
+  readonly authSchemeSelect: Locator;
+  /** Basic auth inputs, inside the Authorization panel. */
+  readonly basicUsernameInput: Locator;
+  readonly basicPasswordInput: Locator;
+  /**
+   * The raw Authorization header field, used by bearer, OpenID Connect and
+   * digest. Bearer pre-fills it with "Bearer ".
+   */
+  readonly authorizationHeaderInput: Locator;
+  /** OAuth 2: the token field ("Bearer …") and the button that fetches one. */
+  readonly accessTokenInput: Locator;
+  readonly authorizeButton: Locator;
+  /** The OAuth "Authorize" dialog. Rendered outside the form, so page-scoped. */
+  readonly oauthDialog: Locator;
+  readonly oauthSubmitButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -25,6 +58,102 @@ export class ApiReferencePage extends DocsPage {
     // starts with a status code.
     this.responseStatus = this.playground.getByText(/^\d{3} \w+/);
     this.responseBody = this.playground.getByRole("region");
+    this.authorizationToggle = this.playground.getByRole("button", {
+      name: "Authorization",
+      exact: true,
+    });
+    this.authSchemeSelect = this.playground.getByRole("combobox").first();
+    // Each field's accessible name is its label plus its type, e.g.
+    // "username string", so match on the start.
+    this.basicUsernameInput = this.playground.getByRole("textbox", { name: /^username\b/ });
+    this.basicPasswordInput = this.playground.getByRole("textbox", { name: /^password\b/ });
+    this.authorizationHeaderInput = this.playground.getByRole("textbox", {
+      name: /^Authorization \(Header\)/,
+    });
+    this.accessTokenInput = this.playground.getByRole("textbox", {
+      name: "Access Token",
+      exact: true,
+    });
+    this.authorizeButton = this.playground.getByRole("button", { name: "Authorize", exact: true });
+    this.oauthDialog = page.getByRole("dialog", { name: "Authorization" });
+    this.oauthSubmitButton = this.oauthDialog.getByRole("button", { name: "Submit", exact: true });
+  }
+
+  /** Open the Authorization panel, unless it's already open. */
+  async openAuthorization(): Promise<void> {
+    if ((await this.authorizationToggle.getAttribute("aria-expanded")) !== "true") {
+      await this.authorizationToggle.click();
+    }
+  }
+
+  /**
+   * Switch to another security requirement, for operations that declare
+   * alternatives. `schemes` is the scheme ids of that requirement, in spec
+   * order, e.g. ["headerToken", "headerApiKey"].
+   */
+  async selectAuthScheme(schemes: string[]): Promise<void> {
+    await this.openAuthorization();
+    await this.authSchemeSelect.click();
+    await this.page.getByRole("option", { name: schemes.join(" "), exact: true }).click();
+  }
+
+  /**
+   * An API key input, by the parameter name the spec gives it and where it's
+   * sent — the playground labels these "token (query)", "accesstoken (header)".
+   */
+  authField(name: string, location: AuthFieldLocation): Locator {
+    const label = `${name} (${location})`.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return this.playground.getByRole("textbox", { name: new RegExp(`^${label}`) });
+  }
+
+  /** Open the Authorization panel and enter Basic credentials. */
+  async fillBasicAuth(username: string, password: string): Promise<void> {
+    await this.openAuthorization();
+    await this.basicUsernameInput.fill(username);
+    await this.basicPasswordInput.fill(password);
+  }
+
+  /** Open the Authorization panel and fill one API key input. */
+  async fillAuthField(name: string, location: AuthFieldLocation, value: string): Promise<void> {
+    await this.openAuthorization();
+    await this.authField(name, location).fill(value);
+  }
+
+  /** Open the Authorization panel and set the Authorization header outright. */
+  async fillAuthorizationHeader(value: string): Promise<void> {
+    await this.openAuthorization();
+    await this.authorizationHeaderInput.fill(value);
+  }
+
+  /** Open the Authorization panel and paste an OAuth token in, skipping the flow. */
+  async fillAccessToken(value: string): Promise<void> {
+    await this.openAuthorization();
+    await this.accessTokenInput.fill(value);
+  }
+
+  /**
+   * Run an OAuth flow through the "Authorize" dialog: fill it and submit.
+   *
+   * For client credentials and password the portal fetches the token itself
+   * and fills it in. For authorization code, Submit navigates away to the
+   * authorization URL and the token is exchanged once the page comes back —
+   * wait on `accessTokenInput` either way.
+   */
+  async authorizeWithOAuth(credentials: OAuthCredentials): Promise<void> {
+    await this.openAuthorization();
+    await this.authorizeButton.click();
+    const fields: [string, string | undefined][] = [
+      ["Client ID", credentials.clientId],
+      ["Client Secret", credentials.clientSecret],
+      ["Username", credentials.username],
+      ["Password", credentials.password],
+    ];
+    for (const [label, value] of fields) {
+      if (value !== undefined) {
+        await this.oauthDialog.getByRole("textbox", { name: label, exact: true }).fill(value);
+      }
+    }
+    await this.oauthSubmitButton.click();
   }
 
   /**
