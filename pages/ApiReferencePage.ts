@@ -4,6 +4,9 @@ import { DocsPage } from "./DocsPage.ts";
 /** Where an API key or header credential goes, as the playground labels it. */
 export type AuthFieldLocation = "header" | "query" | "cookie";
 
+/** The playground's collapsible request sections, by their button text. */
+export type PlaygroundSection = "Path" | "Query" | "Header" | "Body";
+
 /** What the OAuth "Authorize" dialog asks for. Username/password only for the password flow. */
 export type OAuthCredentials = {
   clientId: string;
@@ -77,6 +80,42 @@ export class ApiReferencePage extends DocsPage {
     this.authorizeButton = this.playground.getByRole("button", { name: "Authorize", exact: true });
     this.oauthDialog = page.getByRole("dialog", { name: "Authorization" });
     this.oauthSubmitButton = this.oauthDialog.getByRole("button", { name: "Submit", exact: true });
+  }
+
+  /**
+   * A non-auth parameter input, by the name the spec gives it. Labels read
+   * "id* string" for required ones and "X-APIMatic-CallbackUrl string" for
+   * optional ones, so the asterisk is optional in the match.
+   */
+  parameterField(name: string): Locator {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return this.playground.getByRole("textbox", { name: new RegExp(`^${escaped}\\*? `) });
+  }
+
+  /**
+   * Expand one of the playground's request sections, unless it's already open.
+   * Like Authorization, they're collapsible buttons, closed on load.
+   */
+  async openSection(section: PlaygroundSection): Promise<void> {
+    const toggle = this.playground.getByRole("button", { name: section, exact: true });
+    if ((await toggle.getAttribute("aria-expanded")) !== "true") {
+      await toggle.click();
+    }
+  }
+
+  /** Set a path, query or header parameter. Pass "" to clear an example value. */
+  async fillParameter(section: PlaygroundSection, name: string, value: string): Promise<void> {
+    await this.openSection(section);
+    await this.parameterField(name).fill(value);
+  }
+
+  /**
+   * Attach a file to a multipart body's file field. The "Upload" control is a
+   * styled label over a hidden file input, the only one in the form.
+   */
+  async uploadBodyFile(filePath: string): Promise<void> {
+    await this.openSection("Body");
+    await this.playground.locator('input[type="file"]').setInputFiles(filePath);
   }
 
   /** Open the Authorization panel, unless it's already open. */

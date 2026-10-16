@@ -71,7 +71,8 @@ pnpm report playwright-report/visual   # open a stage's HTML report
 ```
 
 Each stage writes to its own `test-results/<stage>/` and
-`playwright-report/<stage>/` (a run of several stages writes to `all`), so one
+`playwright-report/<stage>/` (a run of several stages writes to `all`; functional
+adds the build, e.g. `functional-auth`), so one
 stage's run can't wipe another's failures.
 
 `webServer` uses `reuseExistingServer` locally, so if a portal is already up on

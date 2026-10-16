@@ -1,0 +1,50 @@
+---
+title: Generate Context Plugins
+description: Give AI coding agents accurate, current context about your API and SDKs.
+---
+
+AI coding agents are good at writing code. They struggle with API integrations.
+
+The problem isn't code generation; it's context. When an agent draws on stale training data or scraped docs, it produces code that calls endpoints that don't exist, uses wrong SDK versions, or mishandles authentication.
+
+APIMatic Context Plugins give agents accurate, current context about your API, so developers get production-ready integrations without needing to read your docs or switch context. Developers go from your portal to a working integration in minutes, not hours. In production, teams have seen a 63% reduction in implementation time and a 78% decrease in rework.
+
+## What an APIMatic Context Plugin contains
+
+- Your full API reference: endpoints, parameters, and request and response models
+- Authentication details for each endpoint
+- Versioned SDK code in the developer's language of choice
+- Integration workflows and code samples from your documentation
+- Skills for each language, covering client setup, authentication, calling endpoints, working with models, handling errors, configuration, and testing
+
+Load an APIMatic Context Plugin into Claude Code, Cursor, or VS Code and the agent gains task-aware, grounded context. It can suggest the correct endpoint, generate type-safe SDK calls, handle authentication properly, and surface real integration patterns.
+
+## Generate and publish a plugin
+
+### 1. Publish your SDKs with source code
+
+The plugin references your APIMatic SDK repositories on GitHub, so publish with source code first:
+
+```bash
+apimatic sdk publish --publish-type=sourcecode
+```
+
+See [Publish SDKs](/generate-sdks/publish-sdks).
+
+### 2. Generate the plugin
+
+```bash
+apimatic plugin generate
+```
+
+You'll be asked for the plugin's ID, display name, and version.
+
+### 3. Publish the plugin
+
+```bash
+apimatic plugin publish
+```
+
+This prints the git commands that publish your plugin to GitHub. It doesn't run them, so you can review what becomes public first.
+
+> **Note:** These commands build plugins for SDKs generated with Codegen v4.

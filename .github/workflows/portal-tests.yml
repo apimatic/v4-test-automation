@@ -30,7 +30,7 @@ concurrency:
 jobs:
   test:
     runs-on: windows-latest
-    timeout-minutes: 45
+    timeout-minutes: 60   # includes up to ~15 min for the Portal Artifacts test
 
     env:
       # dev unless a manual run asks for prod. Pushes and PRs stay on dev so
@@ -180,6 +180,36 @@ jobs:
           PORTAL: auth
           PORTAL_PREBUILT: "1"
         run: pnpm test:functional
+
+      # ---- stage 3, apimatic build ----------------------------------------
+      # The apimatic build's playground calls the real https://api.apimatic.io
+      # (the spec's only server), so this always hits prod with the prod key,
+      # whichever environment the run targets. Every run starts a real
+      # generation on that account.
+      - name: Generate the apimatic portal
+        id: apimatic-portal
+        if: always()
+        env:
+          PORTAL: apimatic
+        run: pnpm portal:generate
+
+      # Up to ~15 minutes: the test polls until the API finishes generating.
+      # The key is checked here because the test skips itself without one,
+      # which would read as a pass.
+      - name: Functional — Portal Artifacts API
+        if: ${{ !cancelled() && steps.apimatic-portal.outcome == 'success' }}
+        shell: bash
+        env:
+          PORTAL: apimatic
+          PORTAL_PREBUILT: "1"
+          APIMATIC_AUTH_KEY: ${{ secrets.APIMATIC_AUTH_KEY_PROD }}
+        run: |
+          if [ -z "$APIMATIC_AUTH_KEY" ]; then
+            echo "::error::APIMATIC_AUTH_KEY_PROD is not set. The Portal Artifacts test calls api.apimatic.io with it."
+            echo "::error::Add it with: gh secret set APIMATIC_AUTH_KEY_PROD --repo apimatic/v4-test-automation"
+            exit 1
+          fi
+          pnpm test:functional
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}

@@ -1,0 +1,51 @@
+---
+title: Publish SDKs
+description: Ship SDKs to NuGet, PyPI, npm, and GitHub.
+---
+
+APIMatic builds and publishes your SDKs for you, so you don't need to know how each registry works. Publishing takes two steps: set up a publishing profile once, then run `apimatic sdk publish` whenever you release a new version.
+
+## Where you can publish
+
+| Language | Package registry |
+| --- | --- |
+| C# | NuGet |
+| Python | PyPI |
+| TypeScript | npm |
+
+You can also publish the SDK source code to **GitHub**, on its own or alongside the registry package.
+
+### 1. Create a publishing profile
+
+An APIMatic publishing profile stores your package details and the credentials APIMatic needs to publish for you. Create one in the Publishing Center on the APIMatic Dashboard:
+
+1. Give the profile a name.
+2. Enter the general package details: name, description, and authors.
+3. Review the package settings for each language.
+4. Save.
+
+Add credentials for each registry and for GitHub from the **Credentials** menu with **+ Add Credential**. You can reuse credentials across profiles.
+
+To see your profiles and their IDs from the terminal:
+
+```bash
+apimatic publishing profile list
+```
+
+### 2. Publish
+
+Run the APIMatic CLI command with no flags for a guided walkthrough:
+
+```bash
+apimatic sdk publish
+```
+
+Or pass everything as flags, for example in a CI/CD pipeline:
+
+```bash
+apimatic sdk publish --profile-id=<id> --language=<lang> --version=<version> --publish-type=<type>
+```
+
+Use semantic versioning (`MAJOR.MINOR.PATCH`) for `--version`. Add `--dry-run` to check what would be published without publishing it.
+
+> **Planning to build a Context Plugin?:** Context Plugins reference your SDK repositories, so publish with source code: `--publish-type=sourcecode`. See [Context Plugins](/generate-context-plugins/context-plugins).

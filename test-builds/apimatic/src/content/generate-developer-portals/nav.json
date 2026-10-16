@@ -1,0 +1,8 @@
+{
+  "title": "Generate Developer Portals",
+  "pages": [
+    "generate-build",
+    "apimatic-json-reference",
+    "hosting"
+  ]
+}

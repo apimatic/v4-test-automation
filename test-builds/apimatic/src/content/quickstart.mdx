@@ -1,0 +1,82 @@
+---
+title: Quickstart
+description: Create a working API documentation portal in about five minutes.
+---
+
+This quickstart guide will help you swiftly set up a customizable API Documentation Portal for your APIs using the APIMatic Command Line Interface (CLI).
+
+By the end of this guide, you'll have a fully functional API Documentation Portal with:
+
+- Interactive API reference documentation
+- A live API playground for testing API endpoints
+- SDKs in C#, Python, and TypeScript, with ready-to-use code samples
+- A Context Plugin that gives AI coding agents accurate context about your API and SDKs
+- Language-specific getting started guides
+
+**Time required:** about 5 minutes
+
+Let's get started!
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org/en/download) v24 or later
+- npm
+
+### 1. Install the APIMatic CLI
+
+```bash
+npm i -g @apimatic/cli@beta
+```
+
+Confirm the install:
+
+```bash
+apimatic --version
+```
+
+### 2. Log in
+
+```bash
+apimatic auth login
+```
+
+Follow the browser prompt to sign in with your APIMatic email and password. Then check your session:
+
+```bash
+apimatic auth status
+```
+
+The output confirms your APIMatic account email and the SDK languages available on your plan (C#, Python, TypeScript).
+
+### 3. Create a portal project
+
+Make an empty directory for the project and move into it:
+
+```bash
+mkdir hello-apimatic
+cd hello-apimatic
+```
+
+Launch the interactive setup:
+
+```bash
+apimatic quickstart
+```
+
+Choose **API Documentation Portal** from the menu. The wizard walks you through:
+
+1. Importing your API definition
+2. Choosing SDK languages
+3. Scaffolding the project
+4. Generating the portal files
+5. Starting a local preview server
+
+## What's next
+
+Your APIMatic portal is running. From here you can browse the generated API reference, try endpoints in the playground, download SDKs with code samples, install the Context Plugin in your IDE, and start customizing your portal with the [apimatic.json reference](/generate-developer-portals/apimatic-json-reference).
+
+To start the preview server again later:
+
+```bash
+apimatic portal serve
+```

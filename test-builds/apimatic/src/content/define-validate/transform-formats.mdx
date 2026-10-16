@@ -1,0 +1,54 @@
+---
+title: Transform API Specifications
+description: Convert your API definition from any supported format to OpenAPI, RAML, Postman, WSDL, and more.
+---
+
+The APIMatic API Transformer converts API definitions between formats such as OpenAPI, RAML, and API Blueprint, so you can use tools built for other formats without rewriting your definition by hand.
+
+## Transform with the APIMatic CLI
+
+```bash
+apimatic api transform --format=<format> --file=<path>
+```
+
+You can pass `--url` instead of `--file`, and `--destination` to choose where the output is written. See the [CLI Reference](/cli-reference#api-transform) for all flags.
+
+## How the APIMatic API Transformer works
+
+1. Your API definition is imported.
+2. The imported definition is validated.
+3. If validation passes, it's converted to the format you asked for.
+
+> **Note:** Transforming a definition runs import validation, but it doesn't add the API to your APIMatic Dashboard the way an explicit import does.
+
+## Input formats
+
+| Format | Versions | File type |
+| --- | --- | --- |
+| OpenAPI / Swagger | 3.1, 3.0, 2.0, 1.x | JSON / YAML |
+| RAML | 1.0, 0.8 | YAML |
+| Postman Collection | 2.0, 1.0 | JSON |
+| Insomnia | 3 | JSON / YAML |
+| HAR | 1.2 | JSON |
+| API Blueprint | 1A | Markdown |
+| WADL | 2009 | XML |
+| WSDL | 1.1 | XML |
+| Google Discovery | — | JSON |
+| I/O Docs (Mashery) | — | JSON |
+| APIMATIC | — | JSON |
+
+## Output formats
+
+| Format | Versions | File type |
+| --- | --- | --- |
+| OpenAPI / Swagger | 3.1, 3.0, 2.0, 1.2 | JSON / YAML |
+| RAML | 1.0, 0.8 | YAML |
+| Postman Collection | 2.0, 1.0 | JSON |
+| Insomnia | 3 | JSON / YAML |
+| API Blueprint | 1A | Markdown |
+| WSDL | 1.1 | XML |
+| WADL | 2009 | XML |
+| GraphQL Schema | — | GraphQL |
+| APIMATIC | — | JSON |
+
+

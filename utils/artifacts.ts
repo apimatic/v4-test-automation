@@ -200,6 +200,40 @@ export function zipEntries(zipPath: string): string[] {
     .filter(Boolean);
 }
 
+/**
+ * Zips the contents of a directory (not the directory itself, so its files sit
+ * at the zip's root: `apimatic.json`, `content/…`, `spec/…`). Overwrites
+ * `zipPath` if it exists.
+ *
+ * Entries are added one by one rather than with `CreateFromDirectory`, which on
+ * Windows PowerShell 5.1 stores paths with backslashes — `content\index.mdx` —
+ * and a Linux server unzips those as flat file names, not folders.
+ */
+export function zipDirectory(sourceDir: string, zipPath: string): void {
+  fs.rmSync(zipPath, { force: true });
+  const files = fs
+    .readdirSync(sourceDir, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => path.join(entry.parentPath, entry.name));
+  const quote = (s: string) => `'${s.replace(/'/g, "''")}'`;
+  const adds = files
+    .map((file) => {
+      const entryName = path.relative(sourceDir, file).split(path.sep).join("/");
+      return `[System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($a, ${quote(file)}, ${quote(entryName)}) | Out-Null`;
+    })
+    .join("\n");
+  const script = `
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $a = [System.IO.Compression.ZipFile]::Open(${quote(zipPath)}, 'Create')
+    try {
+      ${adds}
+    } finally {
+      $a.Dispose()
+    }
+  `;
+  execFileSync("powershell", ["-NoProfile", "-Command", script]);
+}
+
 /** Reads one file out of a zip as text. Returns null when it isn't there. */
 export function readZipEntry(zipPath: string, entryName: string): string | null {
   const script = `

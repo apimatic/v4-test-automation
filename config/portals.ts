@@ -114,6 +114,26 @@ export const portals = {
       authDigest: "/api/auth/unvalidated/digest/",
     },
   },
+
+  // APIMatic's own Portal Artifacts API. The playground calls the real
+  // https://api.apimatic.io, so anything that sends a request needs
+  // APIMATIC_AUTH_KEY set.
+  apimatic: {
+    buildDir: "test-builds/apimatic",
+    label: "APIMatic Docs",
+    routes: {
+      home: "/",
+
+      // The three calls of the generation flow, in the order they're made:
+      // upload a build, poll its status, download what it produced.
+      apiGenerateArtifacts:
+        "/api/openapi/portal-artifacts-generation/Generate-Portal-Artifacts-Async/",
+      apiArtifactsStatus:
+        "/api/openapi/portal-artifacts-generation/Get-Portal-Artifacts-Generation-Status/",
+      apiArtifactsDownload:
+        "/api/openapi/portal-artifacts-generation/Download-Generated-Portal-Artifacts/",
+    },
+  },
 } satisfies Record<string, PortalConfig>;
 
 export type PortalName = keyof typeof portals;

@@ -1,0 +1,171 @@
+---
+title: CLI Reference
+description: Every command in the APIMatic CLI (@apimatic/cli), grouped by what it works on.
+---
+
+Install or update the APIMatic CLI with npm:
+
+```bash
+npm i -g @apimatic/cli@beta
+```
+
+> **Command format:** Commands use spaces between topics, for example `apimatic portal serve`. Older CLI releases used colons (`apimatic portal:serve`); if a command from an older guide doesn't work, swap the colons for spaces.
+
+## Quickstart
+
+```bash
+apimatic quickstart
+```
+
+Interactive guide that sets up your first API portal or SDK. No prior setup needed.
+
+## Portal
+
+### `portal generate`
+
+Generates a static API documentation portal from your `src` directory.
+
+```bash
+apimatic portal generate
+```
+
+**Flags:** `--input` · `--destination` · `-f, --force` · `--zip` · `--auth-key`
+
+### `portal serve`
+
+Builds the portal and serves it locally with hot reload.
+
+```bash
+apimatic portal serve --open
+```
+
+**Flags:** `--input` · `--destination` · `-p, --port` · `-o, --open` · `-i, --ignore` · `--auth-key` · `--no-reload`
+
+## API
+
+### `api validate`
+
+Checks the syntax and semantics of an API definition.
+
+```bash
+apimatic api validate --file=<path>
+apimatic api validate --url=<url>
+```
+
+**Flags:** `--file` · `--url` · `--auth-key`
+
+### `api transform`
+
+Converts an API definition between formats such as OpenAPI, RAML, WSDL, and Postman.
+
+```bash
+apimatic api transform --format=<format> --file=<path>
+```
+
+**Flags:** `--format` (required) · `--file` · `--url` · `--destination` · `-f, --force` · `--auth-key`
+
+## SDK
+
+### `sdk generate`
+
+Generates an SDK in the language you choose.
+
+```bash
+apimatic sdk generate --language=<language>
+```
+
+Supported values for `--language`: `csharp`, `python`, `typescript`.
+
+**Flags:** `-l, --language` (required) · `-i, --input` · `-d, --destination` · `--api-version` · `--skip-changes` · `--track-changes` · `--codegen-version` · `--stability` · `-f, --force` · `-k, --auth-key` · `--zip`
+
+### `sdk save-changes`
+
+Saves your customizations to a generated SDK so they carry over to future generations.
+
+```bash
+apimatic sdk save-changes --language=<language> --sdk=<path>
+```
+
+**Flags:** `-i, --input` · `-l, --language` (required) · `--sdk` · `--api-version`
+
+### `sdk publish`
+
+Publishes an SDK to package registries (NuGet, PyPI, npm) and GitHub using a publishing profile. Run it with no flags for guided mode, or pass flags for CI/CD.
+
+```bash
+apimatic sdk publish
+apimatic sdk publish --profile-id=<id> --language=<lang> --version=<version> --publish-type=<type>
+```
+
+**Flags:** `-p, --profile-id` · `-l, --language` · `-v, --version` · `--publish-type` · `--input` · `--destination` · `--dry-run` · `-f, --force` · `--update-plugin-config`
+
+## Plugin
+
+### `plugin generate`
+
+Creates a Context Plugin from your published SDKs for AI coding agents.
+
+```bash
+apimatic plugin generate
+```
+
+**Flags:** `-i, --input` · `-d, --destination` · `-f, --force` · `-k, --auth-key`
+
+> **Warning:** Context Plugins reference your SDK repositories, so publish your SDKs with source code first (`--publish-type=sourcecode`).
+
+### `plugin publish`
+
+Prints the git commands to publish your plugin to GitHub. It doesn't run them, so you can review what becomes public first.
+
+```bash
+apimatic plugin publish
+```
+
+**Flags:** `-i, --input` · `-d, --destination`
+
+## Publishing
+
+### `publishing profile list`
+
+Lists your publishing profiles with their IDs and enabled languages.
+
+```bash
+apimatic publishing profile list
+```
+
+## Auth
+
+### `auth login`
+
+Signs the APIMatic CLI in to your APIMatic account.
+
+```bash
+apimatic auth login
+```
+
+**Flags:** `--auth-key`
+
+### `auth logout`
+
+Clears your local credentials.
+
+```bash
+apimatic auth logout
+```
+
+### `auth status`
+
+Shows whether you're signed in and as whom.
+
+```bash
+apimatic auth status
+```
+
+## Help
+
+```bash
+apimatic help <command>
+apimatic <command> --help
+```
+
+**Flags:** `-n, --nested-commands`

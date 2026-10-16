@@ -1,0 +1,55 @@
+---
+title: Create an SDK via CLI
+description: Generate an APIMatic SDK from your terminal with one command.
+---
+
+> **Note:** You need the APIMatic CLI installed and a signed-in session. See the [Quickstart](/quickstart) if you haven't set it up yet.
+
+## Generate an SDK
+
+Run the APIMatic CLI's `sdk generate` command and pick a language with `--language`:
+
+```bash
+apimatic sdk generate --language=<language>
+```
+
+`--language` is required and takes one of:
+
+| Language | Value |
+| --- | --- |
+| C# | `csharp` |
+| Python | `python` |
+| TypeScript | `typescript` |
+
+## Example: a Python SDK as a ZIP
+
+```bash
+apimatic sdk generate --language=python --zip
+```
+
+The CLI prints `SDK generated successfully.` and tells you where the SDK was saved. `--zip` downloads it as a compressed file to your working directory.
+
+## Useful flags
+
+| Flag | What it does |
+| --- | --- |
+| `-i, --input` | Path to your API definition or project. |
+| `-d, --destination` | Where to write the SDK. |
+| `--zip` | Download the SDK as a ZIP. |
+| `-f, --force` | Overwrite existing files. |
+
+To see every option:
+
+```bash
+apimatic sdk generate --help
+```
+
+The full list is also in the [CLI Reference](/cli-reference#sdk-generate).
+
+## Keep your customizations
+
+If you edit the generated code, save your changes so they carry over the next time you regenerate:
+
+```bash
+apimatic sdk save-changes --language=<language> --sdk=<path>
+```

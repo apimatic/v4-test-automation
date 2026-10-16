@@ -1,0 +1,41 @@
+---
+title: SDK Generation Overview
+description: "Production-ready client libraries for your API, generated and kept in sync by APIMatic."
+---
+
+
+## How APIMatic generates an SDK
+
+### 1. Transform
+
+Your API definition (OpenAPI, RAML, API Blueprint, and [others](/define-validate/transform-formats#input-formats)) is converted into APIMatic's internal format, which holds SDK-specific details that standard formats don't have.
+
+### 2. Validate
+
+The definition is checked for problems such as duplicate parameters or request bodies on GET endpoints. Minor issues are fixed automatically; anything that needs your attention is reported. See [Validate & Lint](/define-validate/validate-lint).
+
+### 3. Lay out the code
+
+Parts of your API map to parts of the SDK:
+
+| In your API | In the SDK |
+| --- | --- |
+| Settings | Configuration files |
+| Endpoints | Methods on controller classes |
+| Groups of endpoints | Controller classes |
+| Data models | Model classes, with types inferred |
+| HTTP errors | Exception classes |
+
+The SDK also gets an HTTP layer, helper utilities, a client interface, and the packaging files each language needs.
+
+### 4. Document
+
+Each SDK ships with a README written for its language, from setup through code samples.
+
+### 5. Package
+
+Download the SDK as a ZIP, [publish it](/generate-sdks/publish-sdks) to a package registry or GitHub, or add it to your developer portal.
+
+## Customize your APIMatic SDKs
+
+- **Custom code** you add to generated files is kept when you regenerate the SDK after your API changes. Save it with [`apimatic sdk save-changes`](/cli-reference#sdk-save-changes).
