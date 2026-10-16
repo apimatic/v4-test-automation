@@ -1,0 +1,73 @@
+---
+title: Generate a Portal
+description: Turn your API definition and Markdown guides into an APIMatic developer portal with the APIMatic CLI.
+---
+
+A good developer experience starts with a well-built API documentation portal. APIMatic generates one from your API definition: a complete API reference, a live playground, SDKs, and your own guides, in one site that you build and preview with the APIMatic CLI.
+
+## What your portal includes
+
+- **API reference.** Every endpoint documented, with code samples in each of your SDK languages.
+- **Live API playground.** Try endpoints in the browser, with input validation, generated examples, and code samples that update as you type.
+- **APIMatic SDKs.** Downloadable SDKs in C#, Python, and TypeScript.
+- **Your guides.** Getting started guides, tutorials, and any other pages you write in Markdown, with images and videos.
+- **Your brand.** Logo, favicon, colours, and light or dark mode, set in `apimatic.json`.
+- **AI features.** Page actions that open any page in an external AI assistant, and an install page for your APIMatic Context Plugin.
+
+## Set up the project
+
+An APIMatic portal is built from a `src` directory:
+
+```
+src/
+  apimatic.json   # portal, plugin, and SDK language settings
+  content/        # your pages
+    nav.json      # sidebar order
+    index.mdx
+  spec/           # your API definition
+  static/         # images and other files your pages use
+```
+
+- **`spec/`** holds your API definition, such as an OpenAPI file. The API reference, playground, and SDKs are generated from it. See [Transform Formats](/define-validate/transform-formats#input-formats) for the formats APIMatic accepts, and [Validate & Lint](/define-validate/validate-lint) to check it first.
+- **`content/`** holds your guides as `.mdx` files. Each folder has a `nav.json` that sets the order of its pages in the sidebar.
+- **`apimatic.json`** configures the portal's name, address, branding, header links, and AI features. See [the apimatic.json file](/generate-developer-portals/apimatic-json-reference) for every setting.
+- **`static/`** holds images such as your logo, referenced from `apimatic.json` as `static/...` paths.
+
+<Callout>
+  The fastest way to get a working `src` directory is `apimatic quickstart`. It imports your API definition, asks for your SDK languages, and scaffolds the project. See the [Quickstart](/quickstart).
+</Callout>
+
+## Preview locally
+
+Build the portal and serve it with hot reload, so changes to your pages show up as you save them:
+
+```bash
+apimatic portal serve --open
+```
+
+| Flag | What it does |
+| --- | --- |
+| `--input` | Path to the directory that contains `src`. |
+| `--destination` | Where to write the built portal. |
+| `-p, --port` | Port for the local server. |
+| `-o, --open` | Open the portal in your browser. |
+| `-i, --ignore` | Files to ignore when watching for changes. |
+| `--no-reload` | Turn off hot reload. |
+
+## Generate the portal
+
+When you're ready to publish, generate the static portal:
+
+```bash
+apimatic portal generate
+```
+
+| Flag | What it does |
+| --- | --- |
+| `--input` | Path to the directory that contains `src`. |
+| `--destination` | Where to write the generated portal. |
+| `-f, --force` | Overwrite existing files in the destination. |
+| `--zip` | Download the portal as a ZIP. |
+| `--auth-key` | Authenticate with an API key instead of your signed-in session. |
+
+The output is a static site you can host anywhere. See [Hosting](/generate-developer-portals/hosting).

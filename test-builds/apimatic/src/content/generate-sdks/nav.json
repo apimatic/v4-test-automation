@@ -1,0 +1,9 @@
+{
+  "title": "Generate SDKs",
+  "pages": [
+    "apimatic-sdks",
+    "create-sdk-cli",
+    "publish-sdks",
+    "languages-features"
+  ]
+}

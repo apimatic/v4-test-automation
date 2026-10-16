@@ -1,0 +1,28 @@
+{
+  "$schema": "https://cdn.jsdelivr.net/npm/@apimatic/cli@beta/apimatic.schema.json",
+  "schemaVersion": 1,
+  "portal": {
+    "site": {
+      "name": "APIMatic Docs"
+    },
+    "brand": {
+      "logo": "static/images/logo.svg",
+      "colors": {
+        "primary": "#3578e5"
+      },
+      "colorMode": "both"
+    },
+    "navigation": {
+      "links": []
+    },
+    "ai": {
+      "pageActions": true
+    }
+  },
+  "languages": {
+    "csharp": {},
+    "typescript": {},
+    "python": {}
+  }
+
+}

@@ -1,0 +1,475 @@
+openapi: 3.1.0
+info:
+  title: APIMatic Portal Artifacts API
+  description: >-
+    Generate the artifacts an APIMatic API Portal needs (SDKs, code samples, getting started guides and, optionally, a context plugin) from a Portal Build Input, asynchronously.
+
+
+    The generation flow is:
+
+
+    1. Upload your build directory as a zip file using **Generate Portal Artifacts Async**. You get back an `id` and links to check the status and download the artifacts.
+
+    2. Poll **Get Portal Artifacts Generation Status** until generation completes, or pass the `X-APIMatic-CallbackUrl` header in step 1 to be notified instead.
+
+    3. Download the generated artifacts using **Download Generated Portal Artifacts**.
+  contact:
+    name: Team APIMatic
+    email: contactus@apimatic.io
+  version: '3.0'
+
+servers:
+- url: https://api.apimatic.io
+  description: The APIMatic production API server.
+  variables: {}
+
+paths:
+  /portal-artifacts:
+    post:
+      tags:
+        - Portal Artifacts Generation
+      summary: Generate Portal Artifacts Async
+      description: >-
+        Start an asynchronous generation of Portal Artifacts by uploading a Portal Build Input. The build input is your build directory (containing the `apimatic.json` file, your API specification and your content) compressed into a zip file.
+
+
+        An SDK, a code samples catalog and a getting started guide are generated for every language configured in the build input, plus a context plugin when the build input declares one.
+
+
+        The request returns immediately with an `id` and links to check the status and download the artifacts. Generation must finish within 25 minutes.
+      operationId: Generate Portal Artifacts Async
+      parameters:
+      - $ref: '#/components/parameters/CallbackUrl'
+      requestBody:
+        description: The Portal Build Input, uploaded as a zip file in the `file` form field.
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PortalArtifactsGenerationRequest'
+            encoding:
+              file:
+                contentType: application/zip, application/x-zip-compressed, application/octet-stream
+      responses:
+        '202':
+          description: Generation request accepted. Use the returned links to check the status and download the artifacts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalArtifactsGenerationAsyncResponse'
+              example:
+                id: '019992a4-5c3e-7b21-9f0a-3d6e8c1b2a47'
+                links:
+                  status: 'https://api.apimatic.io/portal-artifacts/019992a4-5c3e-7b21-9f0a-3d6e8c1b2a47/status'
+                  download: 'https://api.apimatic.io/portal-artifacts/019992a4-5c3e-7b21-9f0a-3d6e8c1b2a47/download'
+        '400':
+          description: Bad Request. The build file is missing, empty or not a zip file, or the callback URL is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                title: One or more validation errors occurred.
+                status: 400
+                detail: The build directory was not provided in the request.
+                instance: /api/portal-artifacts
+                errors:
+                  file:
+                  - build file is required
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Subscription Issue. Your subscription does not include portal generation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3
+                title: Access denied to resource.
+                status: 403
+                detail: Requested features are not available in subscription
+                instance: /api/portal-artifacts
+                errors:
+                  '':
+                  - Docs as code is not allowed on your subscription
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      callbacks:
+        PortalArtifactsGenerationCompleted:
+          '{$request.header.X-APIMatic-CallbackUrl}':
+            post:
+              summary: Portal Artifacts Generation Completed
+              description: Sent once to the URL provided in the `X-APIMatic-CallbackUrl` header when generation finishes, whether it succeeded or failed. The notification is not retried.
+              operationId: Portal Artifacts Generation Completed
+              parameters:
+              - name: X-APIMatic-Id
+                in: header
+                description: Unique identifier of this notification.
+                required: true
+                schema:
+                  type: string
+                  format: uuid
+                example: '3f2b8c1e-6a4d-4e7f-9b21-0c5d8e7a6f13'
+              - name: X-APIMatic-Event
+                in: header
+                description: Type of the event that triggered this notification.
+                required: true
+                schema:
+                  type: string
+                example: PortalArtifactsGeneration
+              requestBody:
+                description: The final status of the generation request.
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/PortalArtifactsCallbackPayload'
+                    example:
+                      id: '019992a4-5c3e-7b21-9f0a-3d6e8c1b2a47'
+                      status: GenerationCompleted
+                      link: 'https://api.apimatic.io/portal-artifacts/019992a4-5c3e-7b21-9f0a-3d6e8c1b2a47/download'
+              responses:
+                '200':
+                  description: Return any 2xx status to acknowledge the notification.
+  /portal-artifacts/{id}/status:
+    get:
+      tags:
+        - Portal Artifacts Generation
+      summary: Get Portal Artifacts Generation Status
+      description: >-
+        Get the status of a Portal Artifacts generation request.
+
+
+        While generation is running or after it has failed, this endpoint returns `200` with the current status. Once generation completes, it returns a `302` redirect to the download endpoint. HTTP clients that follow redirects automatically will receive the artifacts zip file directly.
+      operationId: Get Portal Artifacts Generation Status
+      parameters:
+      - $ref: '#/components/parameters/PortalArtifactsId'
+      responses:
+        '200':
+          description: Generation is in progress or has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortalArtifactsGenerationStatusResponse'
+              example:
+                status: ValidationError
+                errors:
+                  buildFile:
+                  - the build file is not a readable zip archive
+        '302':
+          description: Generation completed. The `Location` header contains the URL to download the artifacts.
+          headers:
+            Location:
+              description: URL of the download endpoint for this generation request.
+              schema:
+                $ref: '#/components/schemas/DownloadUrl'
+        '400':
+          $ref: '#/components/responses/PortalArtifactsBadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /portal-artifacts/{id}/download:
+    get:
+      tags:
+        - Portal Artifacts Generation
+      summary: Download Generated Portal Artifacts
+      description: >-
+        Download the generated Portal Artifacts as a zip file. The zip file contains:
+
+
+        1. `sdk/<language>.zip`: the SDK for each configured language
+
+        2. `code-samples/<language>.json`: the code samples catalog for each configured language
+
+        3. `docs/<language>.json`: the getting started guide for each configured language
+
+        4. `plugin.zip`: the context plugin, only when the build input declares one
+
+
+        The artifacts are available only after generation completes. Until then, this endpoint returns `400`.
+      operationId: Download Generated Portal Artifacts
+      parameters:
+      - $ref: '#/components/parameters/PortalArtifactsId'
+      responses:
+        '200':
+          description: The generated Portal Artifacts zip file.
+          headers:
+            Content-Disposition:
+              $ref: '#/components/headers/ContentDisposition'
+          content:
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/ZipFile'
+        '400':
+          $ref: '#/components/responses/PortalArtifactsBadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /portal-artifacts/{id}/build/download:
+    get:
+      tags:
+        - Portal Artifacts Generation
+      summary: Download Portal Artifacts Build File
+      description: Download the build file that was uploaded for a Portal Artifacts generation request. Available to admin users only.
+      operationId: Download Portal Artifacts Build File
+      parameters:
+      - $ref: '#/components/parameters/PortalArtifactsId'
+      responses:
+        '200':
+          description: The uploaded build zip file.
+          headers:
+            Content-Disposition:
+              $ref: '#/components/headers/ContentDisposition'
+          content:
+            application/zip:
+              schema:
+                $ref: '#/components/schemas/ZipFile'
+        '400':
+          description: Bad Request. The `id` is not a valid UUID, or no build file exists for it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                title: One or more validation errors occurred.
+                status: 400
+                detail: Build file for portal artifacts with Id '019992a4-5c3e-7b21-9f0a-3d6e8c1b2a47' not found
+                instance: /api/portal-artifacts/019992a4-5c3e-7b21-9f0a-3d6e8c1b2a47/build/download
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+          description: Unauthorized. The Auth key is missing or invalid, or the user is not an admin.
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  parameters:
+    PortalArtifactsId:
+      name: id
+      in: path
+      description: The `id` returned by **Generate Portal Artifacts Async**.
+      required: true
+      schema:
+        $ref: '#/components/schemas/GenerationId'
+    CallbackUrl:
+      name: X-APIMatic-CallbackUrl
+      in: header
+      description: Optional absolute HTTP or HTTPS URL. When provided, the server sends a `POST` request to this URL once generation finishes, with the generation status and, on success, the download link.
+      required: false
+      schema:
+        type: string
+        format: uri
+      example: 'https://example.com/portal-artifacts-callback'
+  headers:
+    ContentDisposition:
+      description: Contains the name of the zip file, for example `attachment; filename=portal-artifacts.zip`.
+      schema:
+        type: string
+  responses:
+    PortalArtifactsBadRequest:
+      description: Bad Request. The `id` is not a valid UUID, no generation request exists for it, or the artifacts are not available yet.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://tools.ietf.org/html/rfc7231#section-6.5.1
+            title: One or more validation errors occurred.
+            status: 400
+            detail: Portal artifacts with Id '019992a4-5c3e-7b21-9f0a-3d6e8c1b2a47' not found
+            instance: /api/portal-artifacts/019992a4-5c3e-7b21-9f0a-3d6e8c1b2a47/status
+    Unauthorized:
+      description: Unauthorized. The Auth key is missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: Authorization has been denied for this request.
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: An error has occurred.
+  schemas:
+    GenerationId:
+      type: string
+      format: uuid
+      description: Unique identifier of the generation request.
+      example: '019992a4-5c3e-7b21-9f0a-3d6e8c1b2a47'
+    DownloadUrl:
+      type: string
+      format: uri
+      description: URL to download the generated artifacts.
+      example: 'https://api.apimatic.io/portal-artifacts/019992a4-5c3e-7b21-9f0a-3d6e8c1b2a47/download'
+    ZipFile:
+      type: string
+      format: binary
+      description: A zip file.
+    ErrorMessages:
+      type: object
+      description: Error messages grouped by the field or part of the request they relate to.
+      additionalProperties:
+        type: array
+        items:
+          type: string
+      example:
+        languages:
+        - 'The following languages are not allowed on your subscription: java'
+    PortalArtifactsGenerationRequest:
+      type: object
+      description: Multipart form data for a Portal Artifacts generation request.
+      properties:
+        file:
+          type: string
+          format: binary
+          description: The Portal Build Input as a zip file (maximum 20 MB). The zip file must contain the build directory, including the `apimatic.json` file.
+      required:
+      - file
+    PortalArtifactsGenerationAsyncResponse:
+      type: object
+      description: Details of an accepted Portal Artifacts generation request.
+      additionalProperties: false
+      properties:
+        id:
+          $ref: '#/components/schemas/GenerationId'
+        links:
+          $ref: '#/components/schemas/PortalArtifactsGenerationLinks'
+      required:
+      - id
+      - links
+    PortalArtifactsGenerationLinks:
+      type: object
+      description: Links to check the status of a generation request and download its artifacts.
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+          format: uri
+          description: URL to check the status of the generation request.
+          example: 'https://api.apimatic.io/portal-artifacts/019992a4-5c3e-7b21-9f0a-3d6e8c1b2a47/status'
+        download:
+          $ref: '#/components/schemas/DownloadUrl'
+          description: URL to download the generated artifacts once generation completes.
+      required:
+      - status
+      - download
+    PortalArtifactsGenerationStatus:
+      type: string
+      description: Status of a Portal Artifacts generation request.
+      enum:
+      - InProgress
+      - Failed
+      - ValidationError
+      - SubscriptionError
+      example: InProgress
+      x-enum-elements:
+      - name: InProgress
+        description: Generation is queued or running.
+      - name: Failed
+        description: Generation failed due to an unexpected error.
+      - name: ValidationError
+        description: The build input is not valid. See `errors` for details.
+      - name: SubscriptionError
+        description: The build input requests features that your subscription does not include. See `errors` for details.
+    PortalArtifactsGenerationStatusResponse:
+      type: object
+      description: Current status of a Portal Artifacts generation request.
+      additionalProperties: false
+      properties:
+        status:
+          $ref: '#/components/schemas/PortalArtifactsGenerationStatus'
+        errors:
+          $ref: '#/components/schemas/ErrorMessages'
+          description: Error messages grouped by the part of the build input they relate to. Returned only when `status` is `ValidationError` or `SubscriptionError`.
+      required:
+      - status
+    PortalArtifactsCallbackStatus:
+      type: string
+      description: Final status of a Portal Artifacts generation request, sent in the callback notification.
+      enum:
+      - GenerationCompleted
+      - ValidationError
+      - SubscriptionError
+      - InternalServerError
+      example: GenerationCompleted
+      x-enum-elements:
+      - name: GenerationCompleted
+        description: Generation completed. `link` contains the download URL.
+      - name: ValidationError
+        description: The build input is not valid. See `errors` for details.
+      - name: SubscriptionError
+        description: The build input requests features that your subscription does not include. See `errors` for details.
+      - name: InternalServerError
+        description: Generation failed due to an unexpected error or did not finish within 25 minutes.
+    PortalArtifactsCallbackPayload:
+      type: object
+      description: Notification sent to the callback URL when a Portal Artifacts generation request finishes.
+      additionalProperties: false
+      properties:
+        id:
+          $ref: '#/components/schemas/GenerationId'
+        status:
+          $ref: '#/components/schemas/PortalArtifactsCallbackStatus'
+        link:
+          $ref: '#/components/schemas/DownloadUrl'
+          description: URL to download the generated artifacts. Present only when `status` is `GenerationCompleted`.
+        errors:
+          $ref: '#/components/schemas/ErrorMessages'
+          description: Error messages grouped by the part of the build input they relate to. Present only when generation did not complete.
+      required:
+      - id
+      - status
+    ErrorResponse:
+      type: object
+      description: Error returned when the request is not authorized or the server encounters an unexpected error.
+      properties:
+        message:
+          type: string
+          description: A message describing the error.
+          example: An error has occurred.
+    ProblemDetails:
+      type: object
+      description: Error details in the Problem Details format (RFC 7807).
+      properties:
+        type:
+          type: string
+          description: A URI reference that identifies the problem type.
+          example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+        title:
+          type: string
+          description: A short summary of the problem type.
+          example: One or more validation errors occurred.
+        status:
+          type: integer
+          description: The HTTP status code.
+          example: 400
+        detail:
+          type: string
+          description: An explanation specific to this occurrence of the problem.
+          example: One or more validation failures have occurred
+        instance:
+          type: string
+          description: The request path where the problem occurred.
+          example: /api/portal
+        errors:
+          $ref: '#/components/schemas/ErrorMessages'
+  securitySchemes:
+    Authorization:
+      type: apiKey
+      description: Auth Header. Provide your Auth key in the format `X-Auth-Key {auth-key}`.
+      name: Authorization
+      in: header
+security:
+- Authorization: []
+
+x-tagGroups:
+- name: Portal Artifacts
+  tags:
+  - Portal Artifacts Generation

@@ -1,0 +1,219 @@
+---
+title: The apimatic.json file
+description: How to configure your portal's branding and navigation, SDK languages and publishing, and Context Plugins.
+---
+
+`apimatic.json` is the APIMatic CLI's project file. It lives at `src/apimatic.json` and holds three things:
+
+- **`portal`** — the documentation portal built by `apimatic portal generate` and `apimatic portal serve`.
+- **`plugin`** — the context plugin's identity, recorded by `apimatic plugin generate`.
+- **`languages`** — the project's SDK languages, which `apimatic sdk publish` adds to.
+
+Every section is optional. Add only the ones you use.
+
+## Example
+
+```json title="src/apimatic.json"
+{
+  "$schema": "https://cdn.jsdelivr.net/npm/@apimatic/cli@beta/apimatic.schema.json",
+  "schemaVersion": 1,
+  "portal": {
+    "site": {
+      "name": "Acme Payments",
+      "url": "https://docs.acme.com",
+      "description": "Accept payments and manage payouts with the Acme API."
+    },
+    "brand": {
+      "logo": {
+        "light": "static/images/logo-light.png",
+        "dark": "static/images/logo-dark.png"
+      },
+      "favicon": "static/images/favicon.png",
+      "colors": {
+        "primary": { "light": "#1d4ed8", "dark": "#60a5fa" }
+      },
+      "colorMode": "both"
+    },
+    "navigation": {
+      "links": [
+        { "label": "Dashboard", "url": "https://dashboard.acme.com" },
+        { "label": "Changelog", "url": "/changelog" }
+      ]
+    },
+    "ai": {
+      "pageActions": true
+    },
+    "pluginUrl": "https://plugins.acme.com/acme-payments"
+  },
+  "plugin": {
+    "pluginId": "acme-payments",
+    "pluginName": "Acme Payments",
+    "pluginVersion": "0.1.0",
+    "author": { "name": "Acme", "email": "devrel@acme.com" },
+    "license": "MIT",
+    "homepage": "https://docs.acme.com",
+    "repository": "https://github.com/acme/acme-plugin"
+  },
+  "languages": {
+    "typescript": {
+      "publishing": {
+        "source": { "repositoryUrl": "https://github.com/acme/acme-typescript", "branch": "main" },
+        "package": { "name": "@acme/payments", "version": "1.2.0" }
+      }
+    },
+    "python": {}
+  }
+}
+```
+
+<Callout>
+Add the `$schema` line to get autocomplete and validation in VS Code and other JSON-aware editors. The CLI ignores it.
+</Callout>
+
+## Top-level properties
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `$schema` | string | No | Where editors find the JSON schema. Ignored by the CLI. |
+| `schemaVersion` | `1` | No | Format of this file. Must be `1`; the CLI refuses a version it does not read. |
+| [`portal`](#portal) | object | No | Documentation portal settings. |
+| [`plugin`](#plugin) | object | No | Context plugin identity. |
+| [`languages`](#languages) | object | No | SDK languages and where they are published. |
+
+Unknown top-level properties are allowed and ignored.
+
+---
+
+## portal
+
+Configures the portal built by `apimatic portal generate` and `apimatic portal serve`. Unknown properties are **not** allowed anywhere inside `portal`.
+
+| Property | Type | Description |
+| --- | --- | --- |
+| [`site`](#portalsite) | object | Name, address, and description of the portal. |
+| [`brand`](#portalbrand) | object | Logo, favicon, colours, and colour mode. |
+| [`navigation`](#portalnavigation) | object | Header links. |
+| [`ai`](#portalai) | object | AI features on portal pages. |
+| `pluginUrl` | string | Where the context plugin is hosted. Must start with `https://` and contain no spaces. The Context Plugin page installs the plugin from here; the portal does not carry its own copy. |
+
+### portal.site
+
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| `name` | string (non-blank) | Title of the only specification | The portal's name. **Required** when the `spec` directory holds more than one specification. |
+| `url` | string | — | Address the portal is hosted at, **without a path**, e.g. `https://docs.example.com`. `http://` and `https://` are accepted; a single trailing `/` is allowed. |
+| `description` | string | First paragraph of the only specification's description | Portal description. An empty string means no description. |
+
+### portal.brand
+
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| `logo` | [static path](#static-paths) or `{ light, dark }` | — | One image for both colour modes, or one per mode. When using the object form, both `light` and `dark` are required. |
+| `favicon` | [static path](#static-paths) | The light logo | Browser tab icon. |
+| `colors.primary` | [colour](#colours) or `{ light, dark }` | — | Primary brand colour for both modes, or one per mode. When using the object form, both `light` and `dark` are required. |
+| `colorMode` | `"light"` \| `"dark"` \| `"both"` | `"both"` | Colour modes the portal offers. Forcing `light` or `dark` hides the theme switch. |
+
+```json title="One logo and colour for both modes"
+"brand": {
+  "logo": "static/images/logo.svg",
+  "colors": { "primary": "#1d4ed8" }
+}
+```
+
+### portal.navigation
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `links` | array of [link](#links) | Links shown in the header and the mobile menu, in order. |
+
+### portal.ai
+
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| `pageActions` | boolean | `true` | Whether each page offers to open itself in an external AI assistant. |
+
+---
+
+## plugin
+
+The context plugin's identity, recorded by `apimatic plugin generate`. Unknown properties are allowed.
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `pluginId` | string | **Yes** | Lower-case alphanumeric words separated by single dashes, e.g. `acme-payments`. |
+| `pluginName` | string (non-blank) | **Yes** | Display name, e.g. `Acme Payments`. |
+| `pluginVersion` | string | **Yes** | `major.minor.patch`, e.g. `0.1.0`. |
+| `pluginKey` | string | No | Plugin key. |
+| `author.name` | string | No | Author name. |
+| `author.email` | string | No | Author email. |
+| `license` | string | No | License identifier, e.g. `MIT`. |
+| `homepage` | string | No | Homepage URL. |
+| `repository` | string | No | Source repository URL. |
+
+<Callout type="warn">
+`pluginId`, `pluginName`, and `pluginVersion` are all required to generate the plugin. If `plugin` is present without them, the file fails validation.
+</Callout>
+
+---
+
+## languages
+
+The project's SDK languages, which `apimatic sdk publish` adds to. Keys must be one of:
+
+`csharp` · `python` · `typescript`
+
+An entry **without** `publishing` marks a language that is wanted but not yet published, e.g. `"python": {}`.
+
+### Language entry
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `publishing.source.repositoryUrl` | string | Git repository the SDK source is pushed to. |
+| `publishing.source.branch` | string | Branch to push to. |
+| `publishing.package` | object | Package registry identity. Fields depend on the language — see below. |
+
+Unknown properties are allowed inside language entries.
+
+### publishing.package by language
+
+| Language | Fields | Registry |
+| --- | --- | --- |
+| `csharp` | `packageId`, `version` | NuGet |
+| `python` | `name`, `version` | PyPI |
+| `typescript` | `name`, `version` | npm |
+
+`version` is always `major.minor.patch`, e.g. `1.2.0`.
+
+```json title="Examples"
+"languages": {
+  "csharp": { "publishing": { "package": { "packageId": "Acme.Payments", "version": "1.0.0" } } },
+  "python": { "publishing": { "package": { "name": "acme-payments", "version": "1.0.0" } } }
+}
+```
+
+---
+
+## Value formats
+
+### Static paths
+
+Paths to files inside `src/static`, written relative to `src`, e.g. `static/images/logo.png`. A leading `./` is allowed; `.` and `..` segments are not.
+
+| ✅ Valid | ❌ Invalid |
+| --- | --- |
+| `static/images/logo.png` | `images/logo.png` (not under `static`) |
+| `./static/logo.svg` | `static/../logo.png` (`..` segment) |
+| `static\images\logo.png` | `static` (no file) |
+
+### Colours
+
+`#rgb` or `#rrggbb` hex, e.g. `#1d4ed8` or `#fff`. Case-insensitive.
+
+### Links
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `label` | string (non-blank) | Yes | Text shown for the link. |
+| `url` | string | Yes | A portal page starting with `/` (e.g. `/changelog`), or an external address starting with `https://` or `http://`. Protocol-relative URLs such as `//example.com` are rejected. |
+
+Unknown properties are not allowed on links.

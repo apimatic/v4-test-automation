@@ -1,0 +1,66 @@
+---
+title: Hosting
+description: Deploy your generated APIMatic portal to any static host on your own domain.
+---
+
+An APIMatic portal is a static site. `apimatic portal generate` turns your `src` directory into a self-contained folder of HTML, CSS, JavaScript, and assets, so there's no server to run. You choose where it's deployed, which domain it lives on, who can reach it, and when it updates.
+
+Static hosting is also fast, cheap, and works well behind a CDN.
+
+## Deploy your portal
+
+### 1. Generate the portal
+
+From the directory that contains `src`, run:
+
+```bash
+apimatic portal generate --destination=./portal
+```
+
+Add `--force` to overwrite a previous build in the same folder. See [Generate a Portal](/generate-developer-portals/generate-build#generate-the-portal) for all flags.
+
+### 2. Find the output folder
+
+The folder you passed to `--destination` holds the complete site. That folder is what you deploy.
+
+### 3. Deploy it to your host
+
+Connect your host to a Git repository that contains the folder, or upload the folder directly. Any host that serves a folder of static files over HTTPS works.
+
+### 4. Set up your domain
+
+Point your custom domain at the host and turn on HTTPS. Then set the same address in `portal.site.url` in `apimatic.json`, without a path:
+
+```json title="src/apimatic.json"
+{
+  "portal": {
+    "site": {
+      "url": "https://docs.example.com"
+    }
+  }
+}
+```
+
+See [the apimatic.json file](/generate-developer-portals/apimatic-json-reference#portalsite).
+
+## Choose a host
+
+| Host                | Good to know                                                  |
+| ------------------- | ------------------------------------------------------------- |
+| Netlify             | Deploys from Git, with custom domains.                        |
+| Cloudflare Pages    | Serves your portal from Cloudflare's global network.          |
+| Vercel              | Automatic HTTPS and preview deployments.                      |
+| Microsoft Azure     | Static Web Apps, or Blob Storage with static website hosting. |
+| Amazon Web Services | S3 for the files, CloudFront in front for HTTPS and caching.  |
+
+## Keep your portal up to date
+
+Regenerate and redeploy the portal whenever your API definition or guides change. The simplest way is to add `apimatic portal generate` to your CI/CD pipeline, so every change to `src` publishes a fresh portal.
+
+In CI, sign in with an API key instead of a browser session:
+
+```bash
+apimatic portal generate --destination=./portal --auth-key=$APIMATIC_API_KEY
+```
+
+Then deploy the `./portal` folder with your host's CLI or Git integration.

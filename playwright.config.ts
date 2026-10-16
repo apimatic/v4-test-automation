@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
-import { baseURL, portalPort, usingExternalPortal } from "./utils/env.ts";
+import { baseURL, portalName, portalPort, usingExternalPortal } from "./utils/env.ts";
 
 dotenv.config({ quiet: true });
 
@@ -37,8 +37,14 @@ const runsFunctional =
  * output folder and rewrites its report. With one shared folder, the visual and
  * functional runs deleted the artifacts stage's failures before CI uploaded
  * them. A run of several projects, or all of them, writes to "all".
+ *
+ * Functional also carries the build, e.g. functional-auth: CI runs it once per
+ * build, and the second run would otherwise wipe the first one's report.
  */
-const runName = requestedProjects.length === 1 ? requestedProjects[0] : "all";
+const runName =
+  requestedProjects.length !== 1 ? "all"
+  : requestedProjects[0] === "functional" ? `functional-${portalName()}`
+  : requestedProjects[0];
 
 /**
  * v4 test automation — three suites over a portal produced by

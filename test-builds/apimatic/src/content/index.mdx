@@ -1,0 +1,78 @@
+---
+title: Introduction
+description: Introduces APIMatic
+---
+
+
+# Introduction (/)
+
+APIMatic helps you deliver a great developer experience for your API. Generate well-documented **APIMatic SDKs** and **APIMatic Context Plugins** that give AI coding agents accurate context about them, spin up APIMatic API documentation portals, lint your API definitions, and transform them into other formats with the APIMatic API Transformer.
+
+<Callout>
+  You're viewing the new APIMatic documentation. [Looking for our v3
+  documentation?](https://docs.apimatic.io)
+</Callout>
+
+## Let's get Started! [#lets-get-started]
+
+From an API definition to a live developer portal, SDKs and an AI-ready Context Plugin, all using one CLI command.
+
+<Cards>
+  <Card
+    icon="<svg viewBox=&#x22;0 0 24 24&#x22; width=&#x22;20&#x22; height=&#x22;20&#x22; fill=&#x22;none&#x22; stroke=&#x22;currentColor&#x22; strokeWidth=&#x22;2&#x22; strokeLinecap=&#x22;round&#x22; strokeLinejoin=&#x22;round&#x22;><path d=&#x22;M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z&#x22; /><path d=&#x22;m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z&#x22; /><path d=&#x22;M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0&#x22; /><path d=&#x22;M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5&#x22; /></svg>"
+    title="CLI Quickstart"
+    description="Set up the APIMatic CLI and generate an API Developer Portal, with APIMatic SDKs, right from your command line."
+    href="/quickstart"
+  />
+</Cards>
+
+## Context Plugins [#context-plugins]
+
+AI agents are good at writing code, but they often get API integrations wrong: they call endpoints that don't exist, use the wrong SDK version, or mishandle auth. The problem is context, not code generation.
+
+APIMatic Context Plugins fix that by giving agents version-aware access to your full API reference, your SDKs, code samples, and workflows, right inside the developer's IDE. Generate one with the APIMatic CLI (`apimatic plugin generate`) after publishing your SDKs.
+
+<Cards>
+  <Card
+    icon="<svg viewBox=&#x22;0 0 24 24&#x22; width=&#x22;20&#x22; height=&#x22;20&#x22; fill=&#x22;none&#x22; stroke=&#x22;currentColor&#x22; strokeWidth=&#x22;2&#x22; strokeLinecap=&#x22;round&#x22; strokeLinejoin=&#x22;round&#x22;><path d=&#x22;M15.39 4.39a1 1 0 0 0 1.68-.474 2.5 2.5 0 1 1 3.014 3.015 1 1 0 0 0-.474 1.68l1.683 1.682a2.414 2.414 0 0 1 0 3.414L19.61 15.39a1 1 0 0 1-1.68-.474 2.5 2.5 0 1 0-3.014 3.015 1 1 0 0 1 .474 1.68l-1.683 1.682a2.414 2.414 0 0 1-3.414 0L8.61 19.61a1 1 0 0 0-1.68.474 2.5 2.5 0 1 1-3.014-3.015 1 1 0 0 0 .474-1.68l-1.683-1.682a2.414 2.414 0 0 1 0-3.414L4.39 8.61a1 1 0 0 1 1.68.474 2.5 2.5 0 1 0 3.014-3.015 1 1 0 0 1-.474-1.68l1.683-1.682a2.414 2.414 0 0 1 3.414 0z&#x22; /></svg>"
+    title="Context Plugins"
+    description="Give AI coding agents accurate, version-aware context from your APIMatic SDKs so they generate correct, production-ready integrations, without leaving the IDE."
+    href="/generate-context-plugins/context-plugins"
+  />
+</Cards>
+
+## SDKs [#sdks]
+
+APIMatic's code generator creates SDKs with reference documentation and code samples in C#, TypeScript, and Python.
+
+<Cards>
+  <Card
+    icon="<svg viewBox=&#x22;0 0 24 24&#x22; width=&#x22;20&#x22; height=&#x22;20&#x22; fill=&#x22;none&#x22; stroke=&#x22;currentColor&#x22; strokeWidth=&#x22;2&#x22; strokeLinecap=&#x22;round&#x22; strokeLinejoin=&#x22;round&#x22;><path d=&#x22;m18 16 4-4-4-4&#x22; /><path d=&#x22;m6 8-4 4 4 4&#x22; /><path d=&#x22;m14.5 4-5 16&#x22; /></svg>"
+    title="Generate and Deploy SDKs"
+    description="Use APIMatic to auto-generate complete SDKs (aka client libraries) for your API and publish them to package managers in minutes."
+    href="/generate-sdks/apimatic-sdks"
+  />
+</Cards>
+
+## API Documentation Portals [#api-documentation-portals]
+
+Write your guides as Markdown files next to your API definition, and the APIMatic CLI builds them into a documentation portal for you.
+
+<Cards>
+  <Card
+    icon="<svg viewBox=&#x22;0 0 24 24&#x22; width=&#x22;20&#x22; height=&#x22;20&#x22; fill=&#x22;none&#x22; stroke=&#x22;currentColor&#x22; strokeWidth=&#x22;2&#x22; strokeLinecap=&#x22;round&#x22; strokeLinejoin=&#x22;round&#x22;><path d=&#x22;M12 19h8&#x22; /><path d=&#x22;m4 17 6-6-6-6&#x22; /></svg>"
+    title="Create API Portals"
+    description="Build APIMatic API Portals using the same tools you use to write code. Ideal for power users or larger teams seeking more flexibility and control."
+    href="/generate-developer-portals/generate-build"
+  />
+</Cards>
+
+## API Governance and Transformation [#api-governance-and-transformation]
+
+Generated SDKs, docs, and Context Plugins are only as good as the API definition behind them. Use APIMatic's governance tools to validate your definition before you generate anything, and convert it between formats as needed.
+
+<Cards>
+  <Card icon="<svg viewBox=&#x22;0 0 24 24&#x22; width=&#x22;20&#x22; height=&#x22;20&#x22; fill=&#x22;none&#x22; stroke=&#x22;currentColor&#x22; strokeWidth=&#x22;2&#x22; strokeLinecap=&#x22;round&#x22; strokeLinejoin=&#x22;round&#x22;><path d=&#x22;m7 11 2-2-2-2&#x22; /><path d=&#x22;M11 13h4&#x22; /><rect width=&#x22;18&#x22; height=&#x22;18&#x22; x=&#x22;3&#x22; y=&#x22;3&#x22; rx=&#x22;2&#x22; ry=&#x22;2&#x22; /></svg>" title="Validate and Lint API Definitions" description="Check your API definition against APIMatic's validation and linting rules, from the APIMatic CLI or VS Code." href="/define-validate/validate-lint" />
+
+  <Card icon="<svg viewBox=&#x22;0 0 24 24&#x22; width=&#x22;20&#x22; height=&#x22;20&#x22; fill=&#x22;none&#x22; stroke=&#x22;currentColor&#x22; strokeWidth=&#x22;2&#x22; strokeLinecap=&#x22;round&#x22; strokeLinejoin=&#x22;round&#x22;><path d=&#x22;M8 3 4 7l4 4&#x22; /><path d=&#x22;M4 7h16&#x22; /><path d=&#x22;m16 21 4-4-4-4&#x22; /><path d=&#x22;M20 17H4&#x22; /></svg>" title="Transform API Specification Formats" description="Convert your API definition between OpenAPI, RAML, Postman, and other formats with the APIMatic API Transformer." href="/define-validate/transform-formats" />
+</Cards>

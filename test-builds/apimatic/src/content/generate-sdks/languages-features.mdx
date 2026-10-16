@@ -1,0 +1,58 @@
+---
+title: Languages & Features
+description: The languages APIMatic supports and the features available in each.
+---
+
+APIMatic generates SDKs for your API in **C#**, **Python**, and **TypeScript**. Each SDK comes with utility classes, authentication helpers, configuration files, and strict language bindings, so developers work with your API through native objects and functions.
+
+## Built-in features
+
+Every APIMatic SDK includes:
+
+- Immutable clients
+- Timeouts, with automatic retries on API errors
+- Access to the HTTP response
+- Logging of API lifecycle events
+- XML support for sending and receiving data
+- Cancellable asynchronous calls
+- Multipart requests
+
+
+## OpenAPI support
+
+| Feature | C# | Python | TypeScript |
+|---|:-:|:-:|:-:|
+| Path, query and header parameters | ✅ | ✅ | ✅ |
+| JSON, text and form request bodies | ✅ | ✅ | ✅ |
+| Multipart and file upload / download | ✅ | ✅ | ✅ |
+| Required, optional, nullable and default values | ✅ | ✅ | ✅ |
+| oneOf / anyOf / allOf (unions and polymorphism) | ✅ | ✅ | ✅ |
+| Authentication (API key, Basic, Bearer, OAuth 2.0, AND / OR) | ✅ | ✅ | ✅ |
+| Multiple servers and environments | ✅ | ✅ | ✅ |
+| Typed errors per status code | ✅ | ✅ | ✅ |
+| Constraint validation (min, max, pattern) | ✅ | ❌ | ❌ |
+| Webhooks and callbacks | ✅ | ❌ | ❌ |
+| Typed additional properties | ✅ | ❌ | ❌ |
+| Parameter serialization styles (style / explode) | ❌ | ❌ | ❌ |
+
+## SDK capabilities 
+
+| Feature | C# | Python | TypeScript |
+|---|:-:|:-:|:-:|
+| Async support | ✅ | ✅ | ✅ |
+| Streaming (Server-Sent Events) | ✅ | ✅ | ❌ |
+| Pagination | ✅ | ❌ | ❌ |
+| Retries with backoff | ✅ | ✅ | ✅ |
+| Per-request timeout and cancellation | ✅ | ✅ | ✅ |
+| Hooks / interceptors | ✅ | ❌ | ❌ |
+| Logging | ✅ | ❌ | ❌ |
+
+## Documentation and developer experience
+
+| Feature | C# | Python | TypeScript |
+|---|:-:|:-:|:-:|
+| README (install and first call) | ✅ | ✅ | ✅ |
+| Doc comments in code (XML docs / docstrings / TSDoc) | ✅ | ✅ | ✅ |
+| API reference docs | ✅ | ✅ | ✅ |
+| AI context (SDK map and skills) | ✅ | ✅ | ✅ |
+

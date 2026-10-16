@@ -1,0 +1,40 @@
+---
+title: Validate & Lint
+description: Check the syntax and semantics of your API definition before you generate anything from it.
+---
+
+When you import an API definition, APIMatic runs validation and linting checks on it and reports every issue it finds. Fixing these first gives you better APIMatic SDKs, docs, and portals.
+
+## Validate with the APIMatic CLI
+
+```bash
+apimatic api validate --file=<path>
+apimatic api validate --url=<url>
+```
+
+To validate locally while you edit, use the [APIMatic extension for VS Code](https://marketplace.visualstudio.com/items?itemName=apimatic-developers.apimatic-for-vscode), which checks your definition against APIMatic's validation and linting rules.
+
+## Rules and rulesets
+
+Each APIMatic check is a **rule**, and rules are grouped into **rulesets**. A rule is identified by its ruleset ID and rule ID, for example `apimatic-preliminary-validation:required-server-url`, or by a rule code such as `APIMATICPRE_V036`.
+
+There are two kinds of rules:
+
+- **Validation rules** make sure your API definition conforms to its format and is technically correct.
+- **Linting rules** are style checks and recommendations. They improve the definition without affecting whether it's valid.
+
+Rules check two things:
+
+- **Syntax**: the structure of expressions and statements is valid.
+- **Semantics**: the definition makes sense in context.
+
+## Severity levels
+
+Messages are reported at one of four levels, from most to least severe:
+
+| Severity | What it means |
+| --- | --- |
+| Blocking | A critical issue that stops validation from continuing. |
+| Error | A syntax or semantic problem you must fix before any output is generated. |
+| Warning | Doesn't block processing, but can lower the quality of what's generated. |
+| Information | A suggestion to make your API definition more complete. |
