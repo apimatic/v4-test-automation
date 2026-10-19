@@ -63,6 +63,7 @@ test.describe("Auth — API reference playground @auth", () => {
   test("no auth — a call with no credentials passes", async ({ page }) => {
     const api = new ApiReferencePage(page);
     await api.open(routes.authNone);
+    await api.openPlayground();
 
     const response = await api.sendRequest();
 
@@ -71,7 +72,7 @@ test.describe("Auth — API reference playground @auth", () => {
     expect(response.status()).toBe(200);
 
     // What the playground shows for it.
-    await expect(api.responseStatus).toHaveText("200 Successful");
+    await expect(api.responseStatus).toHaveText("200 OK");
     await expect(api.responseBody).toHaveText("You've passed the test!");
     await expect(api.playground).toHaveScreenshot(
       "no-auth-response.png",
@@ -88,6 +89,7 @@ test.describe("Auth — API reference playground @auth", () => {
 
     const api = new ApiReferencePage(page);
     await api.open(routes.authBasic);
+    await api.openPlayground();
     await api.fillBasicAuth(username, password);
 
     const response = await api.sendRequest();
@@ -98,7 +100,7 @@ test.describe("Auth — API reference playground @auth", () => {
     expect(response.status()).toBe(200);
 
     // What the playground shows for it.
-    await expect(api.responseStatus).toHaveText("200 Successful");
+    await expect(api.responseStatus).toHaveText("200 OK");
     await expect(api.responseBody).toHaveText("You've passed the test!");
     await expect(api.playground).toHaveScreenshot(
       "basic-auth-response.png",
@@ -111,7 +113,7 @@ test.describe("Auth — API reference playground @auth", () => {
   }) => {
     const api = new ApiReferencePage(page);
     await api.open(routes.authBearer);
-    await api.openAuthorization();
+    await api.openPlayground();
 
     // The field opens holding the scheme's prefix.
     await expect(api.authorizationHeaderInput).toHaveValue("Bearer ");
@@ -124,7 +126,7 @@ test.describe("Auth — API reference playground @auth", () => {
     );
     expect(response.status()).toBe(200);
 
-    await expect(api.responseStatus).toHaveText("200 Successful");
+    await expect(api.responseStatus).toHaveText("200 OK");
     await expect(api.responseBody).toHaveText("You've passed the test!");
     await expect(api.playground).toHaveScreenshot(
       "bearer-response.png",
@@ -137,6 +139,7 @@ test.describe("Auth — API reference playground @auth", () => {
   }) => {
     const api = new ApiReferencePage(page);
     await api.open(routes.authApiKeyHeader);
+    await api.openPlayground();
     await api.fillAuthField("accesstoken", "header", creds.accessToken);
 
     const response = await api.sendRequest();
@@ -144,7 +147,7 @@ test.describe("Auth — API reference playground @auth", () => {
     expect(response.request().headers()["accesstoken"]).toBe(creds.accessToken);
     expect(response.status()).toBe(200);
 
-    await expect(api.responseStatus).toHaveText("200 Successful");
+    await expect(api.responseStatus).toHaveText("200 OK");
     await expect(api.responseBody).toHaveText("You've passed the test!");
     await expect(api.playground).toHaveScreenshot(
       "api-key-header-response.png",
@@ -157,6 +160,7 @@ test.describe("Auth — API reference playground @auth", () => {
   }) => {
     const api = new ApiReferencePage(page);
     await api.open(routes.authApiKeyQuery);
+    await api.openPlayground();
     await api.fillAuthField("token", "query", creds.queryToken);
     await api.fillAuthField("api-key", "query", creds.apiKey);
 
@@ -167,7 +171,7 @@ test.describe("Auth — API reference playground @auth", () => {
     expect(query.get("api-key")).toBe(creds.apiKey);
     expect(response.status()).toBe(200);
 
-    await expect(api.responseStatus).toHaveText("200 Successful");
+    await expect(api.responseStatus).toHaveText("200 OK");
     await expect(api.responseBody).toHaveText("You've passed the test!");
     await expect(api.playground).toHaveScreenshot(
       "api-key-query-response.png",
@@ -180,6 +184,7 @@ test.describe("Auth — API reference playground @auth", () => {
   }) => {
     const api = new ApiReferencePage(page);
     await api.open(routes.authApiKeyHeaderPair);
+    await api.openPlayground();
     await api.fillAuthField("token", "header", creds.headerToken);
     await api.fillAuthField("api-key", "header", creds.apiKey);
 
@@ -190,7 +195,7 @@ test.describe("Auth — API reference playground @auth", () => {
     expect(headers["api-key"]).toBe(creds.apiKey);
     expect(response.status()).toBe(200);
 
-    await expect(api.responseStatus).toHaveText("200 Successful");
+    await expect(api.responseStatus).toHaveText("200 OK");
     await expect(api.responseBody).toHaveText("You've passed the test!");
     await expect(api.playground).toHaveScreenshot(
       "api-key-header-pair-response.png",
@@ -204,6 +209,7 @@ test.describe("Auth — API reference playground @auth", () => {
     }) => {
       const api = new ApiReferencePage(page);
       await api.open(routes.authOr);
+      await api.openPlayground();
       // The query pair is selected by default; switch to the header pair.
       await api.selectAuthScheme(["headerToken", "headerApiKey"]);
       await api.fillAuthField("token", "header", creds.headerToken);
@@ -218,7 +224,7 @@ test.describe("Auth — API reference playground @auth", () => {
       expect(new URL(response.url()).search).toBe("");
       expect(response.status()).toBe(200);
 
-      await expect(api.responseStatus).toHaveText("200 Successful");
+      await expect(api.responseStatus).toHaveText("200 OK");
       await expect(api.responseBody).toHaveText("You've passed the test!");
       await expect(api.playground).toHaveScreenshot(
         "or-auth-response.png",
@@ -231,6 +237,7 @@ test.describe("Auth — API reference playground @auth", () => {
     }) => {
       const api = new ApiReferencePage(page);
       await api.open(routes.authAnd);
+      await api.openPlayground();
       await api.fillBasicAuth(creds.basic.username, creds.basic.password);
       await api.fillAuthField("token", "query", creds.queryToken);
       await api.fillAuthField("api-key", "query", creds.apiKey);
@@ -250,7 +257,7 @@ test.describe("Auth — API reference playground @auth", () => {
       expect(headers["api-key"]).toBe(creds.apiKey);
       expect(response.status()).toBe(200);
 
-      await expect(api.responseStatus).toHaveText("200 Successful");
+      await expect(api.responseStatus).toHaveText("200 OK");
       await expect(api.responseBody).toHaveText("You've passed the test!");
       await expect(api.playground).toHaveScreenshot(
         "and-auth-response.png",
@@ -263,6 +270,7 @@ test.describe("Auth — API reference playground @auth", () => {
     }) => {
       const api = new ApiReferencePage(page);
       await api.open(routes.authOrOfAnds);
+      await api.openPlayground();
       // The custom header is selected by default; switch to bearer.
       await api.selectAuthScheme(["bearerAuth"]);
       await api.fillAuthorizationHeader(`Bearer ${creds.bearer}`);
@@ -274,7 +282,7 @@ test.describe("Auth — API reference playground @auth", () => {
       expect(headers["accesstoken"]).toBeUndefined();
       expect(response.status()).toBe(200);
 
-      await expect(api.responseStatus).toHaveText("200 Successful");
+      await expect(api.responseStatus).toHaveText("200 OK");
       await expect(api.responseBody).toHaveText("You've passed the test!");
       await expect(api.playground).toHaveScreenshot(
         "or-of-ands-response.png",
@@ -292,6 +300,7 @@ test.describe("Auth — API reference playground @auth", () => {
       const { clientId, clientSecret } = creds.clientCredentials;
       const api = new ApiReferencePage(page);
       await api.open(routes.authOAuthClientCredentials);
+      await api.openPlayground();
 
       const tokenResponse = waitForTokenResponse(
         page,
@@ -312,14 +321,14 @@ test.describe("Auth — API reference playground @auth", () => {
       const { access_token } = await token.json();
 
       // The issued token lands in the field and goes out on the call.
-      await expect(api.accessTokenInput).toHaveValue(`Bearer ${access_token}`);
+      await expect(api.authorizationHeaderInput).toHaveValue(`Bearer ${access_token}`);
       const response = await api.sendRequest();
       expect(response.request().headers()["authorization"]).toBe(
         `Bearer ${access_token}`,
       );
       expect(response.status()).toBe(200);
 
-      await expect(api.responseStatus).toHaveText("200 Successful");
+      await expect(api.responseStatus).toHaveText("200 OK");
       await expect(api.responseBody).toHaveText("You've passed the test!");
     });
 
@@ -329,6 +338,7 @@ test.describe("Auth — API reference playground @auth", () => {
       const { clientId, clientSecret, username, password } = creds.password;
       const api = new ApiReferencePage(page);
       await api.open(routes.authOAuthPassword);
+      await api.openPlayground();
 
       const tokenResponse = waitForTokenResponse(
         page,
@@ -352,14 +362,14 @@ test.describe("Auth — API reference playground @auth", () => {
       expect(token.status()).toBe(200);
       const { access_token } = await token.json();
 
-      await expect(api.accessTokenInput).toHaveValue(`Bearer ${access_token}`);
+      await expect(api.authorizationHeaderInput).toHaveValue(`Bearer ${access_token}`);
       const response = await api.sendRequest();
       expect(response.request().headers()["authorization"]).toBe(
         `Bearer ${access_token}`,
       );
       expect(response.status()).toBe(200);
 
-      await expect(api.responseStatus).toHaveText("200 Successful");
+      await expect(api.responseStatus).toHaveText("200 OK");
       // The playground pretty-prints JSON.
       await expect(api.responseBody).toHaveText(/"status":\s*"passed"/);
     });
@@ -390,6 +400,7 @@ test.describe("Auth — API reference playground @auth", () => {
       const { clientId, clientSecret } = creds.authorizationCode;
       const api = new ApiReferencePage(page);
       await api.open(routes.authOAuthAuthorizationCode);
+      await api.openPlayground();
 
       const tokenResponse = waitForTokenResponse(
         page,
@@ -410,14 +421,14 @@ test.describe("Auth — API reference playground @auth", () => {
       expect(token.status()).toBe(200);
       const { access_token } = await token.json();
 
-      await expect(api.accessTokenInput).toHaveValue(`Bearer ${access_token}`);
+      await expect(api.authorizationHeaderInput).toHaveValue(`Bearer ${access_token}`);
       const response = await api.sendRequest();
       expect(response.request().headers()["authorization"]).toBe(
         `Bearer ${access_token}`,
       );
       expect(response.status()).toBe(200);
 
-      await expect(api.responseStatus).toHaveText("200 Successful");
+      await expect(api.responseStatus).toHaveText("200 OK");
       // The playground pretty-prints JSON.
       await expect(api.responseBody).toHaveText(/"status":\s*"passed"/);
     });
@@ -427,6 +438,7 @@ test.describe("Auth — API reference playground @auth", () => {
     }) => {
       const api = new ApiReferencePage(page);
       await api.open(routes.authOAuthOrBearer);
+      await api.openPlayground();
       await api.selectAuthScheme(["bearerAuth"]);
       await api.fillAuthorizationHeader(`Bearer ${creds.bearer}`);
 
@@ -437,7 +449,7 @@ test.describe("Auth — API reference playground @auth", () => {
       );
       expect(response.status()).toBe(200);
 
-      await expect(api.responseStatus).toHaveText("200 Successful");
+      await expect(api.responseStatus).toHaveText("200 OK");
       await expect(api.responseBody).toHaveText("You've passed the test!");
     });
   });
@@ -453,14 +465,15 @@ test.describe("Auth — API reference playground @auth", () => {
       // catch-all — so this covers sending a token, not obtaining one.
       const api = new ApiReferencePage(page);
       await api.open(routes.authOAuthImplicit);
-      await api.fillAccessToken("Bearer implicit-token");
+      await api.openPlayground();
+      await api.fillAuthorizationHeader("Bearer implicit-token");
 
       const response = await api.sendRequest();
       const echoed = await response.json();
 
       expect(response.status()).toBe(200);
       expect(echoed.headers["authorization"]).toBe("Bearer implicit-token");
-      await expect(api.responseStatus).toHaveText("200 Successful");
+      await expect(api.responseStatus).toHaveText("200 OK");
     });
 
     test("OpenID Connect — the access token field sets the Authorization header", async ({
@@ -468,14 +481,7 @@ test.describe("Auth — API reference playground @auth", () => {
     }) => {
       const api = new ApiReferencePage(page);
       await api.open(routes.authOpenIdConnect);
-      await api.openAuthorization();
-
-      // The portal says up front that it can't run the flow.
-      await expect(
-        api.playground.getByText(
-          "OpenID Connect is not supported at the moment",
-        ),
-      ).toBeVisible();
+      await api.openPlayground();
 
       await api.fillAuthorizationHeader("Bearer oidc-token");
       const response = await api.sendRequest();
@@ -483,7 +489,7 @@ test.describe("Auth — API reference playground @auth", () => {
 
       expect(response.status()).toBe(200);
       expect(echoed.headers["authorization"]).toBe("Bearer oidc-token");
-      await expect(api.responseStatus).toHaveText("200 Successful");
+      await expect(api.responseStatus).toHaveText("200 OK");
     });
 
     test("digest — the Authorization header value is sent as entered", async ({
@@ -492,6 +498,7 @@ test.describe("Auth — API reference playground @auth", () => {
       const digest = 'Digest username="Zeeshan", realm="test", nonce="abc"';
       const api = new ApiReferencePage(page);
       await api.open(routes.authDigest);
+      await api.openPlayground();
       await api.fillAuthorizationHeader(digest);
 
       const response = await api.sendRequest();
@@ -499,7 +506,7 @@ test.describe("Auth — API reference playground @auth", () => {
 
       expect(response.status()).toBe(200);
       expect(echoed.headers["authorization"]).toBe(digest);
-      await expect(api.responseStatus).toHaveText("200 Successful");
+      await expect(api.responseStatus).toHaveText("200 OK");
     });
   });
 });
