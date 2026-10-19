@@ -73,6 +73,7 @@ test.describe("APIMatic — Portal Artifacts flow @apimatic", () => {
 
     await test.step("1. Generate Portal Artifacts Async — upload the build", async () => {
       await api.open(routes.apiGenerateArtifacts);
+      await api.openPlayground();
       await api.fillAuthField("Authorization", "header", authorization);
       await api.uploadBodyFile(buildZip);
 
@@ -102,6 +103,7 @@ test.describe("APIMatic — Portal Artifacts flow @apimatic", () => {
 
     await test.step("2. Get Portal Artifacts Generation Status — poll until done", async () => {
       await api.open(routes.apiArtifactsStatus);
+      await api.openPlayground();
       await api.fillAuthField("Authorization", "header", authorization);
       await api.fillParameter("Path", "id", id);
 
@@ -149,6 +151,7 @@ test.describe("APIMatic — Portal Artifacts flow @apimatic", () => {
 
     await test.step("3. Download Generated Portal Artifacts — fetch the zip", async () => {
       await api.open(routes.apiArtifactsDownload);
+      await api.openPlayground();
       await api.fillAuthField("Authorization", "header", authorization);
       await api.fillParameter("Path", "id", id);
 
