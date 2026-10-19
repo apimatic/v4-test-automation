@@ -66,8 +66,9 @@ export const portals = {
       contextPlugin: "/context-plugin/",
 
       // Generated from src/spec/petstore.json — 19 operations across pet,
-      // store and user.
-      apiReference: "/api/petstore/",
+      // store and user. No index route: /api/petstore/ is a 404 since the
+      // reference stopped generating a landing page, and the "API Reference"
+      // tab links straight to the first operation instead.
       apiEndpoint: "/api/petstore/pet/addPet/",
       apiEndpointDelete: "/api/petstore/pet/deletePet/",
 
@@ -85,7 +86,7 @@ export const portals = {
     label: "Auth Tester",
     routes: {
       home: "/",
-      apiReference: "/api/auth/",
+      // No apiReference index — /api/auth/ is a 404, as for petstore.
 
       // One scheme, or one AND-pair the server needs together.
       authNone: "/api/auth/single/noAuth/",
@@ -125,13 +126,14 @@ export const portals = {
       home: "/",
 
       // The three calls of the generation flow, in the order they're made:
-      // upload a build, poll its status, download what it produced.
+      // upload a build, poll its status, download what it produced. The
+      // generator nests them under an extra `portal-artifacts/` segment.
       apiGenerateArtifacts:
-        "/api/openapi/portal-artifacts-generation/Generate-Portal-Artifacts-Async/",
+        "/api/openapi/portal-artifacts/portal-artifacts-generation/Generate-Portal-Artifacts-Async/",
       apiArtifactsStatus:
-        "/api/openapi/portal-artifacts-generation/Get-Portal-Artifacts-Generation-Status/",
+        "/api/openapi/portal-artifacts/portal-artifacts-generation/Get-Portal-Artifacts-Generation-Status/",
       apiArtifactsDownload:
-        "/api/openapi/portal-artifacts-generation/Download-Generated-Portal-Artifacts/",
+        "/api/openapi/portal-artifacts/portal-artifacts-generation/Download-Generated-Portal-Artifacts/",
     },
   },
 } satisfies Record<string, PortalConfig>;
