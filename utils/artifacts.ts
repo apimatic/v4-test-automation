@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { execFileSync } from "node:child_process";
+import AdmZip from "adm-zip";
 
 /**
  * Helpers for the artifact suite: read what `src/apimatic.json` DECLARES, read
@@ -177,27 +177,14 @@ export function normalizeText(text: string): string {
 // Reading inside an archive
 // ---------------------------------------------------------------------------
 
-/**
- * Lists the entries of a zip without extracting it.
- *
- * Uses PowerShell's System.IO.Compression rather than adding a zip dependency —
- * the runner is Windows (the visual baselines require it), and this keeps the
- * toolchain to what's already installed.
+/*
+ * The zip helpers below use adm-zip, which reads and writes zips in plain
+ * JavaScript, so they behave the same on Windows, Linux and macOS.
  */
+
+/** Lists the entries of a zip without extracting it. */
 export function zipEntries(zipPath: string): string[] {
-  const script = `
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-    $a = [System.IO.Compression.ZipFile]::OpenRead('${zipPath.replace(/'/g, "''")}')
-    $a.Entries | ForEach-Object { $_.FullName }
-    $a.Dispose()
-  `;
-  return execFileSync("powershell", ["-NoProfile", "-Command", script], {
-    encoding: "utf-8",
-    maxBuffer: 32 * 1024 * 1024,
-  })
-    .split(/\r?\n/)
-    .map((l) => l.trim())
-    .filter(Boolean);
+  return new AdmZip(zipPath).getEntries().map((entry) => entry.entryName);
 }
 
 /**
@@ -205,49 +192,35 @@ export function zipEntries(zipPath: string): string[] {
  * at the zip's root: `apimatic.json`, `content/…`, `spec/…`). Overwrites
  * `zipPath` if it exists.
  *
- * Entries are added one by one rather than with `CreateFromDirectory`, which on
- * Windows PowerShell 5.1 stores paths with backslashes — `content\index.mdx` —
- * and a Linux server unzips those as flat file names, not folders.
+ * Entry names are built with forward slashes on purpose. A name like
+ * `content\index.mdx` is what Windows would give us, and a Linux server
+ * unzips that as a flat file name, not a folder.
  */
 export function zipDirectory(sourceDir: string, zipPath: string): void {
-  fs.rmSync(zipPath, { force: true });
+  const zip = new AdmZip();
   const files = fs
     .readdirSync(sourceDir, { recursive: true, withFileTypes: true })
     .filter((entry) => entry.isFile())
     .map((entry) => path.join(entry.parentPath, entry.name));
-  const quote = (s: string) => `'${s.replace(/'/g, "''")}'`;
-  const adds = files
-    .map((file) => {
-      const entryName = path.relative(sourceDir, file).split(path.sep).join("/");
-      return `[System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($a, ${quote(file)}, ${quote(entryName)}) | Out-Null`;
-    })
-    .join("\n");
-  const script = `
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-    $a = [System.IO.Compression.ZipFile]::Open(${quote(zipPath)}, 'Create')
-    try {
-      ${adds}
-    } finally {
-      $a.Dispose()
-    }
-  `;
-  execFileSync("powershell", ["-NoProfile", "-Command", script]);
+  for (const file of files) {
+    const entryName = path.relative(sourceDir, file).split(path.sep).join("/");
+    zip.addFile(entryName, fs.readFileSync(file));
+  }
+  fs.rmSync(zipPath, { force: true });
+  zip.writeZip(zipPath);
 }
 
-/** Reads one file out of a zip as text. Returns null when it isn't there. */
+/** Extracts a zip into `destDir`, replacing whatever was there. */
+export function extractZip(zipPath: string, destDir: string): void {
+  fs.rmSync(destDir, { recursive: true, force: true });
+  new AdmZip(zipPath).extractAllTo(destDir, true);
+}
+
+/** Reads one file out of a zip as UTF-8 text. Returns null when it isn't there. */
 export function readZipEntry(zipPath: string, entryName: string): string | null {
-  const script = `
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-    $a = [System.IO.Compression.ZipFile]::OpenRead('${zipPath.replace(/'/g, "''")}')
-    $e = $a.Entries | Where-Object { $_.FullName -eq '${entryName.replace(/'/g, "''")}' } | Select-Object -First 1
-    if ($e) { $r = New-Object System.IO.StreamReader($e.Open()); $r.ReadToEnd(); $r.Close() }
-    $a.Dispose()
-  `;
-  const out = execFileSync("powershell", ["-NoProfile", "-Command", script], {
-    encoding: "utf-8",
-    maxBuffer: 32 * 1024 * 1024,
-  });
-  return out.trim() ? out : null;
+  const zip = new AdmZip(zipPath);
+  const entry = zip.getEntry(entryName);
+  return entry ? zip.readAsText(entry, "utf8") : null;
 }
 
 /**

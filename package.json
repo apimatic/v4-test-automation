@@ -14,6 +14,8 @@
     "test": "playwright test",
     "test:artifacts": "playwright test --project=artifacts",
     "test:artifacts:update": "playwright test --project=artifacts --update-snapshots",
+    "test:sdk-docs": "playwright test --project=artifacts tests/artifacts/petstore/sdk-docs.test.ts",
+    "test:sdk-docs:update": "playwright test --project=artifacts tests/artifacts/petstore/sdk-docs.test.ts --update-snapshots",
     "test:visual": "playwright test --project=visual",
     "test:visual:headed": "playwright test --project=visual --headed",
     "test:visual:update": "playwright test --project=visual --update-snapshots",
@@ -24,6 +26,7 @@
   "devDependencies": {
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.5.0",
+    "adm-zip": "^0.6.1",
     "basic-auth": "^2.0.1",
     "cors": "^2.8.6",
     "dotenv": "^17.2.4",

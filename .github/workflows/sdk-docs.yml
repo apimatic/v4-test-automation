@@ -1,0 +1,101 @@
+name: SDK Docs — Portal Artifacts API
+
+# Uploads the petstore build to the Portal Artifacts API, waits for generation,
+# and compares docs/<language>.json in the download to the committed baselines
+# in portal-snapshots/artifacts/petstore/sdk-docs/.
+#
+# Manual only: every run starts a real generation on the chosen account.
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Which APIMatic environment to generate against
+        required: false
+        default: dev
+        type: choice
+        options:
+          - dev
+          - prod
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30   # up to ~15 min of polling while the API generates
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.14.0"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      # No CLI, no browser: the test is plain HTTP calls plus file comparisons.
+      - name: Install test dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Picks the key for the chosen environment and writes it to GITHUB_ENV,
+      # so the test step reads it as APIMATIC_AUTH_KEY. GitHub masks it in the
+      # log because it came from a secret. Checked here because the test skips
+      # itself without a key, which would read as a pass.
+      #
+      # Prod needs no URL: the test defaults to https://api.apimatic.io. Dev
+      # reads it from DEV_APIMATIC_API_BASE_URL into APIMATIC_API_BASE_URL —
+      # not APIMATIC_BASE_URL, which the CLI reads as its own `;`-separated URLs.
+      - name: Set the auth key and base URL
+        shell: bash
+        env:
+          APIMATIC_ENV: ${{ inputs.environment }}
+          AUTH_KEY: ${{ inputs.environment == 'prod' && secrets.APIMATIC_AUTH_KEY_PROD || secrets.APIMATIC_AUTH_KEY_DEV }}
+          DEV_API_BASE_URL: ${{ secrets.DEV_APIMATIC_API_BASE_URL }}
+        run: |
+          echo "environment: $APIMATIC_ENV"
+          secret="APIMATIC_AUTH_KEY_$(echo "$APIMATIC_ENV" | tr '[:lower:]' '[:upper:]')"
+          if [ -z "$AUTH_KEY" ]; then
+            echo "::error::${secret} is not set. Add it with: gh secret set ${secret} --repo apimatic/v4-test-automation"
+            exit 1
+          fi
+          echo "APIMATIC_AUTH_KEY=$AUTH_KEY" >> "$GITHUB_ENV"
+          echo "auth key set from ${secret}"
+
+          if [ "$APIMATIC_ENV" = "dev" ]; then
+            if [ -z "$DEV_API_BASE_URL" ]; then
+              echo "::error::DEV_APIMATIC_API_BASE_URL is not set, so the test would send the dev key to prod."
+              echo "::error::Add it with: gh secret set DEV_APIMATIC_API_BASE_URL --repo apimatic/v4-test-automation"
+              exit 1
+            fi
+            echo "APIMATIC_API_BASE_URL=$DEV_API_BASE_URL" >> "$GITHUB_ENV"
+            echo "APIMATIC_API_BASE_URL set from DEV_APIMATIC_API_BASE_URL"
+          fi
+
+      - name: SDK docs vs baseline
+        run: pnpm test:sdk-docs
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-sdk-docs-${{ inputs.environment }}-${{ github.run_id }}
+          path: playwright-report/
+          retention-days: 30
+
+      # The downloaded artifacts zip and the expected/actual docs — what you
+      # need to decide whether a diff is a regression or an intended change.
+      - name: Upload failure output
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-sdk-docs-${{ inputs.environment }}-${{ github.run_id }}
+          path: test-results/
+          retention-days: 30
+          if-no-files-found: ignore
