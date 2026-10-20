@@ -33,6 +33,27 @@ function expectKeySent(request: Request): void {
   }`).toBe(true);
 }
 
+/** Replaces the key wherever it appears, so a logged value can't leak it. */
+function redact(text: string): string {
+  return authKey ? text.split(authKey).join("<redacted>") : text;
+}
+
+/** One playground call to the API, as recorded for the failure attachment. */
+type CallRecord = {
+  sentAt: string;
+  method: string;
+  url: string;
+  requestContentType?: string;
+  /** Absent while no response arrived — the shape of a waitForResponse timeout. */
+  status?: number;
+  responseContentType?: string;
+  location?: string;
+  /** The first 2000 characters of a text body. Zip downloads are left out. */
+  body?: string;
+  failure?: string;
+  durationMs?: number;
+};
+
 /** How long to keep polling the status before giving up. The API allows 25 minutes. */
 const GENERATION_TIMEOUT = 15 * 60_000;
 const POLL_INTERVAL = 10_000;
@@ -44,10 +65,67 @@ test.describe("APIMatic — Portal Artifacts flow @apimatic", () => {
   test.skip(portalName() !== "apimatic", "Run with PORTAL=apimatic");
   test.skip(!authKey, "Set APIMATIC_AUTH_KEY to call api.apimatic.io");
 
+  // With trace off, this log is what a failure leaves to debug with: every
+  // call the playground made to the API, minus the Authorization header.
+  let calls: CallRecord[] = [];
+  let pendingBodies: Promise<void>[] = [];
+
+  test.beforeEach(async ({ page }) => {
+    calls = [];
+    pendingBodies = [];
+    const records = new Map<Request, CallRecord>();
+    // Same filter sendRequest() waits on: fetch/xhr leaving the portal's origin.
+    const isApiCall = (request: Request) =>
+      ["fetch", "xhr"].includes(request.resourceType()) &&
+      new URL(request.url()).origin !== new URL(page.url()).origin;
+
+    page.on("request", (request) => {
+      if (!isApiCall(request)) return;
+      const record: CallRecord = {
+        sentAt: new Date().toISOString(),
+        method: request.method(),
+        url: redact(request.url()),
+        requestContentType: request.headers()["content-type"],
+      };
+      records.set(request, record);
+      calls.push(record);
+    });
+
+    page.on("response", (response) => {
+      const record = records.get(response.request());
+      if (!record) return;
+      const headers = response.headers();
+      record.status = response.status();
+      record.responseContentType = headers["content-type"];
+      record.location = headers["location"] && redact(headers["location"]);
+      record.durationMs = Date.now() - Date.parse(record.sentAt);
+      if (record.status >= 300 && record.status < 400) return; // redirects have no body
+      if (record.responseContentType?.includes("application/zip")) return;
+      pendingBodies.push(
+        response.text().then(
+          (text) => { record.body = redact(text).slice(0, 2000); },
+          () => { record.body = "<body not available>"; },
+        ),
+      );
+    });
+
+    page.on("requestfailed", (request) => {
+      const record = records.get(request);
+      if (record) record.failure = request.failure()?.errorText ?? "failed";
+    });
+  });
+
   // The key is typed into the playground, so keep it out of what's saved on
   // failure: the snapshot (taken when the context closes, after afterEach)
   // sees a blank page instead of the filled form. Trace is off file-wide, above.
-  test.afterEach(async ({ page }) => {
+  test.afterEach(async ({ page }, testInfo) => {
+    if (testInfo.status !== testInfo.expectedStatus) {
+      await Promise.all(pendingBodies);
+      await testInfo.attach("api-calls.json", {
+        body: JSON.stringify(calls, null, 2),
+        contentType: "application/json",
+      });
+    }
     await page.goto("about:blank");
   });
 
