@@ -57,7 +57,11 @@ export async function generateScenario(
   return new GeneratedPortal(root);
 }
 
-function applyChanges(src: string, changes: ScenarioChanges): void {
+/**
+ * Applies a scenario's changes to a copy of `src/`. Exported for tests that
+ * upload the edited copy to the API instead of generating it with the CLI.
+ */
+export function applyChanges(src: string, changes: ScenarioChanges): void {
   // Guards against a typo in a scenario quietly editing nothing (or something
   // outside the copy) — a scenario that changed nothing would still pass.
   const inSrc = (relative: string) => {
