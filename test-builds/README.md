@@ -66,3 +66,16 @@ npm run test:visual:update
 
 Commit the build change and the new baselines together, so the diff shows why
 the pixels moved.
+
+## Codegen builds
+
+`codegen-oas30/` and `codegen-oas31/` are never served. They're uploaded to the
+Portal Artifacts API by `tests/artifacts/codegen/`, which compares the code
+samples codegen-v2 generates for them. Each operation is one request-example
+case, and its description says what the sample should show.
+
+They hold only the build input: `apimatic.json`, `content/` and `spec/`. Don't
+copy generated output (`portal-artifacts/`, `*.zip`) in beside them, because it
+would be zipped and uploaded with the build. Editing a spec moves the code
+sample baselines, so re-baseline with `pnpm test:code-samples:update` and review
+the diff.

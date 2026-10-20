@@ -1,8 +1,9 @@
-name: SDK Docs — Portal Artifacts API
+name: Portal Artifacts API — SDK docs & code samples
 
-# Uploads the petstore build to the Portal Artifacts API, waits for generation,
-# and compares docs/<language>.json in the download to the committed baselines
-# in portal-snapshots/artifacts/petstore/sdk-docs/.
+# Uploads builds to the Portal Artifacts API, waits for generation, and
+# compares what comes back to committed baselines:
+#   - petstore:          docs/<language>.json         -> portal-snapshots/artifacts/petstore/sdk-docs/
+#   - codegen-oas30/31:  code-samples/<language>.json -> portal-snapshots/artifacts/codegen/code-samples/
 #
 # Manual only: every run starts a real generation on the chosen account.
 on:
@@ -24,7 +25,9 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30   # up to ~15 min of polling while the API generates
+    # Four generations, one after another. Each usually takes under a minute,
+    # but the test allows up to 15 for any one of them.
+    timeout-minutes: 60
 
     steps:
       - name: Checkout
@@ -40,7 +43,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
-      # No CLI, no browser: the test is plain HTTP calls plus file comparisons.
+      # No CLI, no browser: the tests are plain HTTP calls plus file comparisons.
       - name: Install test dependencies
         run: pnpm install --frozen-lockfile
 
@@ -78,24 +81,26 @@ jobs:
             echo "APIMATIC_API_BASE_URL set from DEV_APIMATIC_API_BASE_URL"
           fi
 
-      - name: SDK docs vs baseline
-        run: pnpm test:sdk-docs
+      # One Playwright run for both, so they share one report rather than the
+      # second run overwriting the first's.
+      - name: SDK docs and code samples vs baseline
+        run: pnpm test:portal-artifacts-api
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-sdk-docs-${{ inputs.environment }}-${{ github.run_id }}
+          name: playwright-report-portal-artifacts-api-${{ inputs.environment }}-${{ github.run_id }}
           path: playwright-report/
           retention-days: 30
 
-      # The downloaded artifacts zip and the expected/actual docs — what you
+      # The downloaded artifacts zips and the expected/actual baselines — what you
       # need to decide whether a diff is a regression or an intended change.
       - name: Upload failure output
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-sdk-docs-${{ inputs.environment }}-${{ github.run_id }}
+          name: test-results-portal-artifacts-api-${{ inputs.environment }}-${{ github.run_id }}
           path: test-results/
           retention-days: 30
           if-no-files-found: ignore

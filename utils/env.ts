@@ -33,11 +33,19 @@ export function portalConfig(): PortalConfig {
  * `apimatic portal generate --input` expects.
  */
 export function buildDir(): string {
-  const dir = path.join(REPO_ROOT, portalConfig().buildDir);
+  return buildDirOf(portalName());
+}
+
+/**
+ * The build input for a named build, whichever one PORTAL selects. For tests
+ * that cover several builds in one run, like the codegen code samples.
+ */
+export function buildDirOf(name: string): string {
+  const dir = path.join(REPO_ROOT, getPortal(name).buildDir);
   const config = path.join(dir, "src", "apimatic.json");
   if (!fs.existsSync(config)) {
     throw new Error(
-      `Portal build "${portalName()}" is missing or malformed — expected ${config}. ` +
+      `Portal build "${name}" is missing or malformed — expected ${config}. ` +
         `Builds live in test-builds/; see test-builds/README.md.`,
     );
   }

@@ -66,6 +66,11 @@ pnpm test:artifacts      # stage 1 — generates its own portals, no server
 pnpm test:visual         # stage 2
 PORTAL=auth pnpm test:functional   # stage 3 — also starts the API Tester
 
+# Portal Artifacts API — needs APIMATIC_AUTH_KEY, skipped without it
+pnpm test:sdk-docs              # petstore SDK docs vs baselines
+pnpm test:code-samples          # codegen-v2 code samples, OpenAPI 3.0 + 3.1 builds
+pnpm test:portal-artifacts-api  # both, in one run (what CI runs)
+
 pnpm test:visual:update  # accept the current rendering as the new baselines
 pnpm report playwright-report/visual   # open a stage's HTML report
 ```

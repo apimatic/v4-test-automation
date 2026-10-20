@@ -1,0 +1,514 @@
+openapi: 3.0.3
+info:
+  title: Fix Verification (3.0) - apimatic-common#1409
+  version: 1.0.0
+  description: 'Request-level examples only, one case per operation, built to exercise what apimatic-common#1409
+    changed. Authored values carry an AUTHORED- prefix so a generated placeholder is unmistakable in the
+    code sample.
+
+
+    EVERY description below states behaviour VERIFIED against the merged #1409 build by transforming this
+    spec and reading the SDL - so any surprise in the generated sample is codegen rendering, not common.
+
+
+    Key finding already captured here: several #1409 fixes apply to a property-level or parameter example
+    but NOT to a value nested inside a request-body example, which is the only place codegen reads. r1/r3
+    and d1 are the clearest cases.'
+servers:
+- url: https://fix-verify.example.com
+tags:
+- name: cases
+paths:
+  /case/r1-array-bare-scalar:
+    post:
+      operationId: r1_array_bare_scalar
+      tags:
+      - cases
+      summary: Array given a bare scalar
+      description: 'VERIFIED: example REMOVED. The bare-scalar array repair added in #1409 does NOT apply
+        inside a request-body example - only at a parameter position (see r2). Sample should therefore
+        show a GENERATED placeholder.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/R1ArrayBareScalar'
+            example:
+              value: AUTHORED-1234
+      responses:
+        '200':
+          description: OK
+  /case/r2-param-array-bare-scalar:
+    post:
+      operationId: r2_param_array_bare_scalar
+      tags:
+      - cases
+      summary: Query array parameter given a bare scalar
+      description: 'VERIFIED: parameter example REPAIRED to ["AUTHORED-one-two"]. Sample should show that
+        array for r2_tags, and "AUTHORED-body" for the body.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/R2ParamArrayBareScalar'
+            example:
+              value: AUTHORED-body
+      responses:
+        '200':
+          description: OK
+      parameters:
+      - name: r2_tags
+        in: query
+        required: true
+        description: Repaired array parameter.
+        schema:
+          type: array
+          items:
+            type: string
+            description: A tag.
+        example: AUTHORED-one-two
+  /case/d1-byte-invalid:
+    post:
+      operationId: d1_byte_invalid
+      tags:
+      - cases
+      summary: format byte given non-base64
+      description: 'VERIFIED: example KEPT. The base64 validation added in #1409 does not reach a value
+        nested in a request-body example. Sample should show the invalid "!!!not-base64!!!".'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/D1ByteInvalid'
+            example:
+              value: '!!!not-base64!!!'
+      responses:
+        '200':
+          description: OK
+  /case/d2-date-day-first:
+    post:
+      operationId: d2_date_day_first
+      tags:
+      - cases
+      summary: format date given a day-first date
+      description: 'VERIFIED: example REMOVED. Sample should show a GENERATED date, not 31/02/2026.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/D2DateDayFirst'
+            example:
+              value: 31/02/2026
+      responses:
+        '200':
+          description: OK
+  /case/d3-date-impossible:
+    post:
+      operationId: d3_date_impossible
+      tags:
+      - cases
+      summary: format date given an impossible date
+      description: 'VERIFIED: example REMOVED. Sample should show a GENERATED date, not 2026-02-31.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/D3DateImpossible'
+            example:
+              value: '2026-02-31'
+      responses:
+        '200':
+          description: OK
+  /case/d4-array-of-arrays-flat:
+    post:
+      operationId: d4_array_of_arrays_flat
+      tags:
+      - cases
+      summary: Array of arrays given a flat array
+      description: 'VERIFIED: example REMOVED. Sample should show a GENERATED nested array.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/D4ArrayOfArraysFlat'
+            example:
+              value:
+              - AUTHORED-a
+              - AUTHORED-b
+      responses:
+        '200':
+          description: OK
+  /case/d5-null-on-non-nullable:
+    post:
+      operationId: d5_null_on_non_nullable
+      tags:
+      - cases
+      summary: Explicit null on a non-nullable string
+      description: 'VERIFIED: example REMOVED. Sample should show a GENERATED string, not null.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/D5NullOnNonNullable'
+            example:
+              value: null
+      responses:
+        '200':
+          description: OK
+  /case/d6-oneof-no-match:
+    post:
+      operationId: d6_oneof_no_match
+      tags:
+      - cases
+      summary: oneOf string or integer given a boolean
+      description: 'VERIFIED: example REMOVED. Sample should show a GENERATED value for the union.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/D6OneofNoMatch'
+            example:
+              value: true
+      responses:
+        '200':
+          description: OK
+  /case/d7-nullable-wrong-type:
+    post:
+      operationId: d7_nullable_wrong_type
+      tags:
+      - cases
+      summary: nullable string given an integer
+      description: 'VERIFIED: example COERCED to the string "42" - not removed. Sample should show "42"
+        as a string.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/D7NullableWrongType'
+            example:
+              value: 42
+      responses:
+        '200':
+          description: OK
+  /case/c1-byte-valid:
+    post:
+      operationId: c1_byte_valid
+      tags:
+      - cases
+      summary: Valid base64
+      description: CONTROL, VERIFIED KEPT. Sample must show QVVUSE9SRUQ= exactly.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/C1ByteValid'
+            example:
+              value: QVVUSE9SRUQ=
+      responses:
+        '200':
+          description: OK
+  /case/c2-date-valid:
+    post:
+      operationId: c2_date_valid
+      tags:
+      - cases
+      summary: Valid ISO date
+      description: CONTROL, VERIFIED KEPT. Sample must show 2026-05-01.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/C2DateValid'
+            example:
+              value: '2026-05-01'
+      responses:
+        '200':
+          description: OK
+  /case/c3-array-of-arrays-nested:
+    post:
+      operationId: c3_array_of_arrays_nested
+      tags:
+      - cases
+      summary: Properly nested array of arrays
+      description: CONTROL, VERIFIED KEPT. Sample must show [["AUTHORED-a","AUTHORED-b"]] nested.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/C3ArrayOfArraysNested'
+            example:
+              value:
+              - - AUTHORED-a
+                - AUTHORED-b
+      responses:
+        '200':
+          description: OK
+  /case/c4-null-on-nullable:
+    post:
+      operationId: c4_null_on_nullable
+      tags:
+      - cases
+      summary: Explicit null on a nullable string
+      description: CONTROL, VERIFIED KEPT as an explicit null. Sample should show null.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/C4NullOnNullable'
+            example:
+              value: null
+      responses:
+        '200':
+          description: OK
+  /case/c5-oneof-match:
+    post:
+      operationId: c5_oneof_match
+      tags:
+      - cases
+      summary: oneOf string or integer given a string
+      description: CONTROL, VERIFIED KEPT. Sample must show AUTHORED-oneof-string on the matching arm.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/C5OneofMatch'
+            example:
+              value: AUTHORED-oneof-string
+      responses:
+        '200':
+          description: OK
+  /case/k1-map-of-arrays-bad:
+    post:
+      operationId: k1_map_of_arrays_bad
+      tags:
+      - cases
+      summary: Map of arrays given a scalar value
+      description: 'VERIFIED KEPT by common. Expect the known map-of-arrays defect in the SAMPLE: the
+        value is emptied or dropped by codegen. Not a #1409 regression.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/K1MapOfArraysBad'
+            example:
+              value:
+                key: AUTHORED-not-an-array
+      responses:
+        '200':
+          description: OK
+  /case/k2-object-as-json-string:
+    post:
+      operationId: k2_object_as_json_string
+      tags:
+      - cases
+      summary: Object given a JSON string literal
+      description: 'VERIFIED: example REMOVED, despite #1409 listing JSON-object-as-string as deliberate
+        leniency. Sample should show a GENERATED object.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/K2ObjectAsJsonString'
+            example:
+              value: '{"x":1}'
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    R1ArrayBareScalar:
+      type: object
+      description: Array given a bare scalar
+      required:
+      - value
+      properties:
+        value:
+          type: array
+          description: Tags.
+          items:
+            type: string
+            description: A tag.
+    R2ParamArrayBareScalar:
+      type: object
+      description: Query array parameter given a bare scalar
+      required:
+      - value
+      properties:
+        value:
+          type: string
+          description: Unused body field.
+    D1ByteInvalid:
+      type: object
+      description: format byte given non-base64
+      required:
+      - value
+      properties:
+        value:
+          type: string
+          format: byte
+          description: Base64 payload.
+    D2DateDayFirst:
+      type: object
+      description: format date given a day-first date
+      required:
+      - value
+      properties:
+        value:
+          type: string
+          format: date
+          description: A date.
+    D3DateImpossible:
+      type: object
+      description: format date given an impossible date
+      required:
+      - value
+      properties:
+        value:
+          type: string
+          format: date
+          description: A date.
+    D4ArrayOfArraysFlat:
+      type: object
+      description: Array of arrays given a flat array
+      required:
+      - value
+      properties:
+        value:
+          type: array
+          description: Rows.
+          items:
+            type: array
+            description: One row.
+            items:
+              type: string
+              description: A cell.
+    D5NullOnNonNullable:
+      type: object
+      description: Explicit null on a non-nullable string
+      required:
+      - value
+      properties:
+        value:
+          type: string
+          description: Not nullable.
+    D6OneofNoMatch:
+      type: object
+      description: oneOf string or integer given a boolean
+      required:
+      - value
+      properties:
+        value:
+          description: Scalar union.
+          oneOf:
+          - type: string
+          - type: integer
+    D7NullableWrongType:
+      type: object
+      description: nullable string given an integer
+      required:
+      - value
+      properties:
+        value:
+          type: string
+          nullable: true
+          description: Nullable string.
+    C1ByteValid:
+      type: object
+      description: Valid base64
+      required:
+      - value
+      properties:
+        value:
+          type: string
+          format: byte
+          description: Base64 payload.
+    C2DateValid:
+      type: object
+      description: Valid ISO date
+      required:
+      - value
+      properties:
+        value:
+          type: string
+          format: date
+          description: A date.
+    C3ArrayOfArraysNested:
+      type: object
+      description: Properly nested array of arrays
+      required:
+      - value
+      properties:
+        value:
+          type: array
+          description: Rows.
+          items:
+            type: array
+            description: One row.
+            items:
+              type: string
+              description: A cell.
+    C4NullOnNullable:
+      type: object
+      description: Explicit null on a nullable string
+      required:
+      - value
+      properties:
+        value:
+          type: string
+          nullable: true
+          description: Nullable string.
+    C5OneofMatch:
+      type: object
+      description: oneOf string or integer given a string
+      required:
+      - value
+      properties:
+        value:
+          description: Scalar union.
+          oneOf:
+          - type: string
+          - type: integer
+    K1MapOfArraysBad:
+      type: object
+      description: Map of arrays given a scalar value
+      required:
+      - value
+      properties:
+        value:
+          type: object
+          description: Map of string arrays.
+          additionalProperties:
+            type: array
+            description: Values.
+            items:
+              type: string
+              description: A value.
+    K2ObjectAsJsonString:
+      type: object
+      description: Object given a JSON string literal
+      required:
+      - value
+      properties:
+        value:
+          type: object
+          description: A point.
+          properties:
+            x:
+              type: integer
+              description: X.

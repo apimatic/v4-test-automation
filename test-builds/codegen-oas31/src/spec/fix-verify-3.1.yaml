@@ -1,0 +1,145 @@
+openapi: 3.1.0
+info:
+  title: Fix Verification (3.1) - apimatic-common#1409
+  version: 1.0.0
+  description: 'Request-level examples only, one case per operation, built to exercise what apimatic-common#1409
+    changed. Authored values carry an AUTHORED- prefix so a generated placeholder is unmistakable in the
+    code sample.
+
+
+    EVERY description below states behaviour VERIFIED against the merged #1409 build by transforming this
+    spec and reading the SDL - so any surprise in the generated sample is codegen rendering, not common.
+
+
+    Key finding already captured here: several #1409 fixes apply to a property-level or parameter example
+    but NOT to a value nested inside a request-body example, which is the only place codegen reads. r1/r3
+    and d1 are the clearest cases.
+
+
+    3.1 companion: JSON-Schema-native nullable (type: [X, "null"]) plus the array repair.'
+jsonSchemaDialect: https://spec.openapis.org/oas/3.1/dialect/base
+servers:
+- url: https://fix-verify.example.com
+tags:
+- name: cases
+paths:
+  /case/d8-type-array-wrong-member:
+    post:
+      operationId: d8_type_array_wrong_member
+      tags:
+      - cases
+      summary: type [string, null] given an integer
+      description: 'VERIFIED: example COERCED to the string "42" - not removed. Sample should show "42".'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/D8TypeArrayWrongMember'
+            example:
+              value: 42
+      responses:
+        '200':
+          description: OK
+  /case/c6-type-array-null-ok:
+    post:
+      operationId: c6_type_array_null_ok
+      tags:
+      - cases
+      summary: type [string, null] given null
+      description: CONTROL, VERIFIED KEPT. Sample should show null.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/C6TypeArrayNullOk'
+            example:
+              value: null
+      responses:
+        '200':
+          description: OK
+  /case/c7-type-array-string-ok:
+    post:
+      operationId: c7_type_array_string_ok
+      tags:
+      - cases
+      summary: type [string, null] given a string
+      description: CONTROL, VERIFIED KEPT. Sample must show AUTHORED-31-string.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/C7TypeArrayStringOk'
+            example:
+              value: AUTHORED-31-string
+      responses:
+        '200':
+          description: OK
+  /case/r3-array-bare-scalar-31:
+    post:
+      operationId: r3_array_bare_scalar_31
+      tags:
+      - cases
+      summary: Array given a bare scalar (3.1)
+      description: 'VERIFIED: example REMOVED. Same as r1 - the repair does not apply inside a request-body
+        example. Sample should show a GENERATED array.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/R3ArrayBareScalar31'
+            example:
+              value: AUTHORED-1234
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    D8TypeArrayWrongMember:
+      type: object
+      description: type [string, null] given an integer
+      required:
+      - value
+      properties:
+        value:
+          type:
+          - string
+          - 'null'
+          description: String or null.
+    C6TypeArrayNullOk:
+      type: object
+      description: type [string, null] given null
+      required:
+      - value
+      properties:
+        value:
+          type:
+          - string
+          - 'null'
+          description: String or null.
+    C7TypeArrayStringOk:
+      type: object
+      description: type [string, null] given a string
+      required:
+      - value
+      properties:
+        value:
+          type:
+          - string
+          - 'null'
+          description: String or null.
+    R3ArrayBareScalar31:
+      type: object
+      description: Array given a bare scalar (3.1)
+      required:
+      - value
+      properties:
+        value:
+          type: array
+          description: Tags.
+          items:
+            type: string
+            description: A tag.

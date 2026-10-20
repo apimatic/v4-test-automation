@@ -13,6 +13,8 @@ test-builds/** text=auto eol=lf
 *.ico binary
 *.zip binary
 
-# Text baselines (llms.txt, llms-full.txt) are compared byte-for-byte too. The
-# generator writes LF, so a CRLF checkout would fail every line.
+# Text baselines (llms.txt, llms-full.txt, the SDK docs and code samples .md)
+# are compared byte-for-byte too. The tests write LF, so a CRLF checkout would
+# fail every line.
 portal-snapshots/**/*.txt -text
+portal-snapshots/**/*.md -text

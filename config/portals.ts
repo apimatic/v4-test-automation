@@ -134,6 +134,20 @@ export const portals = {
         "/api/openapi/portal-artifacts-generation/Download-Generated-Portal-Artifacts/",
     },
   },
+
+  // codegen-v2 request-example cases, one operation per case. These are only
+  // uploaded to the Portal Artifacts API to compare the code samples it
+  // generates (tests/artifacts/codegen/) — never served, so no routes.
+  "codegen-oas30": {
+    buildDir: "test-builds/codegen-oas30",
+    label: "Codegen request examples (OpenAPI 3.0)",
+    routes: {},
+  },
+  "codegen-oas31": {
+    buildDir: "test-builds/codegen-oas31",
+    label: "Codegen request examples (OpenAPI 3.1)",
+    routes: {},
+  },
 } satisfies Record<string, PortalConfig>;
 
 export type PortalName = keyof typeof portals;
