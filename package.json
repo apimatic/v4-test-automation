@@ -16,6 +16,9 @@
     "test:artifacts:update": "playwright test --project=artifacts --update-snapshots",
     "test:sdk-docs": "playwright test --project=artifacts tests/artifacts/petstore/sdk-docs.test.ts",
     "test:sdk-docs:update": "playwright test --project=artifacts tests/artifacts/petstore/sdk-docs.test.ts --update-snapshots",
+    "test:code-samples": "playwright test --project=artifacts tests/artifacts/codegen",
+    "test:code-samples:update": "playwright test --project=artifacts tests/artifacts/codegen --update-snapshots",
+    "test:portal-artifacts-api": "playwright test --project=artifacts tests/artifacts/petstore/sdk-docs.test.ts tests/artifacts/codegen",
     "test:visual": "playwright test --project=visual",
     "test:visual:headed": "playwright test --project=visual --headed",
     "test:visual:update": "playwright test --project=visual --update-snapshots",
@@ -31,6 +34,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.2.4",
     "express": "^4.22.3",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "yaml": "^2.9.1"
   }
 }
