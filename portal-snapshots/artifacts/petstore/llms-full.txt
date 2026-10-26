@@ -6,41 +6,39 @@
   <Accordion title="Why am I getting 429 responses?">
     Requests are rate limited per API key rather than per IP address. When you exceed the limit the API answers `429 Too Many Requests` and sets `Retry-After` to the number of seconds remaining in the current window. The generated SDKs read that header and back off for you, so you only need to handle it directly if you are calling the API without an SDK.
   </Accordion>
-
   <Accordion title="Which endpoints accept an idempotency key?">
-    | Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-    | ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-    | `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-    | `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-    | `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-    | `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-    | `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-    | `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-    | `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
-  </Accordion>
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
+  </Accordion>
   <Accordion title="How do I retry safely from TypeScript?">
-    ```ts
-    import { SwaggerPetstoreOpenApi30Client, ApiError } from "@acme/petstore-sdk";
+```ts
+import { SwaggerPetstoreOpenApi30Client, ApiError } from "@acme/petstore-sdk";
 
-    const client = new SwaggerPetstoreOpenApi30Client({ apiKey: process.env.PETSTORE_API_KEY });
+const client = new SwaggerPetstoreOpenApi30Client({ apiKey: process.env.PETSTORE_API_KEY });
 
-    export async function listAvailablePets(limit = 100): Promise<Pet[]> {
-      try {
-        const { result } = await client.petController.findPetsByStatus({ status: "available", limit });
-        return result;
-      } catch (error) {
-        if (error instanceof ApiError && error.statusCode === 429) {
-          const retryAfterSeconds = Number(error.headers["retry-after"] ?? 1);
-          await new Promise((resolve) => setTimeout(resolve, retryAfterSeconds * 1000));
-          return listAvailablePets(limit);
-        }
-        throw error;
-      }
+export async function listAvailablePets(limit = 100): Promise<Pet[]> {
+  try {
+    const { result } = await client.petController.findPetsByStatus({ status: "available", limit });
+    return result;
+  } catch (error) {
+    if (error instanceof ApiError && error.statusCode === 429) {
+      const retryAfterSeconds = Number(error.headers["retry-after"] ?? 1);
+      await new Promise((resolve) => setTimeout(resolve, retryAfterSeconds * 1000));
+      return listAvailablePets(limit);
     }
-    ```
+    throw error;
+  }
+}
+```
   </Accordion>
-
   <Accordion title="What is the difference between code and message?">
     Errors carry a machine-readable `code` alongside the human-readable `message`. Match on `code` in your own error handling: the `message` is written for a developer reading a log and may be reworded between releases, while `code` is part of the contract and changes only with a major version bump.
   </Accordion>
@@ -52,7 +50,6 @@
   <Accordion title="A section that starts closed">
     The Petstore API exposes pets, store orders and user accounts over HTTPS. Every request is authenticated, every response is JSON, and every list endpoint is paginated. This page walks through the parts of that contract you are most likely to need on your first integration, and points at the reference pages for the rest.
   </Accordion>
-
   <Accordion title="A section with a very long title that will need to wrap on a narrow viewport because it keeps going">
     Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.
   </Accordion>
@@ -60,19 +57,15 @@
 
 # Banner and InlineTOC (/components/banner)
 
-<Banner variant="rainbow">
-  Petstore API v3.3 is now generally available.
-</Banner>
+<Banner variant="rainbow">Petstore API v3.3 is now generally available.</Banner>
 
 ## On this page [#on-this-page]
 
-<InlineTOC
-  items="[
-{ title: 'Authentication', url: '#authentication', depth: 2 },
-{ title: 'Rate limits', url: '#rate-limits', depth: 2 },
-{ title: 'Errors', url: '#errors', depth: 2 },
-]"
-/>
+<InlineTOC items={[
+  { title: 'Authentication', url: '#authentication', depth: 2 },
+  { title: 'Rate limits', url: '#rate-limits', depth: 2 },
+  { title: 'Errors', url: '#errors', depth: 2 },
+]} />
 
 ## Authentication [#authentication]
 
@@ -114,11 +107,11 @@ Callouts come from the default component set, so they need no import.
   Retrying a non-idempotent request can create duplicate orders. Before you turn on
   automatic retries, check that every endpoint you call accepts an idempotency key:
 
-  | Endpoint            | Idempotent | Key header        |
-  | ------------------- | ---------- | ----------------- |
-  | `POST /pet`         | Yes        | `Idempotency-Key` |
-  | `POST /store/order` | Yes        | `Idempotency-Key` |
-  | `DELETE /pet/petId` | No         | not accepted      |
+  | Endpoint | Idempotent | Key header |
+  | --- | --- | --- |
+  | `POST /pet` | Yes | `Idempotency-Key` |
+  | `POST /store/order` | Yes | `Idempotency-Key` |
+  | `DELETE /pet/petId` | No | not accepted |
 
   The SDKs send the header for you when you pass `idempotencyKey` to the call.
 </Callout>
@@ -126,25 +119,25 @@ Callouts come from the default component set, so they need no import.
 <Callout type="info" title="Example">
   The TypeScript SDK reads `Retry-After` and backs off without any configuration:
 
-  ```ts
-  import { SwaggerPetstoreOpenApi30Client, ApiError } from "@acme/petstore-sdk";
+```ts
+import { SwaggerPetstoreOpenApi30Client, ApiError } from "@acme/petstore-sdk";
 
-  const client = new SwaggerPetstoreOpenApi30Client({ apiKey: process.env.PETSTORE_API_KEY });
+const client = new SwaggerPetstoreOpenApi30Client({ apiKey: process.env.PETSTORE_API_KEY });
 
-  export async function listAvailablePets(limit = 100): Promise<Pet[]> {
-    try {
-      const { result } = await client.petController.findPetsByStatus({ status: "available", limit });
-      return result;
-    } catch (error) {
-      if (error instanceof ApiError && error.statusCode === 429) {
-        const retryAfterSeconds = Number(error.headers["retry-after"] ?? 1);
-        await new Promise((resolve) => setTimeout(resolve, retryAfterSeconds * 1000));
-        return listAvailablePets(limit);
-      }
-      throw error;
+export async function listAvailablePets(limit = 100): Promise<Pet[]> {
+  try {
+    const { result } = await client.petController.findPetsByStatus({ status: "available", limit });
+    return result;
+  } catch (error) {
+    if (error instanceof ApiError && error.statusCode === 429) {
+      const retryAfterSeconds = Number(error.headers["retry-after"] ?? 1);
+      await new Promise((resolve) => setTimeout(resolve, retryAfterSeconds * 1000));
+      return listAvailablePets(limit);
     }
+    throw error;
   }
-  ```
+}
+```
 
   Set `maxRetries: 0` in `ClientOptions` if you would rather handle it yourself.
 </Callout>
@@ -153,17 +146,11 @@ Errors carry a machine-readable `code` alongside the human-readable `message`. M
 
 ## Callouts in sequence [#callouts-in-sequence]
 
-<Callout type="info">
-  First of three consecutive callouts, to check vertical rhythm.
-</Callout>
+<Callout type="info">First of three consecutive callouts, to check vertical rhythm.</Callout>
 
-<Callout type="warn">
-  Second of three.
-</Callout>
+<Callout type="warn">Second of three.</Callout>
 
-<Callout type="error">
-  Third of three.
-</Callout>
+<Callout type="error">Third of three.</Callout>
 
 Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.
 
@@ -175,9 +162,7 @@ Cards reflow by viewport width, so this page is the one to resize.
 
 <Cards>
   <Card title="Authentication" href="/guides" description="API keys, OAuth 2 and which endpoints accept which" />
-
   <Card title="Pagination" href="/guides" description="Cursor paging, offset paging and the limits of each" />
-
   <Card title="Webhooks" href="/guides" description="Delivery, retries and signature verification" />
 </Cards>
 
@@ -185,9 +170,7 @@ Cards reflow by viewport width, so this page is the one to resize.
 
 <Cards>
   <Card title="Changelog" href="/guides" />
-
   <Card title="Status page" href="https://status.example.com" />
-
   <Card title="Support" href="/guides" />
 </Cards>
 
@@ -196,28 +179,19 @@ Cards reflow by viewport width, so this page is the one to resize.
 A `Card` used on its own, without a surrounding `Cards` grid.
 
 <Card title="Pets" href="/components/cards" description="Create, read, update and delete pet records" />
-
 <Card title="Store" href="/components/cards" description="Place orders and read inventory counts" />
 
 ## Nine cards in one grid [#nine-cards-in-one-grid]
 
 <Cards>
   <Card title="Pets" href="/components/cards" description="Create, read, update and delete pet records" />
-
   <Card title="Store" href="/components/cards" description="Place orders and read inventory counts" />
-
   <Card title="Users" href="/components/cards" description="Account creation and session management" />
-
   <Card title="Webhooks" href="/components/cards" description="Subscribe to events rather than polling for them" />
-
   <Card title="Rate limits" href="/components/cards" description="Per-key windows, headers and backoff guidance" />
-
   <Card title="Idempotency" href="/components/cards" description="Safe retries for every mutating endpoint" />
-
   <Card title="Pagination" href="/components/cards" description="Cursor and offset paging across list endpoints" />
-
   <Card title="Errors" href="/components/cards" description="Machine-readable codes and what each one means" />
-
   <Card title="Versioning" href="/components/cards" description="How breaking changes are introduced and announced" />
 </Cards>
 
@@ -233,7 +207,6 @@ Requests are rate limited per API key rather than per IP address. When you excee
 
 <Cards>
   <Card title="Configuring exponential backoff with jitter for webhook delivery retries" href="/guides" description="A deliberately long description that runs past the width of a single card at most viewport sizes, so that wrapping, clamping and overflow behaviour are all visible on this page rather than only in production." />
-
   <Card title="Short" href="/guides" description="Short." />
 </Cards>
 
@@ -317,7 +290,7 @@ Accept: application/json
 ## Inline code of unusual length [#inline-code-of-unusual-length]
 
 A parameter named `includeCategoryAndTagsAndPhotoUrlsInTheResponsePayload` inside a sentence,
-followed by a bare URL that cannot break: [https://api.petstore.example.com/v3/pet/findByStatus?status=available\&limit=100\&offset=0\&sort=name\&order=ascending\&include=category,tags,photoUrls](https://api.petstore.example.com/v3/pet/findByStatus?status=available\&limit=100\&offset=0\&sort=name\&order=ascending\&include=category,tags,photoUrls)
+followed by a bare URL that cannot break: https://api.petstore.example.com/v3/pet/findByStatus?status=available&limit=100&offset=0&sort=name&order=ascending&include=category,tags,photoUrls
 
 Errors carry a machine-readable `code` alongside the human-readable `message`. Match on `code` in your own error handling: the `message` is written for a developer reading a log and may be reworded between releases, while `code` is part of the contract and changes only with a major version bump.
 
@@ -326,47 +299,34 @@ Errors carry a machine-readable `code` alongside the human-readable `message`. M
 ## What the CLI writes [#what-the-cli-writes]
 
 <Files>
-  <Folder name="src">
+  <Folder name="src" defaultOpen>
     <File name="apimatic.json" />
-
     <Folder name="spec">
       <File name="petstore.json" />
     </Folder>
-
-    <Folder name="content">
+    <Folder name="content" defaultOpen>
       <File name="index.md" />
-
       <File name="nav.json" />
-
       <Folder name="guides">
         <File name="index.md" />
-
         <File name="authentication.md" />
-
         <Folder name="webhooks">
           <File name="index.md" />
-
           <File name="delivery.md" />
         </Folder>
       </Folder>
     </Folder>
-
     <Folder name="static">
       <File name="logo.png" />
     </Folder>
   </Folder>
-
   <Folder name="portal">
     <File name="index.html" />
-
     <File name="llms.txt" />
   </Folder>
-
   <Folder name="sdk">
     <File name="typescript.zip" />
-
     <File name="python.zip" />
-
     <File name="csharp.zip" />
   </Folder>
 </Files>
@@ -382,23 +342,14 @@ The Petstore API exposes pets, store orders and user accounts over HTTPS. Every 
 
 <Cards>
   <Card title="Callouts" href="/components/callouts" description="info, warn and error, including callouts that hold lists and code" />
-
   <Card title="Cards" href="/components/cards" description="Card grids at one, two and three columns, with and without descriptions" />
-
   <Card title="Tabs" href="/components/tabs" description="Tab groups, including a group with more tabs than fit on a phone" />
-
   <Card title="Steps" href="/components/steps" description="Numbered procedures with code in each step" />
-
   <Card title="Accordions" href="/components/accordions" description="Collapsible sections holding tables and code" />
-
   <Card title="Files" href="/components/files" description="A project tree rendered as nested folders" />
-
   <Card title="Type Table" href="/components/type-table" description="A parameter reference with types and defaults" />
-
   <Card title="Banner and InlineTOC" href="/components/banner" description="Page-level banner and an inline table of contents" />
-
   <Card title="Code blocks" href="/components/code-blocks" description="Long lines, many languages and long output" />
-
   <Card title="Typography" href="/components/typography" description="Headings, wide tables, deep lists and overflow stress" />
 </Cards>
 
@@ -450,67 +401,68 @@ Anything below this line should still render, whichever way the two diagrams abo
 ## Integrating the SDK [#integrating-the-sdk]
 
 <Steps>
-  <Step>
-    ### Create an API key [#create-an-api-key]
+<Step>
+### Create an API key [#create-an-api-key]
 
-    Open the dashboard, create a key scoped to the environment you are integrating, and store it
-    outside your source tree. The examples below read it from `PETSTORE_API_KEY`.
-  </Step>
+Open the dashboard, create a key scoped to the environment you are integrating, and store it
+outside your source tree. The examples below read it from `PETSTORE_API_KEY`.
+</Step>
 
-  <Step>
-    ### Install the package [#install-the-package]
+<Step>
+### Install the package [#install-the-package]
 
-    ```bash
-    curl -X GET "https://api.petstore.example.com/v3/pet/findByStatus?status=available&limit=100&offset=0&sort=name&order=ascending&include=category,tags,photoUrls" -H "api_key: $PETSTORE_API_KEY" -H "Accept: application/json" --compressed --retry 3 --retry-delay 2 --max-time 30
-    ```
-  </Step>
+```bash
+curl -X GET "https://api.petstore.example.com/v3/pet/findByStatus?status=available&limit=100&offset=0&sort=name&order=ascending&include=category,tags,photoUrls" -H "api_key: $PETSTORE_API_KEY" -H "Accept: application/json" --compressed --retry 3 --retry-delay 2 --max-time 30
+```
+</Step>
 
-  <Step>
-    ### Construct one client [#construct-one-client]
+<Step>
+### Construct one client [#construct-one-client]
 
-    Construct the client once and reuse it. It owns a connection pool, and building one per request
-    exhausts sockets under load.
+Construct the client once and reuse it. It owns a connection pool, and building one per request
+exhausts sockets under load.
 
-    ```ts
-    import { SwaggerPetstoreOpenApi30Client, ApiError } from "@acme/petstore-sdk";
+```ts
+import { SwaggerPetstoreOpenApi30Client, ApiError } from "@acme/petstore-sdk";
 
-    const client = new SwaggerPetstoreOpenApi30Client({ apiKey: process.env.PETSTORE_API_KEY });
+const client = new SwaggerPetstoreOpenApi30Client({ apiKey: process.env.PETSTORE_API_KEY });
 
-    export async function listAvailablePets(limit = 100): Promise<Pet[]> {
-      try {
-        const { result } = await client.petController.findPetsByStatus({ status: "available", limit });
-        return result;
-      } catch (error) {
-        if (error instanceof ApiError && error.statusCode === 429) {
-          const retryAfterSeconds = Number(error.headers["retry-after"] ?? 1);
-          await new Promise((resolve) => setTimeout(resolve, retryAfterSeconds * 1000));
-          return listAvailablePets(limit);
-        }
-        throw error;
-      }
+export async function listAvailablePets(limit = 100): Promise<Pet[]> {
+  try {
+    const { result } = await client.petController.findPetsByStatus({ status: "available", limit });
+    return result;
+  } catch (error) {
+    if (error instanceof ApiError && error.statusCode === 429) {
+      const retryAfterSeconds = Number(error.headers["retry-after"] ?? 1);
+      await new Promise((resolve) => setTimeout(resolve, retryAfterSeconds * 1000));
+      return listAvailablePets(limit);
     }
-    ```
-  </Step>
+    throw error;
+  }
+}
+```
+</Step>
 
-  <Step>
-    ### Handle rate limits [#handle-rate-limits]
+<Step>
+### Handle rate limits [#handle-rate-limits]
 
-    Requests are rate limited per API key rather than per IP address. When you exceed the limit the API answers `429 Too Many Requests` and sets `Retry-After` to the number of seconds remaining in the current window. The generated SDKs read that header and back off for you, so you only need to handle it directly if you are calling the API without an SDK.
-  </Step>
+Requests are rate limited per API key rather than per IP address. When you exceed the limit the API answers `429 Too Many Requests` and sets `Retry-After` to the number of seconds remaining in the current window. The generated SDKs read that header and back off for you, so you only need to handle it directly if you are calling the API without an SDK.
+</Step>
 
-  <Step>
-    ### Go to production [#go-to-production]
+<Step>
+### Go to production [#go-to-production]
 
-    | Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-    | ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-    | `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-    | `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-    | `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-    | `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-    | `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-    | `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-    | `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
-  </Step>
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
+
+</Step>
 </Steps>
 
 Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.
@@ -521,55 +473,53 @@ Tabs are not in the default component set, so this page imports them.
 
 ## Three tabs, one per language [#three-tabs-one-per-language]
 
-<Tabs items="['TypeScript', 'Python', 'C#']">
+<Tabs items={['TypeScript', 'Python', 'C#']}>
   <Tab value="TypeScript">
-    ```ts
-    import { SwaggerPetstoreOpenApi30Client, ApiError } from "@acme/petstore-sdk";
+```ts
+import { SwaggerPetstoreOpenApi30Client, ApiError } from "@acme/petstore-sdk";
 
-    const client = new SwaggerPetstoreOpenApi30Client({ apiKey: process.env.PETSTORE_API_KEY });
+const client = new SwaggerPetstoreOpenApi30Client({ apiKey: process.env.PETSTORE_API_KEY });
 
-    export async function listAvailablePets(limit = 100): Promise<Pet[]> {
-      try {
-        const { result } = await client.petController.findPetsByStatus({ status: "available", limit });
-        return result;
-      } catch (error) {
-        if (error instanceof ApiError && error.statusCode === 429) {
-          const retryAfterSeconds = Number(error.headers["retry-after"] ?? 1);
-          await new Promise((resolve) => setTimeout(resolve, retryAfterSeconds * 1000));
-          return listAvailablePets(limit);
-        }
-        throw error;
-      }
+export async function listAvailablePets(limit = 100): Promise<Pet[]> {
+  try {
+    const { result } = await client.petController.findPetsByStatus({ status: "available", limit });
+    return result;
+  } catch (error) {
+    if (error instanceof ApiError && error.statusCode === 429) {
+      const retryAfterSeconds = Number(error.headers["retry-after"] ?? 1);
+      await new Promise((resolve) => setTimeout(resolve, retryAfterSeconds * 1000));
+      return listAvailablePets(limit);
     }
-    ```
+    throw error;
+  }
+}
+```
   </Tab>
-
   <Tab value="Python">
-    ```python
-    import os
-    from petstore_sdk import SwaggerPetstoreOpenApi30Client, ApiException
+```python
+import os
+from petstore_sdk import SwaggerPetstoreOpenApi30Client, ApiException
 
-    client = SwaggerPetstoreOpenApi30Client(api_key=os.environ["PETSTORE_API_KEY"])
+client = SwaggerPetstoreOpenApi30Client(api_key=os.environ["PETSTORE_API_KEY"])
 
-    def list_available_pets(limit: int = 100):
-        try:
-            return client.pet.find_pets_by_status(status="available", limit=limit)
-        except ApiException as exc:
-            if exc.status_code == 429:
-                raise RuntimeError("rate limited; let the SDK retry policy handle this") from exc
-            raise
-    ```
+def list_available_pets(limit: int = 100):
+    try:
+        return client.pet.find_pets_by_status(status="available", limit=limit)
+    except ApiException as exc:
+        if exc.status_code == 429:
+            raise RuntimeError("rate limited; let the SDK retry policy handle this") from exc
+        raise
+```
   </Tab>
-
   <Tab value="C#">
-    ```csharp
-    using Acme.Petstore.Sdk;
+```csharp
+using Acme.Petstore.Sdk;
 
-    var client = new SwaggerPetstoreOpenApi30Client(
-        apiKey: Environment.GetEnvironmentVariable("PETSTORE_API_KEY"));
+var client = new SwaggerPetstoreOpenApi30Client(
+    apiKey: Environment.GetEnvironmentVariable("PETSTORE_API_KEY"));
 
-    var pets = await client.PetController.FindPetsByStatusAsync(status: "available", limit: 100);
-    ```
+var pets = await client.PetController.FindPetsByStatusAsync(status: "available", limit: 100);
+```
   </Tab>
 </Tabs>
 
@@ -577,23 +527,22 @@ Requests are rate limited per API key rather than per IP address. When you excee
 
 ## Tabs holding prose and tables [#tabs-holding-prose-and-tables]
 
-<Tabs items="['Overview', 'Limits', 'Errors']">
+<Tabs items={['Overview', 'Limits', 'Errors']}>
   <Tab value="Overview">
     The Petstore API exposes pets, store orders and user accounts over HTTPS. Every request is authenticated, every response is JSON, and every list endpoint is paginated. This page walks through the parts of that contract you are most likely to need on your first integration, and points at the reference pages for the rest.
   </Tab>
-
   <Tab value="Limits">
-    | Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-    | ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-    | `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-    | `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-    | `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-    | `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-    | `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-    | `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-    | `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
-  </Tab>
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
+  </Tab>
   <Tab value="Errors">
     Errors carry a machine-readable `code` alongside the human-readable `message`. Match on `code` in your own error handling: the `message` is written for a developer reading a log and may be reworded between releases, while `code` is part of the contract and changes only with a major version bump.
   </Tab>
@@ -601,46 +550,17 @@ Requests are rate limited per API key rather than per IP address. When you excee
 
 ## More tabs than fit on a narrow screen [#more-tabs-than-fit-on-a-narrow-screen]
 
-<Tabs items="['TypeScript', 'Python', 'C#', 'Java', 'PHP', 'Ruby', 'Go', 'curl', 'HTTPie', 'PowerShell']">
-  <Tab value="TypeScript">
-    The tab strip should scroll or wrap rather than overflow the page.
-  </Tab>
-
-  <Tab value="Python">
-    Second tab.
-  </Tab>
-
-  <Tab value="C#">
-    Third tab.
-  </Tab>
-
-  <Tab value="Java">
-    Fourth tab.
-  </Tab>
-
-  <Tab value="PHP">
-    Fifth tab.
-  </Tab>
-
-  <Tab value="Ruby">
-    Sixth tab.
-  </Tab>
-
-  <Tab value="Go">
-    Seventh tab.
-  </Tab>
-
-  <Tab value="curl">
-    Eighth tab.
-  </Tab>
-
-  <Tab value="HTTPie">
-    Ninth tab.
-  </Tab>
-
-  <Tab value="PowerShell">
-    Tenth tab, the one most likely to be cut off.
-  </Tab>
+<Tabs items={['TypeScript', 'Python', 'C#', 'Java', 'PHP', 'Ruby', 'Go', 'curl', 'HTTPie', 'PowerShell']}>
+  <Tab value="TypeScript">The tab strip should scroll or wrap rather than overflow the page.</Tab>
+  <Tab value="Python">Second tab.</Tab>
+  <Tab value="C#">Third tab.</Tab>
+  <Tab value="Java">Fourth tab.</Tab>
+  <Tab value="PHP">Fifth tab.</Tab>
+  <Tab value="Ruby">Sixth tab.</Tab>
+  <Tab value="Go">Seventh tab.</Tab>
+  <Tab value="curl">Eighth tab.</Tab>
+  <Tab value="HTTPie">Ninth tab.</Tab>
+  <Tab value="PowerShell">Tenth tab, the one most likely to be cut off.</Tab>
 </Tabs>
 
 # Twoslash (/components/twoslash)
@@ -709,33 +629,33 @@ Anything below this line should still render, whichever way the blocks above res
 ## ClientOptions [#clientoptions]
 
 <TypeTable
-  type="{
-  apiKey: {
-    description: 'The API key sent as the api_key header on every request.',
-    type: 'string',
-    default: 'undefined',
-  },
-  timeout: {
-    description: 'Per-attempt timeout in milliseconds. Applies to each retry, not to the call as a whole.',
-    type: 'number',
-    default: '30000',
-  },
-  maxRetries: {
-    description: 'How many times a failed request is retried before the error is thrown.',
-    type: 'number',
-    default: '3',
-  },
-  environment: {
-    description: 'Which declared server the client talks to.',
-    type: '&#x22;production&#x22; | &#x22;staging&#x22;',
-    default: '&#x22;production&#x22;',
-  },
-  fetch: {
-    description: 'A replacement fetch implementation, used as the seam in tests.',
-    type: 'typeof fetch',
-    default: 'globalThis.fetch',
-  },
-}"
+  type={{
+    apiKey: {
+      description: 'The API key sent as the api_key header on every request.',
+      type: 'string',
+      default: 'undefined',
+    },
+    timeout: {
+      description: 'Per-attempt timeout in milliseconds. Applies to each retry, not to the call as a whole.',
+      type: 'number',
+      default: '30000',
+    },
+    maxRetries: {
+      description: 'How many times a failed request is retried before the error is thrown.',
+      type: 'number',
+      default: '3',
+    },
+    environment: {
+      description: 'Which declared server the client talks to.',
+      type: '"production" | "staging"',
+      default: '"production"',
+    },
+    fetch: {
+      description: 'A replacement fetch implementation, used as the seam in tests.',
+      type: 'typeof fetch',
+      default: 'globalThis.fetch',
+    },
+  }}
 />
 
 # Typography (/components/typography)
@@ -764,28 +684,28 @@ A sixth-level heading.
 
 ## A table wider than the page [#a-table-wider-than-the-page]
 
-| Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-| ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-| `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-| `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-| `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-| `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-| `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-| `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-| `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
 ## A deeply nested list [#a-deeply-nested-list]
 
 1. Create an API key in the dashboard and store it outside your source tree.
 2. Install the SDK for your language from its public registry.
-   * TypeScript from npm
-   * Python from PyPI
-   * C# from NuGet
+    - TypeScript from npm
+    - Python from PyPI
+    - C# from NuGet
 3. Construct one client and reuse it for the lifetime of your process.
-   * The client owns a connection pool
-   * Constructing one per request exhausts sockets under load
-     * On Linux you will see `EADDRNOTAVAIL` first
-     * On Windows the symptom is a slow creep in handle count
+    - The client owns a connection pool
+    - Constructing one per request exhausts sockets under load
+        - On Linux you will see `EADDRNOTAVAIL` first
+        - On Windows the symptom is a slow creep in handle count
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
@@ -797,7 +717,7 @@ A sixth-level heading.
 
 ## Overflow stress [#overflow-stress]
 
-A bare unbreakable URL in a paragraph: [https://api.petstore.example.com/v3/pet/findByStatus?status=available\&limit=100\&offset=0\&sort=name\&order=ascending\&include=category,tags,photoUrls](https://api.petstore.example.com/v3/pet/findByStatus?status=available\&limit=100\&offset=0\&sort=name\&order=ascending\&include=category,tags,photoUrls)
+A bare unbreakable URL in a paragraph: https://api.petstore.example.com/v3/pet/findByStatus?status=available&limit=100&offset=0&sort=name&order=ascending&include=category,tags,photoUrls
 
 A very long single word: Donaudampfschifffahrtselektrizitaetenhauptbetriebswerkbauunterbeamtengesellschaft
 
@@ -806,7 +726,7 @@ A very long single word: Donaudampfschifffahrtselektrizitaetenhauptbetriebswerkb
 A paragraph with **bold text**, *italic text*, ***both at once***, `inline code`,
 ~~strikethrough~~, and [a link to the SDKs page](/sdks) beside [an external link](https://swagger.io).
 
-***
+---
 
 A horizontal rule sits above this paragraph.
 
@@ -818,27 +738,27 @@ GFM turns bare URLs into links without any angle brackets or link syntax.
 
 ## Extended autolinks [#extended-autolinks]
 
-A bare https URL: [https://swagger.io/specification/](https://swagger.io/specification/)
+A bare https URL: https://swagger.io/specification/
 
-A bare http URL: [http://example.com/docs](http://example.com/docs)
+A bare http URL: http://example.com/docs
 
-A www autolink with no scheme: [www.example.com/petstore](http://www.example.com/petstore)
+A www autolink with no scheme: www.example.com/petstore
 
-An email address: [support@example.com](mailto:support@example.com)
+An email address: support@example.com
 
 ## Autolinks inside other text [#autolinks-inside-other-text]
 
-See [https://swagger.io](https://swagger.io) for the specification, or write to [support@example.com](mailto:support@example.com) if that does not help.
+See https://swagger.io for the specification, or write to support@example.com if that does not help.
 
-A URL in parentheses ([https://example.com/a](https://example.com/a)) and one followed by a comma [https://example.com/b](https://example.com/b), then more text.
+A URL in parentheses (https://example.com/a) and one followed by a comma https://example.com/b, then more text.
 
 ## Trailing punctuation [#trailing-punctuation]
 
-GFM trims trailing punctuation from an autolink. Visit [https://example.com/page](https://example.com/page). And [https://example.com/other](https://example.com/other)!
+GFM trims trailing punctuation from an autolink. Visit https://example.com/page. And https://example.com/other!
 
 ## Classic autolinks [#classic-autolinks]
 
-The pointy-bracket form: [https://swagger.io](https://swagger.io) and [support@example.com](mailto:support@example.com)
+The pointy-bracket form: <https://swagger.io> and <support@example.com>
 
 ## Not autolinks [#not-autolinks]
 
@@ -848,9 +768,11 @@ A bare domain with no www and no scheme: example.com/petstore
 
 # Block structure (/gfm/blocks)
 
-# Setext heading level one [#setext-heading-level-one]
+Setext heading level one [#setext-heading-level-one]
+========================
 
-## Setext heading level two [#setext-heading-level-two]
+Setext heading level two [#setext-heading-level-two]
+------------------------
 
 ## Thematic breaks [#thematic-breaks]
 
@@ -860,11 +782,11 @@ Three asterisks:
 
 Three underscores:
 
-***
+___
 
 Three hyphens with spaces:
 
-***
+- - -
 
 ## Blockquotes [#blockquotes]
 
@@ -874,15 +796,13 @@ Three hyphens with spaces:
 > spanning two lines.
 
 > Level one
->
 > > Level two
-> >
 > > > Level three
 
 > A quote containing a list:
 >
-> * first
-> * second
+> - first
+> - second
 >
 > and a code block:
 >
@@ -894,17 +814,17 @@ Three hyphens with spaces:
 
 Tight:
 
-* one
-* two
-* three
+- one
+- two
+- three
 
 Loose:
 
-* one
+- one
 
-* two
+- two
 
-* three
+- three
 
 ## Ordered lists starting elsewhere [#ordered-lists-starting-elsewhere]
 
@@ -914,16 +834,14 @@ Loose:
 
 ## Indented code block [#indented-code-block]
 
-```
-curl https://api.petstore.example.com/v3/pet/1 \
-  -H "api_key: $PETSTORE_API_KEY"
-```
+    curl https://api.petstore.example.com/v3/pet/1 \
+      -H "api_key: $PETSTORE_API_KEY"
 
 ## Fenced code with a tilde fence [#fenced-code-with-a-tilde-fence]
 
-```json
+~~~json
 { "id": 1, "name": "Kitty", "status": "available" }
-```
+~~~
 
 # Links and images (/gfm/links-images)
 
@@ -936,16 +854,14 @@ curl https://api.petstore.example.com/v3/pet/1 \
 [A full reference][spec], [a collapsed one][], and [a shortcut].
 
 [spec]: https://swagger.io/specification/ "The OpenAPI specification"
-
 [a collapsed one]: https://swagger.io/tools/
-
 [a shortcut]: https://swagger.io/docs/
 
 ## Links with awkward targets [#links-with-awkward-targets]
 
-[A link with parentheses](https://example.com/path_\(with_parens\))
+[A link with parentheses](https://example.com/path_(with_parens))
 
-[A link with spaces](/guides/authentication)
+[A link with spaces](</guides/authentication>)
 
 [A link with a fragment](/guides/authentication#detail)
 
@@ -953,61 +869,61 @@ curl https://api.petstore.example.com/v3/pet/1 \
 
 An inline image with a title:
 
-<img alt="The Petstore logo" src="__img0" title="Petstore" />
+![The Petstore logo](/images/logo-light.png "Petstore")
 
 A reference image:
 
-<img alt="Dark logo" src="__img1" />
+![Dark logo][darklogo]
 
 [darklogo]: /images/logo-dark.png
 
 An image inside a link:
 
-[<img alt="Clickable logo" src="__img2" />](/sdks)
+[![Clickable logo](/images/logo-light.png)](/sdks)
 
 # Tables (/gfm/tables)
 
 ## Every alignment [#every-alignment]
 
-| Left                | Centre |   Right | Default |
-| :------------------ | :----: | ------: | ------- |
-| `/pet`              |  POST  | 100/min | 45 ms   |
-| `/pet/findByStatus` |   GET  | 300/min | 120 ms  |
-| `/store/order`      |  POST  |  60/min | 90 ms   |
+| Left | Centre | Right | Default |
+| :--- | :----: | ----: | ------- |
+| `/pet` | POST | 100/min | 45 ms |
+| `/pet/findByStatus` | GET | 300/min | 120 ms |
+| `/store/order` | POST | 60/min | 90 ms |
 
 ## Inline formatting in cells [#inline-formatting-in-cells]
 
-| Field        | Type     | Notes                                                    |
-| ------------ | -------- | -------------------------------------------------------- |
+| Field | Type | Notes |
+| --- | --- | --- |
 | **`apiKey`** | `string` | *Required.* See [authentication](/guides/authentication) |
-| `timeout`    | `number` | Defaults to ~~60000~~ 30000                              |
-| `retries`    | `number` | Set to `0` to disable                                    |
+| `timeout` | `number` | Defaults to ~~60000~~ 30000 |
+| `retries` | `number` | Set to `0` to disable |
 
 ## Escaped pipes in cells [#escaped-pipes-in-cells]
 
-| Expression                  | Meaning                           |
-| --------------------------- | --------------------------------- |
-| `a \| b`                    | A literal pipe inside a code span |
-| `"production" \| "staging"` | A union type                      |
+| Expression | Meaning |
+| --- | --- |
+| `a \| b` | A literal pipe inside a code span |
+| `"production" \| "staging"` | A union type |
 
 ## Ragged rows [#ragged-rows]
 
 GFM pads a short row and drops cells beyond the header count.
 
-| One | Two | Three |   |
-| --- | --- | ----- | - |
-| a   | b   | c     |   |
-| d   | e   |       |   |
-| f   |     |       |   |
-| g   | h   | i     | j |
+| One | Two | Three |
+| --- | --- | --- |
+| a | b | c |
+| d | e |
+| f |
+| g | h | i | j |
 
 ## A table with one column [#a-table-with-one-column]
 
-| Status    |
-| --------- |
+| Status |
+| --- |
 | available |
-| pending   |
-| sold      |
+| pending |
+| sold |
 
 # Task lists (/gfm/task-lists)
 
@@ -1015,18 +931,18 @@ GFM adds task list items to ordinary lists. Each should render as a checkbox.
 
 ## A flat list [#a-flat-list]
 
-* [ ] An unchecked item
-* [x] A checked item
-* [x] A checked item with a capital X
-* An ordinary item with no checkbox, in the same list
+- [ ] An unchecked item
+- [x] A checked item
+- [X] A checked item with a capital X
+- An ordinary item with no checkbox, in the same list
 
 ## Nested task lists [#nested-task-lists]
 
-* [ ] Parent task
-  * [x] Finished subtask
-  * [ ] Unfinished subtask
-    * [x] Deeper still
-* [x] Second parent
+- [ ] Parent task
+    - [x] Finished subtask
+    - [ ] Unfinished subtask
+        - [x] Deeper still
+- [x] Second parent
 
 ## Ordered task list [#ordered-task-list]
 
@@ -1036,10 +952,10 @@ GFM adds task list items to ordinary lists. Each should render as a checkbox.
 
 ## Task items carrying other content [#task-items-carrying-other-content]
 
-* [ ] A task whose text has **bold**, `code` and [a link](/sdks)
-* [x] A task with a following paragraph
+- [ ] A task whose text has **bold**, `code` and [a link](/sdks)
+- [x] A task with a following paragraph
 
-  This paragraph belongs to the checked item above.
+    This paragraph belongs to the checked item above.
 
 # Text formatting (/gfm/text-formatting)
 
@@ -1051,29 +967,29 @@ A ~~struck phrase~~ inside a sentence, and ~~one with **bold** inside it~~.
 
 ## Emphasis edge cases [#emphasis-edge-cases]
 
-*single asterisk* and *single underscore*
+*single asterisk* and _single underscore_
 
-**double asterisk** and **double underscore**
+**double asterisk** and __double underscore__
 
-***triple*** and ***triple underscore***
+***triple*** and ___triple underscore___
 
 Intra-word emphasis: un*frigging*believable, and snake_case_word should NOT be emphasised.
 
 ## Backslash escapes [#backslash-escapes]
 
-Escaped characters: \*not emphasis\*, \_not emphasis\_, \`not code\`, # not a heading
+Escaped characters: \*not emphasis\*, \_not emphasis\_, \`not code\`, \# not a heading
 
 A literal backslash: \\
 
 ## Entity references [#entity-references]
 
-Named: © & \< >   … —
+Named: &copy; &amp; &lt; &gt; &nbsp; &hellip; &mdash;
 
-Numeric: # Ӓ Ϡ "
+Numeric: &#35; &#1234; &#992; &#x22;
 
 ## Hard line breaks [#hard-line-breaks]
 
-A line ending with two spaces\
+A line ending with two spaces  
 breaks here.
 
 A line ending with a backslash\
@@ -1095,15 +1011,15 @@ A sibling page at depth 1, reached at `/guides/authentication`.
 
 Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.
 
-| Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-| ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-| `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-| `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-| `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-| `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-| `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-| `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-| `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
 ```python
 import os
@@ -1124,14 +1040,14 @@ def list_available_pets(limit: int = 100):
 
 1. Create an API key in the dashboard and store it outside your source tree.
 2. Install the SDK for your language from its public registry.
-   * TypeScript from npm
-   * Python from PyPI
-   * C# from NuGet
+    - TypeScript from npm
+    - Python from PyPI
+    - C# from NuGet
 3. Construct one client and reuse it for the lifetime of your process.
-   * The client owns a connection pool
-   * Constructing one per request exhausts sockets under load
-     * On Linux you will see `EADDRNOTAVAIL` first
-     * On Windows the symptom is a slow creep in handle count
+    - The client owns a connection pool
+    - Constructing one per request exhausts sockets under load
+        - On Linux you will see `EADDRNOTAVAIL` first
+        - On Windows the symptom is a slow creep in handle count
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
@@ -1145,15 +1061,15 @@ This page sits **1 level** below the content root, at `/guides`.
 
 Errors carry a machine-readable `code` alongside the human-readable `message`. Match on `code` in your own error handling: the `message` is written for a developer reading a log and may be reworded between releases, while `code` is part of the contract and changes only with a major version bump.
 
-| Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-| ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-| `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-| `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-| `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-| `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-| `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-| `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-| `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
 ## Worked example [#worked-example]
 
@@ -1181,14 +1097,14 @@ export async function listAvailablePets(limit = 100): Promise<Pet[]> {
 
 1. Create an API key in the dashboard and store it outside your source tree.
 2. Install the SDK for your language from its public registry.
-   * TypeScript from npm
-   * Python from PyPI
-   * C# from NuGet
+    - TypeScript from npm
+    - Python from PyPI
+    - C# from NuGet
 3. Construct one client and reuse it for the lifetime of your process.
-   * The client owns a connection pool
-   * Constructing one per request exhausts sockets under load
-     * On Linux you will see `EADDRNOTAVAIL` first
-     * On Windows the symptom is a slow creep in handle count
+    - The client owns a connection pool
+    - Constructing one per request exhausts sockets under load
+        - On Linux you will see `EADDRNOTAVAIL` first
+        - On Windows the symptom is a slow creep in handle count
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
@@ -1206,15 +1122,15 @@ This page sits **3 levels** below the content root, at `/guides/webhooks/deliver
 
 The Petstore API exposes pets, store orders and user accounts over HTTPS. Every request is authenticated, every response is JSON, and every list endpoint is paginated. This page walks through the parts of that contract you are most likely to need on your first integration, and points at the reference pages for the rest.
 
-| Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-| ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-| `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-| `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-| `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-| `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-| `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-| `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-| `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
 ## Worked example [#worked-example]
 
@@ -1242,14 +1158,14 @@ export async function listAvailablePets(limit = 100): Promise<Pet[]> {
 
 1. Create an API key in the dashboard and store it outside your source tree.
 2. Install the SDK for your language from its public registry.
-   * TypeScript from npm
-   * Python from PyPI
-   * C# from NuGet
+    - TypeScript from npm
+    - Python from PyPI
+    - C# from NuGet
 3. Construct one client and reuse it for the lifetime of your process.
-   * The client owns a connection pool
-   * Constructing one per request exhausts sockets under load
-     * On Linux you will see `EADDRNOTAVAIL` first
-     * On Windows the symptom is a slow creep in handle count
+    - The client owns a connection pool
+    - Constructing one per request exhausts sockets under load
+        - On Linux you will see `EADDRNOTAVAIL` first
+        - On Windows the symptom is a slow creep in handle count
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
@@ -1267,15 +1183,15 @@ A sibling page at depth 3, reached at `/guides/webhooks/delivery/ordering`.
 
 Requests are rate limited per API key rather than per IP address. When you exceed the limit the API answers `429 Too Many Requests` and sets `Retry-After` to the number of seconds remaining in the current window. The generated SDKs read that header and back off for you, so you only need to handle it directly if you are calling the API without an SDK.
 
-| Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-| ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-| `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-| `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-| `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-| `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-| `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-| `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-| `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
 ```python
 import os
@@ -1296,14 +1212,14 @@ def list_available_pets(limit: int = 100):
 
 1. Create an API key in the dashboard and store it outside your source tree.
 2. Install the SDK for your language from its public registry.
-   * TypeScript from npm
-   * Python from PyPI
-   * C# from NuGet
+    - TypeScript from npm
+    - Python from PyPI
+    - C# from NuGet
 3. Construct one client and reuse it for the lifetime of your process.
-   * The client owns a connection pool
-   * Constructing one per request exhausts sockets under load
-     * On Linux you will see `EADDRNOTAVAIL` first
-     * On Windows the symptom is a slow creep in handle count
+    - The client owns a connection pool
+    - Constructing one per request exhausts sockets under load
+        - On Linux you will see `EADDRNOTAVAIL` first
+        - On Windows the symptom is a slow creep in handle count
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
@@ -1317,15 +1233,15 @@ This page sits **5 levels** below the content root, at `/guides/webhooks/deliver
 
 Errors carry a machine-readable `code` alongside the human-readable `message`. Match on `code` in your own error handling: the `message` is written for a developer reading a log and may be reworded between releases, while `code` is part of the contract and changes only with a major version bump.
 
-| Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-| ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-| `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-| `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-| `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-| `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-| `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-| `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-| `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
 ## Worked example [#worked-example]
 
@@ -1353,14 +1269,14 @@ export async function listAvailablePets(limit = 100): Promise<Pet[]> {
 
 1. Create an API key in the dashboard and store it outside your source tree.
 2. Install the SDK for your language from its public registry.
-   * TypeScript from npm
-   * Python from PyPI
-   * C# from NuGet
+    - TypeScript from npm
+    - Python from PyPI
+    - C# from NuGet
 3. Construct one client and reuse it for the lifetime of your process.
-   * The client owns a connection pool
-   * Constructing one per request exhausts sockets under load
-     * On Linux you will see `EADDRNOTAVAIL` first
-     * On Windows the symptom is a slow creep in handle count
+    - The client owns a connection pool
+    - Constructing one per request exhausts sockets under load
+        - On Linux you will see `EADDRNOTAVAIL` first
+        - On Windows the symptom is a slow creep in handle count
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
@@ -1378,15 +1294,15 @@ A sibling page at depth 6, reached at `/guides/webhooks/delivery/retries/backoff
 
 The Petstore API exposes pets, store orders and user accounts over HTTPS. Every request is authenticated, every response is JSON, and every list endpoint is paginated. This page walks through the parts of that contract you are most likely to need on your first integration, and points at the reference pages for the rest.
 
-| Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-| ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-| `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-| `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-| `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-| `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-| `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-| `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-| `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
 ```python
 import os
@@ -1407,14 +1323,14 @@ def list_available_pets(limit: int = 100):
 
 1. Create an API key in the dashboard and store it outside your source tree.
 2. Install the SDK for your language from its public registry.
-   * TypeScript from npm
-   * Python from PyPI
-   * C# from NuGet
+    - TypeScript from npm
+    - Python from PyPI
+    - C# from NuGet
 3. Construct one client and reuse it for the lifetime of your process.
-   * The client owns a connection pool
-   * Constructing one per request exhausts sockets under load
-     * On Linux you will see `EADDRNOTAVAIL` first
-     * On Windows the symptom is a slow creep in handle count
+    - The client owns a connection pool
+    - Constructing one per request exhausts sockets under load
+        - On Linux you will see `EADDRNOTAVAIL` first
+        - On Windows the symptom is a slow creep in handle count
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
@@ -1428,15 +1344,15 @@ This page sits **6 levels** below the content root, at `/guides/webhooks/deliver
 
 Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.
 
-| Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-| ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-| `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-| `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-| `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-| `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-| `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-| `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-| `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
 ## Worked example [#worked-example]
 
@@ -1464,14 +1380,14 @@ export async function listAvailablePets(limit = 100): Promise<Pet[]> {
 
 1. Create an API key in the dashboard and store it outside your source tree.
 2. Install the SDK for your language from its public registry.
-   * TypeScript from npm
-   * Python from PyPI
-   * C# from NuGet
+    - TypeScript from npm
+    - Python from PyPI
+    - C# from NuGet
 3. Construct one client and reuse it for the lifetime of your process.
-   * The client owns a connection pool
-   * Constructing one per request exhausts sockets under load
-     * On Linux you will see `EADDRNOTAVAIL` first
-     * On Windows the symptom is a slow creep in handle count
+    - The client owns a connection pool
+    - Constructing one per request exhausts sockets under load
+        - On Linux you will see `EADDRNOTAVAIL` first
+        - On Windows the symptom is a slow creep in handle count
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
@@ -1489,15 +1405,15 @@ This page sits **7 levels** below the content root, at `/guides/webhooks/deliver
 
 The Petstore API exposes pets, store orders and user accounts over HTTPS. Every request is authenticated, every response is JSON, and every list endpoint is paginated. This page walks through the parts of that contract you are most likely to need on your first integration, and points at the reference pages for the rest.
 
-| Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-| ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-| `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-| `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-| `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-| `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-| `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-| `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-| `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
 ## Worked example [#worked-example]
 
@@ -1525,14 +1441,14 @@ export async function listAvailablePets(limit = 100): Promise<Pet[]> {
 
 1. Create an API key in the dashboard and store it outside your source tree.
 2. Install the SDK for your language from its public registry.
-   * TypeScript from npm
-   * Python from PyPI
-   * C# from NuGet
+    - TypeScript from npm
+    - Python from PyPI
+    - C# from NuGet
 3. Construct one client and reuse it for the lifetime of your process.
-   * The client owns a connection pool
-   * Constructing one per request exhausts sockets under load
-     * On Linux you will see `EADDRNOTAVAIL` first
-     * On Windows the symptom is a slow creep in handle count
+    - The client owns a connection pool
+    - Constructing one per request exhausts sockets under load
+        - On Linux you will see `EADDRNOTAVAIL` first
+        - On Windows the symptom is a slow creep in handle count
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
@@ -1550,15 +1466,15 @@ A sibling page at depth 7, reached at `/guides/webhooks/delivery/retries/backoff
 
 Requests are rate limited per API key rather than per IP address. When you exceed the limit the API answers `429 Too Many Requests` and sets `Retry-After` to the number of seconds remaining in the current window. The generated SDKs read that header and back off for you, so you only need to handle it directly if you are calling the API without an SDK.
 
-| Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-| ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-| `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-| `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-| `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-| `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-| `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-| `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-| `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
 ```python
 import os
@@ -1579,14 +1495,14 @@ def list_available_pets(limit: int = 100):
 
 1. Create an API key in the dashboard and store it outside your source tree.
 2. Install the SDK for your language from its public registry.
-   * TypeScript from npm
-   * Python from PyPI
-   * C# from NuGet
+    - TypeScript from npm
+    - Python from PyPI
+    - C# from NuGet
 3. Construct one client and reuse it for the lifetime of your process.
-   * The client owns a connection pool
-   * Constructing one per request exhausts sockets under load
-     * On Linux you will see `EADDRNOTAVAIL` first
-     * On Windows the symptom is a slow creep in handle count
+    - The client owns a connection pool
+    - Constructing one per request exhausts sockets under load
+        - On Linux you will see `EADDRNOTAVAIL` first
+        - On Windows the symptom is a slow creep in handle count
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
@@ -1600,15 +1516,15 @@ A sibling page at depth 5, reached at `/guides/webhooks/delivery/retries/backoff
 
 Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.
 
-| Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-| ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-| `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-| `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-| `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-| `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-| `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-| `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-| `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
 ```python
 import os
@@ -1629,14 +1545,14 @@ def list_available_pets(limit: int = 100):
 
 1. Create an API key in the dashboard and store it outside your source tree.
 2. Install the SDK for your language from its public registry.
-   * TypeScript from npm
-   * Python from PyPI
-   * C# from NuGet
+    - TypeScript from npm
+    - Python from PyPI
+    - C# from NuGet
 3. Construct one client and reuse it for the lifetime of your process.
-   * The client owns a connection pool
-   * Constructing one per request exhausts sockets under load
-     * On Linux you will see `EADDRNOTAVAIL` first
-     * On Windows the symptom is a slow creep in handle count
+    - The client owns a connection pool
+    - Constructing one per request exhausts sockets under load
+        - On Linux you will see `EADDRNOTAVAIL` first
+        - On Windows the symptom is a slow creep in handle count
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
@@ -1650,15 +1566,15 @@ A sibling page at depth 4, reached at `/guides/webhooks/delivery/retries/dead-le
 
 Errors carry a machine-readable `code` alongside the human-readable `message`. Match on `code` in your own error handling: the `message` is written for a developer reading a log and may be reworded between releases, while `code` is part of the contract and changes only with a major version bump.
 
-| Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-| ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-| `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-| `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-| `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-| `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-| `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-| `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-| `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
 ```python
 import os
@@ -1679,14 +1595,14 @@ def list_available_pets(limit: int = 100):
 
 1. Create an API key in the dashboard and store it outside your source tree.
 2. Install the SDK for your language from its public registry.
-   * TypeScript from npm
-   * Python from PyPI
-   * C# from NuGet
+    - TypeScript from npm
+    - Python from PyPI
+    - C# from NuGet
 3. Construct one client and reuse it for the lifetime of your process.
-   * The client owns a connection pool
-   * Constructing one per request exhausts sockets under load
-     * On Linux you will see `EADDRNOTAVAIL` first
-     * On Windows the symptom is a slow creep in handle count
+    - The client owns a connection pool
+    - Constructing one per request exhausts sockets under load
+        - On Linux you will see `EADDRNOTAVAIL` first
+        - On Windows the symptom is a slow creep in handle count
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
@@ -1700,15 +1616,15 @@ This page sits **4 levels** below the content root, at `/guides/webhooks/deliver
 
 Requests are rate limited per API key rather than per IP address. When you exceed the limit the API answers `429 Too Many Requests` and sets `Retry-After` to the number of seconds remaining in the current window. The generated SDKs read that header and back off for you, so you only need to handle it directly if you are calling the API without an SDK.
 
-| Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-| ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-| `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-| `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-| `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-| `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-| `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-| `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-| `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
 ## Worked example [#worked-example]
 
@@ -1736,14 +1652,14 @@ export async function listAvailablePets(limit = 100): Promise<Pet[]> {
 
 1. Create an API key in the dashboard and store it outside your source tree.
 2. Install the SDK for your language from its public registry.
-   * TypeScript from npm
-   * Python from PyPI
-   * C# from NuGet
+    - TypeScript from npm
+    - Python from PyPI
+    - C# from NuGet
 3. Construct one client and reuse it for the lifetime of your process.
-   * The client owns a connection pool
-   * Constructing one per request exhausts sockets under load
-     * On Linux you will see `EADDRNOTAVAIL` first
-     * On Windows the symptom is a slow creep in handle count
+    - The client owns a connection pool
+    - Constructing one per request exhausts sockets under load
+        - On Linux you will see `EADDRNOTAVAIL` first
+        - On Windows the symptom is a slow creep in handle count
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
@@ -1761,15 +1677,15 @@ This page sits **2 levels** below the content root, at `/guides/webhooks`.
 
 Every mutating endpoint accepts an idempotency key. Send the same key with a retried request and the API returns the original response rather than performing the operation twice. Keys are scoped to your account and expire after 24 hours, which is long enough to cover a retry queue draining after an outage but short enough that keys can be recycled.
 
-| Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-| ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-| `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-| `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-| `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-| `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-| `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-| `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-| `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
 ## Worked example [#worked-example]
 
@@ -1797,14 +1713,14 @@ export async function listAvailablePets(limit = 100): Promise<Pet[]> {
 
 1. Create an API key in the dashboard and store it outside your source tree.
 2. Install the SDK for your language from its public registry.
-   * TypeScript from npm
-   * Python from PyPI
-   * C# from NuGet
+    - TypeScript from npm
+    - Python from PyPI
+    - C# from NuGet
 3. Construct one client and reuse it for the lifetime of your process.
-   * The client owns a connection pool
-   * Constructing one per request exhausts sockets under load
-     * On Linux you will see `EADDRNOTAVAIL` first
-     * On Windows the symptom is a slow creep in handle count
+    - The client owns a connection pool
+    - Constructing one per request exhausts sockets under load
+        - On Linux you will see `EADDRNOTAVAIL` first
+        - On Windows the symptom is a slow creep in handle count
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
@@ -1822,15 +1738,15 @@ A sibling page at depth 2, reached at `/guides/webhooks/signatures`.
 
 The Petstore API exposes pets, store orders and user accounts over HTTPS. Every request is authenticated, every response is JSON, and every list endpoint is paginated. This page walks through the parts of that contract you are most likely to need on your first integration, and points at the reference pages for the rest.
 
-| Endpoint            | Method | Auth    | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
-| ------------------- | ------ | ------- | ---------- | ---------- | --------- | --------------- | ---------- | ---------- |
-| `/pet`              | POST   | API key | 100/min    | Yes        | No        | 45 ms           | v3.0       | —          |
-| `/pet/{petId}`      | GET    | API key | 600/min    | Yes        | No        | 18 ms           | v3.0       | —          |
-| `/pet/findByStatus` | GET    | API key | 300/min    | Yes        | Yes       | 120 ms          | v3.0       | —          |
-| `/pet/findByTags`   | GET    | API key | 300/min    | Yes        | Yes       | 180 ms          | v3.0       | v3.2       |
-| `/store/order`      | POST   | OAuth 2 | 60/min     | Yes        | No        | 90 ms           | v3.0       | —          |
-| `/store/inventory`  | GET    | API key | 30/min     | Yes        | No        | 240 ms          | v3.1       | —          |
-| `/user/login`       | GET    | None    | 10/min     | No         | No        | 60 ms           | v3.0       | v3.3       |
+| Endpoint | Method | Auth | Rate limit | Idempotent | Paginated | Typical latency | Introduced | Deprecated |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pet` | POST | API key | 100/min | Yes | No | 45 ms | v3.0 | — |
+| `/pet/{petId}` | GET | API key | 600/min | Yes | No | 18 ms | v3.0 | — |
+| `/pet/findByStatus` | GET | API key | 300/min | Yes | Yes | 120 ms | v3.0 | — |
+| `/pet/findByTags` | GET | API key | 300/min | Yes | Yes | 180 ms | v3.0 | v3.2 |
+| `/store/order` | POST | OAuth 2 | 60/min | Yes | No | 90 ms | v3.0 | — |
+| `/store/inventory` | GET | API key | 30/min | Yes | No | 240 ms | v3.1 | — |
+| `/user/login` | GET | None | 10/min | No | No | 60 ms | v3.0 | v3.3 |
 
 ```python
 import os
@@ -1851,21 +1767,21 @@ def list_available_pets(limit: int = 100):
 
 1. Create an API key in the dashboard and store it outside your source tree.
 2. Install the SDK for your language from its public registry.
-   * TypeScript from npm
-   * Python from PyPI
-   * C# from NuGet
+    - TypeScript from npm
+    - Python from PyPI
+    - C# from NuGet
 3. Construct one client and reuse it for the lifetime of your process.
-   * The client owns a connection pool
-   * Constructing one per request exhausts sockets under load
-     * On Linux you will see `EADDRNOTAVAIL` first
-     * On Windows the symptom is a slow creep in handle count
+    - The client owns a connection pool
+    - Constructing one per request exhausts sockets under load
+        - On Linux you will see `EADDRNOTAVAIL` first
+        - On Windows the symptom is a slow creep in handle count
 4. Make your first call against a read-only endpoint to confirm credentials.
 5. Add error handling for `429` and `5xx` before you go to production.
 
 # TT Status Codes (/)
 
 <Mermaid
-chart="
+  chart="
 graph TD;
 subgraph AA [Consumers]
 A[Mobile app];
@@ -1941,9 +1857,7 @@ Once the plugin is installed, describe what you want to build and your assistant
 ## Supported languages [#supported-languages]
 
 - TypeScript
-
 - Python
-
 - C#
 
 ## Supported platforms [#supported-platforms]
@@ -1966,9 +1880,8 @@ You can now help us improve the API whether it's by making changes to the defini
 That way, with time, we can improve the API in general, and expose some of the new features in OAS3.
 
 Some useful links:
-
-* [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)
-* [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)
+- [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)
+- [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)
 
 ## Installation [#installation]
 
@@ -2021,9 +1934,7 @@ var client = new SwaggerPetstoreOpenApi30Client(httpClient, options);
 # SDKs (/sdks)
 
 - [TypeScript](/sdks/typescript): `npm install @acme/petstore-sdk` · [Download SDK](/__downloads/sdk/typescript.zip) · [View source](https://github.com/acme/petstore-typescript) · [View on npm](https://www.npmjs.com/package/@acme/petstore-sdk)
-
 - [Python](/sdks/python): `pip install acme-petstore-sdk` · [Download SDK](/__downloads/sdk/python.zip) · [View source](https://github.com/acme/petstore-python) · [View on PyPI](https://pypi.org/project/acme-petstore-sdk/)
-
 - [C#](/sdks/csharp): `dotnet add package Acme.Petstore.Sdk` · [Download SDK](/__downloads/sdk/csharp.zip) · [View source](https://github.com/acme/petstore-csharp) · [View on NuGet](https://www.nuget.org/packages/Acme.Petstore.Sdk)
 
 # Python SDK (/sdks/python)
@@ -2040,9 +1951,8 @@ You can now help us improve the API whether it's by making changes to the defini
 That way, with time, we can improve the API in general, and expose some of the new features in OAS3.
 
 Some useful links:
-
-* [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)
-* [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)
+- [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)
+- [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)
 
 ## Installation [#installation]
 
@@ -2114,9 +2024,8 @@ You can now help us improve the API whether it's by making changes to the defini
 That way, with time, we can improve the API in general, and expose some of the new features in OAS3.
 
 Some useful links:
-
-* [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)
-* [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)
+- [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)
+- [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)
 
 ## Installation [#installation]
 
