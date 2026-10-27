@@ -263,8 +263,12 @@ portal-snapshots/          committed visual baselines
 **windows-latest** (the baselines were captured there), each stage its own step:
 
 ```
-install + authenticate the CLI  ->  artifacts  ->  generate  ->  visual  ->  generate auth  ->  functional
+install + authenticate the CLI  ->  artifacts  ->  generate  ->  visual  ->  visual nav.json  ->  generate auth  ->  functional
 ```
+
+The nav.json refused-build cases run inside `artifacts`; the layouts that build
+have their own step, which generates its own portals and reports to
+`playwright-report/visual-nav`.
 
 ### Environments
 
