@@ -44,9 +44,10 @@ jobs:
       # Pinned so a new CLI release can't silently change the generated output
       # and move every baseline. Bump deliberately; the workflow_dispatch input
       # above lets you try a version without committing to it.
-      # beta.6 is the first version the nav.json tests were verified on; beta.1
-      # rejects nav.json's "tabs", which petstore's own nav.json now uses.
-      APIMATIC_CLI_VERSION: 2.0.0-beta.6
+      # beta.8 is what the llms-full.txt baseline (#18) was recorded with, and
+      # every suite was verified on it. beta.1 rejects nav.json's "tabs", which
+      # petstore's own nav.json now uses.
+      APIMATIC_CLI_VERSION: 2.0.0-beta.8
 
     steps:
       - name: Checkout
