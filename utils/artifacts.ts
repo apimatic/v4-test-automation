@@ -81,13 +81,16 @@ export class GeneratedPortal {
   readonly root: string;
   readonly srcDir: string;
   readonly outDir: string;
+  /** What the CLI printed while generating this portal, colour codes stripped. */
+  readonly cliOutput: string;
 
   // Plain fields rather than `constructor(readonly root)`: Node runs this file
   // with type stripping, which doesn't support parameter properties.
-  constructor(root: string) {
+  constructor(root: string, cliOutput = "") {
     this.root = root;
     this.srcDir = path.join(root, "src");
     this.outDir = path.join(root, "portal");
+    this.cliOutput = cliOutput;
   }
 
   /** The apimatic.json this portal was generated from, scenario changes included. */

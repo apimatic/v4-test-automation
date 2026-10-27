@@ -23,6 +23,21 @@ const artifactsOnly =
   requestedProjects.length > 0 && requestedProjects.every((p) => p === "artifacts");
 
 /**
+ * True when this run is only the nav.json tests (`--grep @nav`). Each of their
+ * scenarios generates and serves its own portal (utils/serve.ts), so the
+ * committed build's server would be a wasted generation here too.
+ */
+const navOnly = (() => {
+  const args = process.argv;
+  const grep = args.flatMap((arg, i) =>
+    arg.startsWith("--grep=") ? [arg.slice("--grep=".length)]
+    : arg === "--grep" || arg === "-g" ? [args[i + 1]]
+    : [],
+  );
+  return grep.length > 0 && grep.every((g) => g === "@nav");
+})();
+
+/**
  * True when this run includes the functional project. Its playground calls go
  * to the API Tester, so it's started only then.
  */
@@ -144,7 +159,7 @@ export default defineConfig({
    * timing stand alone; this then only has to serve.
    */
   webServer: [
-    ...(usingExternalPortal() || artifactsOnly
+    ...(usingExternalPortal() || artifactsOnly || navOnly
       ? []
       : [
           {
