@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
-import { buildDir, portalName } from "./env.ts";
+import { buildDirOf, portalName } from "./env.ts";
 import { GeneratedPortal, type ApimaticConfig } from "./artifacts.ts";
 
 /**
@@ -29,11 +29,24 @@ export type ScenarioChanges = {
   files?: Record<string, string>;
   /** Files or folders to delete, e.g. `["spec/APIMATIC-META.json"]`. */
   remove?: string[];
+  /** Empty folders to create, e.g. `["content/drafts"]`. */
+  dirs?: string[];
+};
+
+export type ScenarioOptions = {
+  /**
+   * Which build under test-builds/ to copy. Defaults to the one PORTAL selects;
+   * name it when a suite is tied to one build, like the nav.json suite.
+   */
+  build?: string;
 };
 
 /**
  * Copies the build, applies `changes`, and generates a portal from the result.
  * Pass no changes to generate the build exactly as committed.
+ *
+ * Throws when the CLI refuses the build — use `refusedScenario()` for a
+ * scenario that's meant to be refused.
  *
  * Call `portal.cleanup()` in an `afterAll` when you're done with it. Set
  * KEEP_SCENARIOS=1 to keep the temp folders around for a look after the run.
@@ -41,20 +54,95 @@ export type ScenarioChanges = {
 export async function generateScenario(
   name: string,
   changes: ScenarioChanges = {},
+  options: ScenarioOptions = {},
 ): Promise<GeneratedPortal> {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), `v4-${portalName()}-${slug(name)}-`));
-  const src = path.join(root, "src");
+  const root = copyBuild(name, changes, options);
 
   try {
-    fs.cpSync(path.join(buildDir(), "src"), src, { recursive: true });
-    applyChanges(src, changes);
-    await runGenerate(root);
+    const { command, code, output } = await runGenerate(root);
+    if (code !== 0) {
+      throw new Error(
+        `${command} exited with code ${code}. Last of its output:\n` + tail(output, 30),
+      );
+    }
+    return new GeneratedPortal(root, cleanOutput(output));
   } catch (error) {
     // The test never gets a portal to clean up, so do it here.
-    if (!process.env.KEEP_SCENARIOS) fs.rmSync(root, { recursive: true, force: true });
+    removeRoot(root);
     throw error;
   }
-  return new GeneratedPortal(root);
+}
+
+/** What the CLI said about a build it was asked to generate. */
+export type ScenarioRun = {
+  /** The folder holding `src/`, and `portal/` if the CLI wrote one. */
+  root: string;
+  exitCode: number | null;
+  /** The CLI's output, colour codes stripped. */
+  output: string;
+  /** The `▲` notices — the build went ahead despite them. */
+  warnings: string[];
+  /** The `•` items under a `■` — the reasons the build was refused. */
+  errors: string[];
+  cleanup: () => void;
+};
+
+/**
+ * Copies the build, applies `changes`, and runs `apimatic portal generate`
+ * expecting it to be refused. Never throws on a non-zero exit — the test reads
+ * the exit code and the errors and decides.
+ *
+ * A refused build stops before anything is generated, so this takes seconds
+ * rather than the half-minute of a real generation.
+ *
+ * `before` runs on the scenario folder after `src/` is copied, for a scenario
+ * that needs something in place first — an earlier `portal/`, say.
+ */
+export async function refusedScenario(
+  name: string,
+  changes: ScenarioChanges = {},
+  options: ScenarioOptions & { before?: (root: string) => void } = {},
+): Promise<ScenarioRun> {
+  const root = copyBuild(name, changes, options);
+  try {
+    options.before?.(root);
+    const { code, output } = await runGenerate(root);
+    const cleaned = cleanOutput(output);
+    return {
+      root,
+      exitCode: code,
+      output: cleaned,
+      warnings: cliWarnings(cleaned),
+      errors: cliErrors(cleaned),
+      cleanup: () => removeRoot(root),
+    };
+  } catch (error) {
+    removeRoot(root);
+    throw error;
+  }
+}
+
+/** Makes the temp scenario folder: a copy of the build's `src/`, with `changes` applied. */
+function copyBuild(name: string, changes: ScenarioChanges, options: ScenarioOptions): string {
+  const build = options.build ?? portalName();
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), `v4-${build}-${slug(name)}-`));
+  const src = path.join(root, "src");
+  try {
+    fs.cpSync(path.join(buildDirOf(build), "src"), src, { recursive: true });
+    applyChanges(src, changes);
+  } catch (error) {
+    removeRoot(root);
+    throw error;
+  }
+  return root;
+}
+
+function removeRoot(root: string): void {
+  if (process.env.KEEP_SCENARIOS) {
+    console.log(`[scenario] kept ${root}`);
+    return;
+  }
+  fs.rmSync(root, { recursive: true, force: true });
 }
 
 /**
@@ -78,6 +166,10 @@ export function applyChanges(src: string, changes: ScenarioChanges): void {
       throw new Error(`Scenario removes "${relative}", but the build has no such file`);
     }
     fs.rmSync(full, { recursive: true });
+  }
+
+  for (const relative of changes.dirs ?? []) {
+    fs.mkdirSync(inSrc(relative), { recursive: true });
   }
 
   for (const [relative, content] of Object.entries(changes.files ?? {})) {
@@ -105,7 +197,9 @@ export function applyChanges(src: string, changes: ScenarioChanges): void {
  * alongside `shell` is deprecated, since the args aren't escaped. The only
  * variable part is our own temp path, quoted.
  */
-function runGenerate(input: string): Promise<void> {
+function runGenerate(
+  input: string,
+): Promise<{ command: string; code: number | null; output: string }> {
   const command = `apimatic portal generate --input "${input}" --force`;
   return new Promise((resolve, reject) => {
     const child = spawn(command, { shell: true });
@@ -113,27 +207,74 @@ function runGenerate(input: string): Promise<void> {
     child.stdout.on("data", (chunk) => (output += chunk));
     child.stderr.on("data", (chunk) => (output += chunk));
     child.on("error", reject);
-    child.on("exit", (code) => {
-      if (code === 0) return resolve();
-      reject(
-        new Error(
-          `${command} exited with code ${code}. Last of its output:\n` +
-            tail(output, 30),
-        ),
-      );
-    });
+    child.on("exit", (code) => resolve({ command, code, output }));
   });
 }
 
-/** The last `lines` lines of CLI output, with colour codes and spinner frames stripped. */
-function tail(output: string, lines: number): string {
+/** CLI output with colour codes stripped, each line trimmed, blank lines dropped. */
+function cleanOutput(output: string): string {
   return output
     .replace(/\x1b\[[0-9;?]*[A-Za-z]/g, "")
     .split(/\r?\n/)
     .map((l) => l.trim())
     .filter(Boolean)
-    .slice(-lines)
     .join("\n");
+}
+
+/** The last `lines` lines of CLI output, with colour codes and spinner frames stripped. */
+function tail(output: string, lines: number): string {
+  return cleanOutput(output).split("\n").slice(-lines).join("\n");
+}
+
+/**
+ * The CLI's output is a column of blocks, each opened by a symbol:
+ *
+ *   ▲  a warning — the build carries on
+ *   ■  the build was refused; the reasons follow as `│  • …` lines
+ *   ◇ ● └ …  progress and results
+ *
+ * A `│` line continues whichever block is open. This splits the output into
+ * those blocks so a test can ask for the warnings or the errors alone.
+ */
+function cliBlocks(output: string): Array<{ symbol: string; lines: string[] }> {
+  const blocks: Array<{ symbol: string; lines: string[] }> = [];
+  let open: { symbol: string; lines: string[] } | undefined;
+  for (const line of output.split("\n")) {
+    if (line.startsWith("│")) {
+      const text = line.slice(1).trim();
+      if (open && text) open.lines.push(text);
+      continue;
+    }
+    open = { symbol: line[0], lines: [line.slice(1).trim()] };
+    blocks.push(open);
+  }
+  return blocks;
+}
+
+/**
+ * Each `▲` warning as one string. A warning that lists things continues on
+ * `│` lines, which are joined back on with newlines.
+ */
+export function cliWarnings(output: string): string[] {
+  return cliBlocks(output)
+    .filter((b) => b.symbol === "▲")
+    .map((b) => b.lines.join("\n"));
+}
+
+/**
+ * Each `•` item under a `■`, without the bullet. These are the reasons for a
+ * refusal; the `■` line itself only says which build was refused.
+ */
+export function cliErrors(output: string): string[] {
+  const errors: string[] = [];
+  for (const block of cliBlocks(output).filter((b) => b.symbol === "■")) {
+    for (const line of block.lines.slice(1)) {
+      if (line.startsWith("•")) errors.push(line.slice(1).trim());
+      // A long reason wraps onto lines of its own; keep it with its bullet.
+      else if (errors.length) errors[errors.length - 1] += " " + line;
+    }
+  }
+  return errors;
 }
 
 function slug(name: string): string {

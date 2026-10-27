@@ -65,6 +65,12 @@ export async function settle(page: Page): Promise<void> {
   );
 }
 
+/** Standard options for an element-scoped snapshot — the same, less `fullPage`. */
+export function elementSnapshotOptions(page: Page) {
+  const { fullPage: _fullPage, ...options } = snapshotOptions(page);
+  return options;
+}
+
 /** Standard options for a page-level snapshot. */
 export function snapshotOptions(page: Page, fullPage = false) {
   return {

@@ -42,6 +42,18 @@ export class DocsPage extends BasePage {
   /** Copies the page as markdown — part of the AI page actions. */
   readonly copyMarkdownButton: Locator;
   readonly pageHeading: Locator;
+  /**
+   * The tab bar under the top bar, one link per tab in nav.json's `tabs`, with
+   * Home first. Not rendered at all when there's only the one tab.
+   */
+  readonly headerTabs: Locator;
+  readonly tabLinks: Locator;
+  /**
+   * The sidebar's visible entries in order: pages are links, folders are
+   * buttons that expand. Visible only, because the sidebar also holds a hidden
+   * tab switcher for the mobile layout, and collapsed folders hide their pages.
+   */
+  readonly sidebarEntries: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -56,6 +68,9 @@ export class DocsPage extends BasePage {
     this.searchList = page.locator("#fd-search-list");
     this.copyMarkdownButton = page.getByRole("button", { name: /Copy Markdown/i }).first();
     this.pageHeading = this.pageContent.locator("h1").first();
+    this.headerTabs = this.subnav.locator("[data-header-tabs]");
+    this.tabLinks = this.headerTabs.locator("a");
+    this.sidebarEntries = this.sidebar.locator("a, button").filter({ visible: true });
   }
 
   /** Navigate to a portal route and wait until it's stable enough to screenshot. */
@@ -140,6 +155,16 @@ export class DocsPage extends BasePage {
     await this.searchResultsMatching(text).first().click();
     await expect.poll(() => this.page.url(), { timeout: 30_000 }).not.toBe(from);
     await this.waitUntilReady();
+  }
+
+  /** The tab bar's labels, left to right. Empty when there's no tab bar. */
+  async tabLabels(): Promise<string[]> {
+    return (await this.tabLinks.allInnerTexts()).map((t) => t.trim());
+  }
+
+  /** The visible sidebar entries' labels, top to bottom. */
+  async sidebarLabels(): Promise<string[]> {
+    return (await this.sidebarEntries.allInnerTexts()).map((t) => t.trim());
   }
 
   /** True when the portal chrome rendered — cheap smoke check. */
