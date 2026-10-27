@@ -79,9 +79,34 @@ const cases: RefusedCase[] = [
     changes: { files: nav({ ...BASE_NAV, tabs: ["tutorials", "apimatic:sdks", "tutorials"] }) },
     errors: ["content/nav.json: 'tutorials' is listed more than once."],
   },
-  // TC-09b and TC-09d aren't here yet: the CLI names the two lists in the
-  // other order from the sheet ('pages' and 'tabs'), pending a decision on
-  // which wording is right.
+  // TC-09b and TC-09d: the CLI names the two lists the other way round from
+  // the sheet ('pages' before 'tabs'). The CLI's wording is the expected
+  // outcome — agreed in review of #19.
+  {
+    title: "TC-09b — Folder in both tabs and pages",
+    changes: {
+      files: nav({
+        ...BASE_NAV,
+        pages: ["index", "tutorials", "guides", "apimatic:plugin", "authentication", "..."],
+      }),
+    },
+    errors: [
+      "content/nav.json: 'tutorials' is in both 'pages' and 'tabs', and a node is either a tab or in Home's sidebar. Keep one of them.",
+    ],
+  },
+  {
+    title: "TC-09d — API reference split across lists",
+    changes: {
+      files: nav({
+        ...BASE_NAV,
+        tabs: ["tutorials", "apimatic:sdks", "api"],
+        pages: ["index", "guides", "apimatic:plugin", "authentication", "apimatic:api", "..."],
+      }),
+    },
+    errors: [
+      "content/nav.json: 'apimatic:api' in 'pages' and 'api' in 'tabs' both position the API reference, and a node is either a tab or in Home's sidebar. Keep one of them.",
+    ],
+  },
   {
     title: "TC-09c — API reference under both names in tabs",
     changes: {

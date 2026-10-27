@@ -132,9 +132,22 @@ async function snapshotNavigation(page: Page, id: string): Promise<void> {
 test.describe("nav.json — layouts that build @visual @nav", () => {
   // ---- tabs: [] and no tabs at all -------------------------------------
   //
-  // No sidebar check in TC-01 to TC-03b yet: the sheet orders Home's sidebar
-  // Welcome, SDKs, Context Plugin, API Reference, and the CLI puts Context
-  // Plugin before SDKs. Pending a decision on which one is right.
+  // The sheet orders Home's sidebar Welcome, SDKs, Context Plugin, API
+  // Reference; the CLI puts the API reference first and Context Plugin before
+  // SDKs. The CLI's order is the expected outcome — agreed in review of #19.
+
+  /** Home's sidebar when nothing is a tab, on the scaffolded petstore. */
+  const SECTIONS_IN_HOME = [HOME_PAGE, "API Reference", "Context Plugin", "SDKs"];
+
+  /** No tab bar, and the three sections as folders in Home's sidebar. */
+  const expectSectionsInHome = (id: string) =>
+    test("no tab bar; the sections are folders in Home", async ({ page }) => {
+      const docs = new DocsPage(page);
+      await docs.open(routes.home);
+      expect(await docs.tabLabels(), "tab bar").toEqual([]);
+      expect(await docs.sidebarLabels(), "sidebar").toEqual(SECTIONS_IN_HOME);
+      await snapshotNavigation(page, id);
+    });
 
   scenario(
     "TC-01 — Empty tabs with title",
@@ -144,6 +157,8 @@ test.describe("nav.json — layouts that build @visual @nav", () => {
         // No "nothing is a tab" notice: [] says so on purpose.
         expect(cliWarnings(portal().cliOutput)).toEqual([TITLE_WARNING]);
       });
+
+      expectSectionsInHome("tc-01");
 
       test("the sections keep their addresses, inside Home's sidebar", async ({ page }) => {
         await expectRoutesLoad(page, [routes.sdks, routes.contextPlugin, routes.apiEndpoint]);
@@ -158,6 +173,9 @@ test.describe("nav.json — layouts that build @visual @nav", () => {
     test("no navigation warnings", () => {
       expect(cliWarnings(portal().cliOutput)).toEqual([]);
     });
+
+    // Same layout as TC-01.
+    expectSectionsInHome("tc-02");
   });
 
   scenario("TC-03 — No tabs key", { ...SCAFFOLD, files: nav({}) }, (portal) => {
@@ -166,6 +184,8 @@ test.describe("nav.json — layouts that build @visual @nav", () => {
         NO_TABS_NOTICE('["apimatic:sdks","apimatic:plugin","apimatic:api"]'),
       ]);
     });
+
+    expectSectionsInHome("tc-03");
   });
 
   scenario(
@@ -180,6 +200,8 @@ test.describe("nav.json — layouts that build @visual @nav", () => {
           `Add the file with '"tabs": ["apimatic:sdks","apimatic:plugin","apimatic:api"]'`,
         );
       });
+
+      expectSectionsInHome("tc-03b");
     },
   );
 
@@ -463,13 +485,16 @@ test.describe("nav.json — layouts that build @visual @nav", () => {
       test("unnamed nodes aren't hidden; they follow the named ones", async ({ page }) => {
         const docs = new DocsPage(page);
         await docs.open(routes.home);
-        // Only that they're all there after the named ones: the order they
-        // follow in differs from the sheet, and is pending a decision — so no
-        // snapshot to lock it in yet.
-        expectEllipsisOrder(await docs.sidebarLabels(), {
+        const sidebar = await docs.sidebarLabels();
+        expectEllipsisOrder(sidebar, {
           before: [HOME_PAGE, "Authentication"],
           unnamed: ["API Reference", "Components", "Context Plugin", "GFM", "Guides"],
         });
+        // The sheet has API Reference last; the CLI puts it straight after the
+        // named entries. The CLI's order is the expected outcome — agreed in
+        // review of #19. The rest are petstore's, recorded by the snapshot.
+        expect(sidebar[2], "first unnamed entry").toBe("API Reference");
+        await snapshotNavigation(page, "tc-13b");
       });
     },
   );
