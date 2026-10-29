@@ -11,11 +11,11 @@ import { elementSnapshotOptions } from "../../../utils/visual.ts";
  * Stage 2 for nav.json: what the portal looks like for each layout that builds.
  *
  * Every describe is a row of the nav.json sheet in the QA RTM (issue #7) whose
- * build succeeds. The rows the CLI refuses are in
- * tests/artifacts/petstore/nav-validation.test.ts.
+ * build succeeds. The rows the CLI refuses — validation errors, no portal —
+ * aren't automated here; the Testing Skill covers them.
  *
  * Each scenario edits its own copy of the petstore build — the same way the
- * artifact tests do — generates it (~65s) and serves it on the scenario port
+ * artifact tests do — generates it (~25s in CI) and serves it on the scenario port
  * (utils/serve.ts), so the committed portal the other visual tests use is
  * never touched. Its tests then:
  *

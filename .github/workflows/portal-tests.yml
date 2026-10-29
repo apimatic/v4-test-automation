@@ -168,7 +168,7 @@ jobs:
       # The nav.json layouts that build (~15 min). Each scenario generates its
       # own copy of petstore and serves it on SCENARIO_PORT (8090), so this
       # needs neither the generate step above nor the 8080 server, and runs
-      # even if they failed. The layouts the CLI must refuse ran with stage 1.
+      # even if they failed.
       # Writes to playwright-report/visual-nav, beside the main visual report.
       - name: Visual — nav.json
         if: ${{ !cancelled() }}

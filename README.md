@@ -71,10 +71,8 @@ pnpm test:sdk-docs              # petstore SDK docs vs baselines
 pnpm test:code-samples          # codegen-v2 code samples, OpenAPI 3.0 + 3.1 builds
 pnpm test:portal-artifacts-api  # both, in one run (what CI runs)
 
-# nav.json (copies of petstore) — kept out of test:visual, it's ~30 min on its own
-pnpm test:nav                # both stages below
-pnpm test:nav:refused        # layouts the CLI must refuse, ~2 min
-pnpm test:nav:visual         # layouts that build, one generation each
+# nav.json (copies of petstore) — kept out of test:visual, ~10 min on its own
+pnpm test:nav:visual         # one generation per layout
 pnpm test:nav:visual:update  # accept the current rendering as the nav baselines
 
 pnpm test:visual:update  # accept the current rendering as the new baselines
@@ -171,21 +169,24 @@ pinned 1920×1080, so CI runs `windows-latest` to match.
 
 ## nav.json
 
-The nav.json sheet of the QA RTM (issue #7) is covered across both stages. Each
-case edits its own copy of the petstore build, as the artifact scenarios do,
+The nav.json sheet of the QA RTM (issue #7) is covered by the visual stage, for
+the layouts that build. Each case edits its own copy of the petstore build, as the artifact scenarios do,
 adding the pages the sheet places that petstore lacks (`authentication.md` at
 the root and `tutorials/`, see `SHEET_PAGES` in `utils/nav.ts`) and its own
 `content/nav.json`.
 
 | Sheet outcome | Where | How |
 |---|---|---|
-| Build refused | `tests/artifacts/petstore/nav-validation.test.ts` | `refusedScenario()` runs the CLI and checks the exit code and the exact `•` errors it printed. A refused build stops before generating, so a case takes seconds. |
-| Build succeeds | `tests/visual/petstore/nav.visual.test.ts` | `generateScenario()` builds the copy (~65s) and `serveDir()` (`utils/serve.ts`) serves it on `SCENARIO_PORT` (default `8090`). Tests check the `▲` warnings from that run, assert the tab bar and sidebar labels, snapshot both (`portal-snapshots/visual/petstore/tc-*.png`), and load the addresses the sheet names. |
+| Build succeeds | `tests/visual/petstore/nav.visual.test.ts` | `generateScenario()` builds the copy (~25s) and `serveDir()` (`utils/serve.ts`) serves it on `SCENARIO_PORT` (default `8090`). Tests check the `▲` warnings from that run, assert the tab bar and sidebar labels, snapshot both (`portal-snapshots/visual/petstore/tc-*.png`), and load the addresses the sheet names. |
 
 Petstore holds more than the sheet's portal — its home page is "TT Status
 Codes", and its `components/` and `gfm/` folders land wherever `"..."` puts
 them — so sidebar checks hold the entries nav.json names to an exact order and
 only require the rest to be present. The snapshots record the full layout.
+
+The layouts the CLI refuses (the sheet's "Build refused" rows) aren't automated
+here: they're validation errors with no portal generated, and are covered by
+the Testing Skill instead.
 
 Expected messages are the sheet's, except that the CLI calls the file
 `content/nav.json` (relative to `src/`) where the sheet writes
@@ -247,7 +248,7 @@ utils/scenario.ts          copy src/ to a temp folder, change it, generate
 utils/artifacts.ts         declared-vs-produced helpers, zip manifest reading
 utils/visual.ts            snapshot stability helpers
 utils/serve.ts             serves a scenario's generated portal (nav visual)
-utils/nav.ts               nav.json case helpers shared by both nav suites
+utils/nav.ts               nav.json case helpers
 pages/                     page objects — locators live here, never in tests
 tests/artifacts/<build>/   stage 1
 tests/visual/<build>/      stage 2
@@ -266,9 +267,8 @@ portal-snapshots/          committed visual baselines
 install + authenticate the CLI  ->  artifacts  ->  generate  ->  visual  ->  visual nav.json  ->  generate auth  ->  functional
 ```
 
-The nav.json refused-build cases run inside `artifacts`; the layouts that build
-have their own step, which generates its own portals and reports to
-`playwright-report/visual-nav`.
+The nav.json layouts have their own step, which generates its own portals and
+reports to `playwright-report/visual-nav`.
 
 ### Environments
 
