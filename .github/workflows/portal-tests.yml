@@ -30,7 +30,9 @@ concurrency:
 jobs:
   test:
     runs-on: windows-latest
-    timeout-minutes: 60   # includes up to ~15 min for the Portal Artifacts test
+    # Includes up to ~15 min for the Portal Artifacts test and ~15 min for the
+    # nav.json visual step, which generates a portal per scenario.
+    timeout-minutes: 75
 
     env:
       # dev unless a manual run asks for prod. Pushes and PRs stay on dev so
@@ -42,7 +44,10 @@ jobs:
       # Pinned so a new CLI release can't silently change the generated output
       # and move every baseline. Bump deliberately; the workflow_dispatch input
       # above lets you try a version without committing to it.
-      APIMATIC_CLI_VERSION: 2.0.0-beta.1
+      # beta.8 is what the llms-full.txt baseline (#18) was recorded with, and
+      # every suite was verified on it. beta.1 rejects nav.json's "tabs", which
+      # petstore's own nav.json now uses.
+      APIMATIC_CLI_VERSION: 2.0.0-beta.8
 
     steps:
       - name: Checkout
@@ -159,6 +164,15 @@ jobs:
         env:
           PORTAL_PREBUILT: "1"
         run: pnpm test:visual
+
+      # The nav.json layouts that build (~15 min). Each scenario generates its
+      # own copy of petstore and serves it on SCENARIO_PORT (8090), so this
+      # needs neither the generate step above nor the 8080 server, and runs
+      # even if they failed.
+      # Writes to playwright-report/visual-nav, beside the main visual report.
+      - name: Visual — nav.json
+        if: ${{ !cancelled() }}
+        run: pnpm test:nav:visual
 
       # ---- stage 3 --------------------------------------------------------
       # Functional runs against the auth build, whose playground calls the API
