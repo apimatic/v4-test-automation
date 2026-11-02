@@ -22,8 +22,8 @@
     "test:visual": "playwright test --project=visual --grep-invert @nav",
     "test:visual:headed": "playwright test --project=visual --grep-invert @nav --headed",
     "test:visual:update": "playwright test --project=visual --grep-invert @nav --update-snapshots",
-    "test:nav:visual": "playwright test --project=visual --grep @nav",
-    "test:nav:visual:update": "playwright test --project=visual --grep @nav --update-snapshots",
+    "test:nav:visual": "playwright test --project=visual --grep @nav --workers=3",
+    "test:nav:visual:update": "playwright test --project=visual --grep @nav --workers=3 --update-snapshots",
     "test:functional": "playwright test --project=functional",
     "report": "playwright show-report",
     "types:check": "tsc --noEmit"

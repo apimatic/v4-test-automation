@@ -30,7 +30,7 @@ concurrency:
 jobs:
   test:
     runs-on: windows-latest
-    # Includes up to ~15 min for the Portal Artifacts test and ~15 min for the
+    # Includes up to ~15 min for the Portal Artifacts test and ~5 min for the
     # nav.json visual step, which generates a portal per scenario.
     timeout-minutes: 75
 
@@ -165,10 +165,11 @@ jobs:
           PORTAL_PREBUILT: "1"
         run: pnpm test:visual
 
-      # The nav.json layouts that build (~15 min). Each scenario generates its
-      # own copy of petstore and serves it on SCENARIO_PORT (8090), so this
-      # needs neither the generate step above nor the 8080 server, and runs
-      # even if they failed.
+      # The nav.json layouts that build (~5 min). Each scenario generates its
+      # own copy of petstore and serves it on its worker's port (8090-8092), so
+      # this needs neither the generate step above nor the 8080 server, and
+      # runs even if they failed. Three scenarios run at once: generation is
+      # nearly all of the step's time.
       # Writes to playwright-report/visual-nav, beside the main visual report.
       - name: Visual — nav.json
         if: ${{ !cancelled() }}

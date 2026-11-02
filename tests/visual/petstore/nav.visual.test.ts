@@ -11,13 +11,20 @@ import { elementSnapshotOptions } from "../../../utils/visual.ts";
  * Stage 2 for nav.json: what the portal looks like for each layout that builds.
  *
  * Every describe is a row of the nav.json sheet in the QA RTM (issue #7) whose
- * build succeeds. The rows the CLI refuses — validation errors, no portal —
- * aren't automated here; the Testing Skill covers them.
+ * build succeeds. Not automated here — the Testing Skill covers them:
+ *
+ *   - the rows the CLI refuses (validation errors, no portal);
+ *   - TC-02, TC-03 and TC-03b, whose layout is TC-01's and which differ only
+ *     in the warning the CLI prints;
+ *   - TC-18b, which checks only a warning.
  *
  * Each scenario edits its own copy of the petstore build — the same way the
- * artifact tests do — generates it (~25s in CI) and serves it on the scenario port
- * (utils/serve.ts), so the committed portal the other visual tests use is
- * never touched. Its tests then:
+ * artifact tests do — generates it (~25s in CI) and serves it on its worker's
+ * scenario port (utils/serve.ts), so the committed portal the other visual
+ * tests use is never touched. Generation is nearly all of the suite's time, so
+ * scenarios run side by side: `pnpm test:nav:visual` uses 3 workers, one
+ * scenario each, with a scenario's tests kept together and in order. Its tests
+ * then:
  *
  *   - check the warnings the CLI printed while generating. They come from the
  *     same run that produced the portal, so asking for them costs nothing;
@@ -57,11 +64,6 @@ const SCAFFOLD: ScenarioChanges = {
   remove: ["content/components", "content/gfm", "content/guides"],
 };
 
-const NO_TABS_NOTICE = (suggested: string) =>
-  `'content/nav.json' has no 'tabs', so nothing is a tab: the header shows no tab bar, and ` +
-  `SDKs, Context Plugin and the API reference are folders in Home's sidebar. Add ` +
-  `'"tabs": ${suggested}' to show them as tabs, or '"tabs": []' to keep this sidebar.`;
-
 const TITLE_WARNING =
   "'content/nav.json' names the Home tab with 'title', but Home is the only tab and one tab " +
   "draws no tab bar, so the name shows nowhere. Name a tab in 'tabs', or remove the setting.";
@@ -76,8 +78,10 @@ function scenario(
   body: (portal: () => GeneratedPortal) => void,
 ): void {
   test.describe(title, () => {
-    // Generation plus serving runs in beforeAll, which shares the test timeout.
-    test.describe.configure({ timeout: 300_000 });
+    // Inside the parallel suite, "default" keeps this scenario's tests on one
+    // worker, in order, so they share one generation. Generation plus serving
+    // runs in beforeAll, which shares the test timeout.
+    test.describe.configure({ mode: "default", timeout: 300_000 });
 
     let portal: GeneratedPortal;
     let server: ServedPortal | undefined;
@@ -130,24 +134,11 @@ async function snapshotNavigation(page: Page, id: string): Promise<void> {
 }
 
 test.describe("nav.json — layouts that build @visual @nav", () => {
-  // ---- tabs: [] and no tabs at all -------------------------------------
-  //
-  // The sheet orders Home's sidebar Welcome, SDKs, Context Plugin, API
-  // Reference; the CLI puts the API reference first and Context Plugin before
-  // SDKs. The CLI's order is the expected outcome — agreed in review of #19.
+  // Scenarios run in parallel with each other; each scenario() keeps its own
+  // tests together.
+  test.describe.configure({ mode: "parallel" });
 
-  /** Home's sidebar when nothing is a tab, on the scaffolded petstore. */
-  const SECTIONS_IN_HOME = [HOME_PAGE, "API Reference", "Context Plugin", "SDKs"];
-
-  /** No tab bar, and the three sections as folders in Home's sidebar. */
-  const expectSectionsInHome = (id: string) =>
-    test("no tab bar; the sections are folders in Home", async ({ page }) => {
-      const docs = new DocsPage(page);
-      await docs.open(routes.home);
-      expect(await docs.tabLabels(), "tab bar").toEqual([]);
-      expect(await docs.sidebarLabels(), "sidebar").toEqual(SECTIONS_IN_HOME);
-      await snapshotNavigation(page, id);
-    });
+  // ---- tabs: [] ----------------------------------------------------------
 
   scenario(
     "TC-01 — Empty tabs with title",
@@ -158,7 +149,22 @@ test.describe("nav.json — layouts that build @visual @nav", () => {
         expect(cliWarnings(portal().cliOutput)).toEqual([TITLE_WARNING]);
       });
 
-      expectSectionsInHome("tc-01");
+      test("no tab bar; the sections are folders in Home", async ({ page }) => {
+        const docs = new DocsPage(page);
+        await docs.open(routes.home);
+        expect(await docs.tabLabels(), "tab bar").toEqual([]);
+        // The sheet orders Home's sidebar Welcome, SDKs, Context Plugin, API
+        // Reference; the CLI puts the API reference first and Context Plugin
+        // before SDKs. The CLI's order is the expected outcome — agreed in
+        // review of #19.
+        expect(await docs.sidebarLabels(), "sidebar").toEqual([
+          HOME_PAGE,
+          "API Reference",
+          "Context Plugin",
+          "SDKs",
+        ]);
+        await snapshotNavigation(page, "tc-01");
+      });
 
       test("the sections keep their addresses, inside Home's sidebar", async ({ page }) => {
         await expectRoutesLoad(page, [routes.sdks, routes.contextPlugin, routes.apiEndpoint]);
@@ -166,42 +172,6 @@ test.describe("nav.json — layouts that build @visual @nav", () => {
         expect(await docs.tabLabels(), "still no tab bar").toEqual([]);
         expect(await docs.sidebarLabels(), "Home's sidebar").toContain(HOME_PAGE);
       });
-    },
-  );
-
-  scenario("TC-02 — Empty tabs, no title", { ...SCAFFOLD, files: nav({ tabs: [] }) }, (portal) => {
-    test("no navigation warnings", () => {
-      expect(cliWarnings(portal().cliOutput)).toEqual([]);
-    });
-
-    // Same layout as TC-01.
-    expectSectionsInHome("tc-02");
-  });
-
-  scenario("TC-03 — No tabs key", { ...SCAFFOLD, files: nav({}) }, (portal) => {
-    test("one notice, suggesting the sections in scaffold order", () => {
-      expect(cliWarnings(portal().cliOutput)).toEqual([
-        NO_TABS_NOTICE('["apimatic:sdks","apimatic:plugin","apimatic:api"]'),
-      ]);
-    });
-
-    expectSectionsInHome("tc-03");
-  });
-
-  scenario(
-    "TC-03b — No nav.json file",
-    { remove: [...SCAFFOLD.remove!, "content/nav.json"] },
-    (portal) => {
-      test("the notice says the file is missing, and to add it", () => {
-        const warnings = cliWarnings(portal().cliOutput);
-        expect(warnings).toHaveLength(1);
-        expect(warnings[0]).toMatch(/^There is no 'content\/nav\.json'/);
-        expect(warnings[0]).toContain(
-          `Add the file with '"tabs": ["apimatic:sdks","apimatic:plugin","apimatic:api"]'`,
-        );
-      });
-
-      expectSectionsInHome("tc-03b");
     },
   );
 
@@ -662,26 +632,6 @@ test.describe("nav.json — layouts that build @visual @nav", () => {
       test("/context-plugin is a 404", async ({ request }) => {
         const response = await request.get(routes.contextPlugin);
         expect(response.status()).toBe(404);
-      });
-    },
-  );
-
-  scenario(
-    "TC-18b — No-tabs notice without plugin",
-    {
-      config: withoutPlugin,
-      files: {
-        ...SHEET_PAGES,
-        "content/folder/fold.md": page("Fold"),
-        ...nav({ title: "Overview", pages: ["index", "authentication", "..."] }),
-      },
-    },
-    (portal) => {
-      test("the notice suggests only SDKs and the API reference", () => {
-        const notice = cliWarnings(portal().cliOutput).find((w) => w.includes("has no 'tabs'"));
-        expect(notice, "the no-tabs notice").toBeDefined();
-        expect(notice).toContain(`'"tabs": ["apimatic:sdks","apimatic:api"]'`);
-        expect(notice).not.toMatch(/Context Plugin|apimatic:plugin/);
       });
     },
   );

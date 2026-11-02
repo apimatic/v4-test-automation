@@ -71,8 +71,8 @@ pnpm test:sdk-docs              # petstore SDK docs vs baselines
 pnpm test:code-samples          # codegen-v2 code samples, OpenAPI 3.0 + 3.1 builds
 pnpm test:portal-artifacts-api  # both, in one run (what CI runs)
 
-# nav.json (copies of petstore) — kept out of test:visual, ~10 min on its own
-pnpm test:nav:visual         # one generation per layout
+# nav.json (copies of petstore) — kept out of test:visual, ~5 min on its own
+pnpm test:nav:visual         # one generation per layout, 3 at a time
 pnpm test:nav:visual:update  # accept the current rendering as the nav baselines
 
 pnpm test:visual:update  # accept the current rendering as the new baselines
@@ -177,7 +177,7 @@ the root and `tutorials/`, see `SHEET_PAGES` in `utils/nav.ts`) and its own
 
 | Sheet outcome | Where | How |
 |---|---|---|
-| Build succeeds | `tests/visual/petstore/nav.visual.test.ts` | `generateScenario()` builds the copy (~25s) and `serveDir()` (`utils/serve.ts`) serves it on `SCENARIO_PORT` (default `8090`). Tests check the `▲` warnings from that run, assert the tab bar and sidebar labels, snapshot both (`portal-snapshots/visual/petstore/tc-*.png`), and load the addresses the sheet names. |
+| Build succeeds | `tests/visual/petstore/nav.visual.test.ts` | `generateScenario()` builds the copy (~25s) and `serveDir()` (`utils/serve.ts`) serves it on its worker's port, `SCENARIO_PORT` plus the worker's index (`8090`–`8092` by default). Scenarios run on 3 workers, each scenario's tests together on one. Tests check the `▲` warnings from that run, assert the tab bar and sidebar labels, snapshot both (`portal-snapshots/visual/petstore/tc-*.png`), and load the addresses the sheet names. |
 
 Petstore holds more than the sheet's portal — its home page is "TT Status
 Codes", and its `components/` and `gfm/` folders land wherever `"..."` puts
@@ -186,7 +186,9 @@ only require the rest to be present. The snapshots record the full layout.
 
 The layouts the CLI refuses (the sheet's "Build refused" rows) aren't automated
 here: they're validation errors with no portal generated, and are covered by
-the Testing Skill instead.
+the Testing Skill instead. So are TC-02, TC-03 and TC-03b, which build TC-01's
+layout and differ only in the warning printed, and TC-18b, which checks only a
+warning.
 
 Expected messages are the sheet's, except that the CLI calls the file
 `content/nav.json` (relative to `src/`) where the sheet writes

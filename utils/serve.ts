@@ -8,8 +8,11 @@ import { spawn, spawnSync, type ChildProcess } from "node:child_process";
  * own — the same `http-server` command scripts/serve-portal.mts runs, on a
  * port of its own so the two never collide.
  *
- * Start it in the scenario's `beforeAll`, stop it in `afterAll`. Workers are
- * pinned to 1, so one scenario server runs at a time and the port is reused.
+ * Start it in the scenario's `beforeAll`, stop it in `afterAll`. Scenarios can
+ * run on several workers at once (`pnpm test:nav:visual` uses 3), so each
+ * worker serves on its own port: SCENARIO_PORT plus the worker's parallel
+ * index — 8090, 8091, 8092 by default. Within a worker one scenario runs at a
+ * time, so its port is reused.
  */
 
 const DEFAULT_SCENARIO_PORT = 8090;
@@ -20,7 +23,9 @@ export function scenarioPort(): number {
   if (!Number.isInteger(port) || port <= 0) {
     throw new Error(`SCENARIO_PORT must be a positive integer, got "${raw}"`);
   }
-  return port;
+  // Playwright sets TEST_PARALLEL_INDEX in each worker (0, 1, 2, …); it's
+  // unset outside one, where nothing is served.
+  return port + Number(process.env.TEST_PARALLEL_INDEX ?? 0);
 }
 
 /** Where a scenario's portal is served. 127.0.0.1 for the same reason as env.ts's baseURL(). */
@@ -38,7 +43,8 @@ export async function serveDir(dir: string): Promise<ServedPortal> {
   // test would quietly screenshot the wrong portal.
   if (await answers(port)) {
     throw new Error(
-      `Port ${port} is already serving something. Stop it, or set SCENARIO_PORT to a free port.`,
+      `Port ${port} is already serving something. Stop it, or set SCENARIO_PORT to the first of ` +
+        `enough free ports (one per worker).`,
     );
   }
 
