@@ -39,7 +39,7 @@ utils/scenario.ts          → copy src/ to temp, apply changes, generate
 utils/artifacts.ts         → declared-vs-produced helpers, zip manifest reading
 utils/visual.ts            → snapshot stability helpers
 utils/serve.ts             → serve a scenario's generated portal on SCENARIO_PORT
-utils/nav.ts               → nav.json case helpers (both nav suites)
+utils/nav.ts               → nav.json case helpers
 pages/                     → Page Object classes (locators + actions)
 tests/artifacts/<build>/   → stage 1
 tests/visual/<build>/      → stage 2

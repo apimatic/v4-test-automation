@@ -1,11 +1,10 @@
 /**
- * Shared by the nav.json suites — tests/artifacts/petstore/nav-validation and
- * tests/visual/petstore/nav.visual — which both edit copies of the petstore
- * build. Helpers return `files` entries for a ScenarioChanges, so a case reads
- * as the nav.json it's testing.
+ * Helpers for the nav.json suite, tests/visual/petstore/nav.visual, which
+ * edits copies of the petstore build. Helpers return `files` entries for a
+ * ScenarioChanges, so a case reads as the nav.json it's testing.
  */
 
-/** The build both suites copy. */
+/** The build the suite copies. */
 export const NAV_BUILD = "petstore";
 
 /**

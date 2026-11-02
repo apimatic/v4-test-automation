@@ -55,10 +55,13 @@ const runsFunctional =
  *
  * Functional also carries the build, e.g. functional-auth: CI runs it once per
  * build, and the second run would otherwise wipe the first one's report.
+ * A nav.json run (`--grep @nav`) is marked the same way, e.g. visual-nav, since
+ * CI runs it right after the main visual run.
  */
 const runName =
-  requestedProjects.length !== 1 ? "all"
+  requestedProjects.length !== 1 ? (navOnly ? "all-nav" : "all")
   : requestedProjects[0] === "functional" ? `functional-${portalName()}`
+  : navOnly ? `${requestedProjects[0]}-nav`
   : requestedProjects[0];
 
 /**

@@ -122,7 +122,30 @@ export class ApiReferencePage extends DocsPage {
   async openAuthorization(): Promise<void> {
     if ((await this.authorizationToggle.getAttribute("aria-expanded")) !== "true") {
       await this.authorizationToggle.click();
+      await this.waitForPlaygroundAnimations();
     }
+  }
+
+  /**
+   * Wait for the playground's CSS transitions to finish — the panel sliding
+   * open after a section is expanded.
+   *
+   * Clicking inside the panel while it's still moving can land without
+   * effect: on a slow CI runner, "Authorize" was clicked 40ms after the panel
+   * started opening, the click registered, and its dialog never opened.
+   * Playwright's own stability check passed in between two animation frames,
+   * so it can't be relied on here.
+   */
+  async waitForPlaygroundAnimations(): Promise<void> {
+    await this.playground.evaluate((el) =>
+      Promise.all(
+        el
+          .getAnimations({ subtree: true })
+          // An endless one (a spinner, say) would never finish.
+          .filter((a) => a.effect?.getTiming().iterations !== Infinity)
+          .map((a) => a.finished),
+      ),
+    );
   }
 
   /**
