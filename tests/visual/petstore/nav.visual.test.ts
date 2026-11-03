@@ -79,14 +79,16 @@ function scenario(
 ): void {
   test.describe(title, () => {
     // Inside the parallel suite, "default" keeps this scenario's tests on one
-    // worker, in order, so they share one generation. Generation plus serving
-    // runs in beforeAll, which shares the test timeout.
-    test.describe.configure({ mode: "default", timeout: 300_000 });
+    // worker, in order, so they share one generation.
+    test.describe.configure({ mode: "default" });
 
     let portal: GeneratedPortal;
     let server: ServedPortal | undefined;
 
     test.beforeAll(async () => {
+      // A hook doesn't take describe.configure's timeout, only one set inside
+      // it. Generation can pass the project's 120s with three running at once.
+      test.setTimeout(300_000);
       portal = await generateScenario(title, changes, { build: NAV_BUILD });
       server = await serveDir(portal.outDir);
     });
