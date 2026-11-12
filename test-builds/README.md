@@ -69,10 +69,16 @@ the pixels moved.
 
 ## Codegen builds
 
-`codegen-oas30/` and `codegen-oas31/` are never served. They're uploaded to the
-Portal Artifacts API by `tests/artifacts/codegen/`, which compares the code
-samples codegen-v2 generates for them. Each operation is one request-example
-case, and its description says what the sample should show.
+`codegen-oas30/`, `codegen-oas31/` and `codegen-requests/` are never served.
+They're uploaded to the Portal Artifacts API by `tests/artifacts/codegen/`, which
+compares the code samples codegen-v2 generates for them. Each operation is one
+request-example case, and its description says what the sample should show.
+
+`codegen-requests/` covers how codegen-v2 builds a sample from a request's
+examples; its scenarios are listed in
+`tests/artifacts/codegen/code-samples.planned-scenarios.csv`. Scenarios with an
+open codegen defect are left out of its spec until the fix lands — the spec's
+`info.description` names each one and its issue.
 
 They hold only the build input: `apimatic.json`, `content/` and `spec/`. Don't
 copy generated output (`portal-artifacts/`, `*.zip`) in beside them, because it

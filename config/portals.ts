@@ -148,6 +148,14 @@ export const portals = {
     label: "Codegen request examples (OpenAPI 3.1)",
     routes: {},
   },
+  // How codegen-v2 turns a request's examples into a code sample: field
+  // types, parameters, named examples, unions, media types. Scenarios with an
+  // open codegen defect are left out of its spec; its description lists them.
+  "codegen-requests": {
+    buildDir: "test-builds/codegen-requests",
+    label: "Codegen request scenarios (OpenAPI 3.0)",
+    routes: {},
+  },
 } satisfies Record<string, PortalConfig>;
 
 export type PortalName = keyof typeof portals;

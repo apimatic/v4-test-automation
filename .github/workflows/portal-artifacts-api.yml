@@ -3,7 +3,8 @@ name: Portal Artifacts API — SDK docs & code samples
 # Uploads builds to the Portal Artifacts API, waits for generation, and
 # compares what comes back to committed baselines:
 #   - petstore:          docs/<language>.json         -> portal-snapshots/artifacts/petstore/sdk-docs/
-#   - codegen-oas30/31:  code-samples/<language>.json -> portal-snapshots/artifacts/codegen/code-samples/
+#   - codegen-oas30/31, codegen-requests:
+#                        code-samples/<language>.json -> portal-snapshots/artifacts/codegen/code-samples/
 #
 # Manual only: every run starts a real generation on the chosen account.
 on:
