@@ -170,10 +170,16 @@ export class ApiReferencePage extends DocsPage {
    * A non-auth parameter input, by the name the spec gives it. Labels read
    * "id* string" for required ones and "X-APIMatic-CallbackUrl string" for
    * optional ones, so the asterisk is optional in the match.
+   *
+   * String parameters render as a textbox, integer ones as a spinbutton
+   * ("petId* integer"), so either role is accepted.
    */
   parameterField(name: string): Locator {
     const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    return this.playground.getByRole("textbox", { name: new RegExp(`^${escaped}\\*? `) });
+    const label = new RegExp(`^${escaped}\\*? `);
+    return this.playground
+      .getByRole("textbox", { name: label })
+      .or(this.playground.getByRole("spinbutton", { name: label }));
   }
 
   /**

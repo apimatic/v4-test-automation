@@ -545,6 +545,91 @@
         ]
       }
     },
+    "/pet/{petId}/visits": {
+      "get": {
+        "tags": ["pet"],
+        "summary": "List a pet's vet visits.",
+        "description": "Returns the vet visits recorded for a pet. Takes one parameter of each kind: the pet in the path, a page size in the query, and the clinic in a header.",
+        "operationId": "listPetVisits",
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "description": "ID of the pet whose visits to list",
+            "required": true,
+            "example": 10,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of visits to return",
+            "required": false,
+            "example": 5,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            }
+          },
+          {
+            "name": "X-Clinic-Id",
+            "in": "header",
+            "description": "The clinic the visits were recorded at",
+            "required": true,
+            "example": "clinic-42",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "visitId": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2026-01-15"
+                      },
+                      "reason": {
+                        "type": "string",
+                        "example": "Annual checkup"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID or limit supplied"
+          },
+          "404": {
+            "description": "Pet not found"
+          },
+          "default": {
+            "description": "Unexpected error"
+          }
+        }
+      }
+    },
     "/store/inventory": {
       "get": {
         "tags": [

@@ -65,11 +65,14 @@ export const portals = {
       // Generated from the `plugin` block.
       contextPlugin: "/context-plugin/",
 
-      // Generated from src/spec/petstore.json — 19 operations across pet,
+      // Generated from src/spec/petstore.json — 20 operations across pet,
       // store and user.
       apiReference: "/api/petstore/",
       apiEndpoint: "/api/petstore/pet/addPet/",
       apiEndpointDelete: "/api/petstore/pet/deletePet/",
+      // One parameter of each kind: petId (path), limit (query), X-Clinic-Id
+      // (header). No auth, so the playground needs no credentials.
+      apiEndpointParams: "/api/petstore/pet/listPetVisits/",
 
       // Machine-facing routes an AI agent reads.
       llms: "/llms.txt",

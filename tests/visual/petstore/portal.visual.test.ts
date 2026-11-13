@@ -139,7 +139,7 @@ test.describe("Petstore v4 portal — visual @petstore", () => {
     const docs = new DocsPage(page);
     await docs.open(routes.apiEndpoint);
 
-    // Generated from src/spec/petstore.json — 19 operations across three tags.
+    // Generated from src/spec/petstore.json — 20 operations across three tags.
     await expect(page).toHaveScreenshot("api-add-pet.png", snapshotOptions(page));
   });
 
