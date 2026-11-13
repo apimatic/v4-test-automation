@@ -52,6 +52,16 @@ export class ApiReferencePage extends DocsPage {
   /** The OAuth "Authorize" dialog. Rendered outside the form, so page-scoped. */
   readonly oauthDialog: Locator;
   readonly oauthSubmitButton: Locator;
+  /**
+   * The "Server URL" button at the top of the playground. Its accessible name
+   * is "Server URL <resolved url>", so it doubles as a read of the current server.
+   */
+  readonly serverUrlButton: Locator;
+  /** The dialog the button opens. Rendered outside the form, so page-scoped. */
+  readonly serverDialog: Locator;
+  /** The server picker inside the dialog. It has no name; it's the dialog's first combobox. */
+  readonly serverSelect: Locator;
+  readonly serverDialogCloseButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -80,6 +90,80 @@ export class ApiReferencePage extends DocsPage {
     this.authorizeButton = this.playground.getByRole("button", { name: "Authorize", exact: true });
     this.oauthDialog = page.getByRole("dialog", { name: "Authorization" });
     this.oauthSubmitButton = this.oauthDialog.getByRole("button", { name: "Submit", exact: true });
+    this.serverUrlButton = this.playground.getByRole("button", { name: /^Server URL / });
+    this.serverDialog = page.getByRole("dialog", { name: "Server URL" });
+    this.serverSelect = this.serverDialog.getByRole("combobox").first();
+    this.serverDialogCloseButton = this.serverDialog.getByRole("button", {
+      name: "Close",
+      exact: true,
+    });
+  }
+
+  /**
+   * The request code sample for one language tab — "cURL", "C#", "Python",
+   * "TypeScript". Only the selected tab's panel is in the accessibility tree.
+   */
+  codeSample(language: string): Locator {
+    return this.pageContent.getByRole("tabpanel", { name: language, exact: true });
+  }
+
+  /**
+   * Pick a server in the Server URL dialog and close it. `urlTemplate` is the
+   * URL as the spec writes it, variables unresolved, e.g.
+   * "https://{tenant}.petstore.{region}.example.com/api/v3". Each option's
+   * name is that URL followed by the server's description, so match the start.
+   */
+  async selectServer(urlTemplate: string): Promise<void> {
+    await this.openServerDialog();
+    await this.serverSelect.click();
+    const escaped = urlTemplate.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    await this.page.getByRole("option", { name: new RegExp(`^${escaped}`) }).click();
+    await this.closeServerDialog();
+  }
+
+  /**
+   * Open the Server URL dialog, unless it's already open. While it's open the
+   * rest of the page is hidden from the accessibility tree, so role locators
+   * outside the dialog (`serverUrlButton` included) won't resolve until it closes.
+   */
+  async openServerDialog(): Promise<void> {
+    if (!(await this.serverDialog.isVisible())) {
+      await this.serverUrlButton.click();
+      await this.serverDialog.waitFor({ state: "visible" });
+    }
+  }
+
+  /**
+   * Close the dialog and wait until it's gone. It animates out, and stays
+   * "visible" meanwhile — without the wait, a following `openServerDialog()`
+   * would see it still up, skip reopening, and act on a dialog being removed.
+   */
+  async closeServerDialog(): Promise<void> {
+    await this.serverDialogCloseButton.click();
+    await this.serverDialog.waitFor({ state: "hidden" });
+  }
+
+  /** A free-text server variable's input, labelled with the variable's name. */
+  serverVariableInput(name: string): Locator {
+    return this.serverDialog.getByRole("textbox", { name, exact: true });
+  }
+
+  /** An enum server variable's dropdown, labelled with the variable's name. */
+  serverVariableSelect(name: string): Locator {
+    return this.serverDialog.getByRole("combobox", { name, exact: true });
+  }
+
+  /** Type a value into a free-text server variable. Leaves the dialog open. */
+  async fillServerVariable(name: string, value: string): Promise<void> {
+    await this.openServerDialog();
+    await this.serverVariableInput(name).fill(value);
+  }
+
+  /** Pick one of an enum server variable's values. Leaves the dialog open. */
+  async chooseServerVariable(name: string, value: string): Promise<void> {
+    await this.openServerDialog();
+    await this.serverVariableSelect(name).click();
+    await this.page.getByRole("option", { name: value, exact: true }).click();
   }
 
   /**

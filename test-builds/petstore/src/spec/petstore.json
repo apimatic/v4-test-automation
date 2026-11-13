@@ -20,6 +20,21 @@
   "servers": [
     {
       "url": "https://petstore3.swagger.io/api/v3"
+    },
+    {
+      "url": "https://{tenant}.petstore.{region}.example.com/api/v3",
+      "description": "Tenant-scoped regional server",
+      "variables": {
+        "tenant": {
+          "default": "demo",
+          "description": "Your tenant subdomain. Free text, editable."
+        },
+        "region": {
+          "default": "us-east",
+          "enum": ["us-east", "eu-west", "ap-south"],
+          "description": "Deployment region."
+        }
+      }
     }
   ],
   "tags": [
