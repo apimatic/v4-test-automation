@@ -47,8 +47,12 @@ export class ApiReferencePage extends DocsPage {
   readonly basicPasswordInput: Locator;
   /**
    * The Authorization header field, used by bearer, OAuth 2, OpenID Connect and
-   * digest. Bearer and OAuth pre-fill it with "Bearer ", and an OAuth flow
-   * puts the token it fetched here.
+   * digest. An OAuth flow puts the token it fetched here, as "Bearer <token>".
+   *
+   * Bearer and digest show their scheme as a fixed label in front of the input,
+   * and that label joins the input's accessible name: "Authorization Bearer",
+   * "Authorization Digest". OAuth and OpenID Connect have no label, so the name
+   * is just "Authorization". This matches all three.
    */
   readonly authorizationHeaderInput: Locator;
   /** OAuth 2: opens the Authorize form. Named "Authorize <scheme id>". */
@@ -64,9 +68,11 @@ export class ApiReferencePage extends DocsPage {
     });
     this.playground = page.getByRole("dialog");
     this.sendButton = this.playground.getByRole("button", { name: /^Send\b/ });
-    // No role or label on the status line; it's the only text in the dialog
-    // that starts with a status code.
-    this.responseStatus = this.playground.getByText(/^\d{3} \w+/);
+    // No role or label on the status line, so match its text: a 1xx–5xx code
+    // and a reason phrase, which starts with a capital ("200 OK", "404 Not
+    // Found"). The capital matters: the timing line beside it ("810 ms · 23 B")
+    // also starts with three digits once a call takes 100ms or more.
+    this.responseStatus = this.playground.getByText(/^[1-5]\d{2} [A-Z]/);
     this.responseBody = this.playground
       .getByRole("tabpanel", { name: "Body", exact: true })
       .getByRole("region");
@@ -81,8 +87,7 @@ export class ApiReferencePage extends DocsPage {
       exact: true,
     });
     this.authorizationHeaderInput = this.authorizationSection.getByRole("textbox", {
-      name: "Authorization",
-      exact: true,
+      name: /^Authorization(?: (?:Bearer|Digest))?$/,
     });
     this.authorizeButton = this.playground.getByRole("button", { name: /^Authorize .+/ });
     this.oauthSubmitButton = this.playground.getByRole("button", {
@@ -164,11 +169,14 @@ export class ApiReferencePage extends DocsPage {
    * sent. The input is labelled with the name alone and tagged "query" or
    * "header" beside it, so an AND of a query `token` and a header `token`
    * is told apart by that tag.
+   *
+   * The tag sits next to the input's wrapper div, not inside it, so go up two
+   * levels to reach the element that holds both.
    */
   authField(name: string, location: AuthFieldLocation): Locator {
     return this.authorizationSection
       .getByRole("textbox", { name, exact: true })
-      .locator("..")
+      .locator("../..")
       .filter({ hasText: location })
       .getByRole("textbox");
   }

@@ -108,16 +108,20 @@ test.describe("Auth — API reference playground @auth", () => {
     );
   });
 
-  test("bearer — the field is pre-filled with Bearer and the token passes", async ({
+  test("bearer — the field shows a Bearer prefix and the token passes", async ({
     page,
   }) => {
     const api = new ApiReferencePage(page);
     await api.open(routes.authBearer);
     await api.openPlayground();
 
-    // The field opens holding the scheme's prefix.
-    await expect(api.authorizationHeaderInput).toHaveValue("Bearer ");
-    await api.fillAuthorizationHeader(`Bearer ${creds.bearer}`);
+    // "Bearer" is a fixed label in front of an empty field, and the portal
+    // adds it to the header. Only the token is typed.
+    await expect(api.authorizationHeaderInput).toHaveAccessibleName(
+      "Authorization Bearer",
+    );
+    await expect(api.authorizationHeaderInput).toHaveValue("");
+    await api.fillAuthorizationHeader(creds.bearer);
 
     const response = await api.sendRequest();
 
@@ -273,7 +277,8 @@ test.describe("Auth — API reference playground @auth", () => {
       await api.openPlayground();
       // The custom header is selected by default; switch to bearer.
       await api.selectAuthScheme(["bearerAuth"]);
-      await api.fillAuthorizationHeader(`Bearer ${creds.bearer}`);
+      // The Bearer prefix is a label; only the token is typed.
+      await api.fillAuthorizationHeader(creds.bearer);
 
       const response = await api.sendRequest();
 
@@ -321,7 +326,9 @@ test.describe("Auth — API reference playground @auth", () => {
       const { access_token } = await token.json();
 
       // The issued token lands in the field and goes out on the call.
-      await expect(api.authorizationHeaderInput).toHaveValue(`Bearer ${access_token}`);
+      await expect(api.authorizationHeaderInput).toHaveValue(
+        `Bearer ${access_token}`,
+      );
       const response = await api.sendRequest();
       expect(response.request().headers()["authorization"]).toBe(
         `Bearer ${access_token}`,
@@ -362,7 +369,9 @@ test.describe("Auth — API reference playground @auth", () => {
       expect(token.status()).toBe(200);
       const { access_token } = await token.json();
 
-      await expect(api.authorizationHeaderInput).toHaveValue(`Bearer ${access_token}`);
+      await expect(api.authorizationHeaderInput).toHaveValue(
+        `Bearer ${access_token}`,
+      );
       const response = await api.sendRequest();
       expect(response.request().headers()["authorization"]).toBe(
         `Bearer ${access_token}`,
@@ -421,7 +430,9 @@ test.describe("Auth — API reference playground @auth", () => {
       expect(token.status()).toBe(200);
       const { access_token } = await token.json();
 
-      await expect(api.authorizationHeaderInput).toHaveValue(`Bearer ${access_token}`);
+      await expect(api.authorizationHeaderInput).toHaveValue(
+        `Bearer ${access_token}`,
+      );
       const response = await api.sendRequest();
       expect(response.request().headers()["authorization"]).toBe(
         `Bearer ${access_token}`,
@@ -440,7 +451,8 @@ test.describe("Auth — API reference playground @auth", () => {
       await api.open(routes.authOAuthOrBearer);
       await api.openPlayground();
       await api.selectAuthScheme(["bearerAuth"]);
-      await api.fillAuthorizationHeader(`Bearer ${creds.bearer}`);
+      // The Bearer prefix is a label; only the token is typed.
+      await api.fillAuthorizationHeader(creds.bearer);
 
       const response = await api.sendRequest();
 
