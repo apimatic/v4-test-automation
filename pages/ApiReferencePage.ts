@@ -59,6 +59,19 @@ export class ApiReferencePage extends DocsPage {
   readonly authorizeButton: Locator;
   /** OAuth 2: submits the Authorize form, which opens in place of the request. */
   readonly oauthSubmitButton: Locator;
+  /**
+   * The server button in the playground's URL bar, before the path. Its
+   * accessible name is the resolved server URL alone, so it doubles as a read
+   * of the current server.
+   */
+  readonly serverUrlButton: Locator;
+  /**
+   * The "Server URL" popover the button opens: one button per server, then a
+   * "Variables" section once a server with variables is picked. It's an
+   * unnamed dialog portalled outside the playground, so it's page-scoped and
+   * matched by its "Server URL" label.
+   */
+  readonly serverDialog: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -66,7 +79,11 @@ export class ApiReferencePage extends DocsPage {
       name: "Try in Playground",
       exact: true,
     });
-    this.playground = page.getByRole("dialog");
+    // The server popover is a dialog too, so pick the playground out by its
+    // h2 — the operation name. The popover has no heading.
+    this.playground = page
+      .getByRole("dialog")
+      .filter({ has: page.getByRole("heading", { level: 2 }) });
     this.sendButton = this.playground.getByRole("button", { name: /^Send\b/ });
     // No role or label on the status line, so match its text: a 1xx–5xx code
     // and a reason phrase, which starts with a capital ("200 OK", "404 Not
@@ -94,6 +111,19 @@ export class ApiReferencePage extends DocsPage {
       name: "Authorize",
       exact: true,
     });
+    this.serverUrlButton = this.playground.getByRole("button", { name: /^https?:\/\// });
+    this.serverDialog = page
+      .getByRole("dialog")
+      .filter({ has: page.getByText("Server URL", { exact: true }) });
+  }
+
+  /**
+   * Server-variable labels read "<name> <description>", e.g. "tenant Your
+   * tenant subdomain. Free text, editable.", so match the name at the start.
+   */
+  private serverVariableLabel(name: string): RegExp {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`^${escaped}(?: |$)`);
   }
 
   /** One of the playground's request sections, by its heading. */
@@ -101,6 +131,70 @@ export class ApiReferencePage extends DocsPage {
     return this.playground.locator("section").filter({
       has: this.page.getByRole("heading", { name, exact: true }),
     });
+  }
+
+  /**
+   * The request code sample for one language tab — "cURL", "C#", "Python",
+   * "TypeScript". Only the selected tab's panel is in the accessibility tree.
+   */
+  codeSample(language: string): Locator {
+    return this.pageContent.getByRole("tabpanel", { name: language, exact: true });
+  }
+
+  /**
+   * Pick a server in the Server URL popover and close it. `urlTemplate` is the
+   * URL as the spec writes it, variables unresolved, e.g.
+   * "https://{tenant}.petstore.{region}.example.com/api/v3". Each server is a
+   * button named that URL followed by the server's description, so match the start.
+   */
+  async selectServer(urlTemplate: string): Promise<void> {
+    await this.openServerDialog();
+    const escaped = urlTemplate.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    await this.serverDialog.getByRole("button", { name: new RegExp(`^${escaped}`) }).click();
+    await this.closeServerDialog();
+  }
+
+  /** Open the Server URL popover, unless it's already open. */
+  async openServerDialog(): Promise<void> {
+    if (!(await this.serverDialog.isVisible())) {
+      await this.serverUrlButton.click();
+      await this.serverDialog.waitFor({ state: "visible" });
+    }
+  }
+
+  /**
+   * Close the popover and wait until it's gone. Picking a server leaves it
+   * open, and it has no Close button; Escape closes it without closing the
+   * playground behind it. It animates out and stays "visible" meanwhile —
+   * without the wait, a following `openServerDialog()` would see it still up,
+   * skip reopening, and act on a popover being removed.
+   */
+  async closeServerDialog(): Promise<void> {
+    await this.page.keyboard.press("Escape");
+    await this.serverDialog.waitFor({ state: "hidden" });
+  }
+
+  /** A free-text server variable's input, labelled with the variable's name and description. */
+  serverVariableInput(name: string): Locator {
+    return this.serverDialog.getByRole("textbox", { name: this.serverVariableLabel(name) });
+  }
+
+  /** An enum server variable's dropdown, labelled with the variable's name and description. */
+  serverVariableSelect(name: string): Locator {
+    return this.serverDialog.getByRole("combobox", { name: this.serverVariableLabel(name) });
+  }
+
+  /** Type a value into a free-text server variable. Leaves the dialog open. */
+  async fillServerVariable(name: string, value: string): Promise<void> {
+    await this.openServerDialog();
+    await this.serverVariableInput(name).fill(value);
+  }
+
+  /** Pick one of an enum server variable's values. Leaves the dialog open. */
+  async chooseServerVariable(name: string, value: string): Promise<void> {
+    await this.openServerDialog();
+    await this.serverVariableSelect(name).click();
+    await this.page.getByRole("option", { name: value, exact: true }).click();
   }
 
   /** Click "Try in Playground" and wait for the dialog. */
@@ -114,9 +208,15 @@ export class ApiReferencePage extends DocsPage {
    * A non-auth parameter input, by the name the spec gives it. Scoped to its
    * section: a path parameter also has an inline input in the URL bar under
    * the same name.
+   *
+   * String parameters render as a textbox, integer ones as a spinbutton, so
+   * either role is accepted.
    */
   parameterField(section: PlaygroundSection, name: string): Locator {
-    return this.section(section).getByRole("textbox", { name, exact: true });
+    const scope = this.section(section);
+    return scope
+      .getByRole("textbox", { name, exact: true })
+      .or(scope.getByRole("spinbutton", { name, exact: true }));
   }
 
   /** Set a path, query or header parameter. Pass "" to clear an example value. */

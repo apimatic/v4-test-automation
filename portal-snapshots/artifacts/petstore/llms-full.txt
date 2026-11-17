@@ -1985,7 +1985,7 @@ Construct `SwaggerPetstoreOpenApi30Client` with keyword arguments, and call `clo
 ```python
 from swagger_petstore_open_api_3_0 import SwaggerPetstoreOpenApi30Client
 
-client = SwaggerPetstoreOpenApi30Client(petstore_auth="YOUR_API_KEY", api_key="YOUR_API_KEY")
+client = SwaggerPetstoreOpenApi30Client(petstore_auth="YOUR_API_KEY", api_key="YOUR_API_KEY", environment="production")
 
 client.close()
 ```
@@ -2002,7 +2002,9 @@ from asyncio import run
 from swagger_petstore_open_api_3_0 import AsyncSwaggerPetstoreOpenApi30Client
 
 async def main() -> None:
-    client = AsyncSwaggerPetstoreOpenApi30Client(petstore_auth="YOUR_API_KEY", api_key="YOUR_API_KEY")
+    client = AsyncSwaggerPetstoreOpenApi30Client(
+        petstore_auth="YOUR_API_KEY", api_key="YOUR_API_KEY", environment="production"
+    )
     await client.aclose()
 
 run(main())
@@ -2046,15 +2048,16 @@ npm install <path-to-sdk>
 Create one client and reuse it. Configure its behaviour through `ClientOptions`.
 
 ```ts
-import { SwaggerPetstoreOpenApi30Client } from "@acme/petstore-sdk";
+import { ServerEnvironment, SwaggerPetstoreOpenApi30Client } from "@acme/petstore-sdk";
 
 const client = new SwaggerPetstoreOpenApi30Client({
+  serverEnvironment: ServerEnvironment.Production,
   petstoreAuth: "YOUR_API_KEY",
   apiKey: "YOUR_API_KEY",
 });
 ```
 
-Nothing in `ClientOptions` is required — `new SwaggerPetstoreOpenApi30Client()` compiles — and each option left out falls back to its default. This API declares one environment, so there is no environment to select and no host to state at the construction site.
+Nothing in `ClientOptions` is required — `new SwaggerPetstoreOpenApi30Client()` compiles — and each option left out falls back to its default. `serverEnvironment` is spelled out above so the environment a call reaches is visible where the client is built rather than inherited silently.
 
 ### From CommonJS [#from-commonjs]
 
@@ -2064,6 +2067,7 @@ The package ships both dialects from a single entry, so `require` works with ful
 import sdk = require("@acme/petstore-sdk");
 
 const client = new sdk.SwaggerPetstoreOpenApi30Client({
+  serverEnvironment: sdk.ServerEnvironment.Production,
   petstoreAuth: "YOUR_API_KEY",
   apiKey: "YOUR_API_KEY",
 });
@@ -2116,6 +2120,12 @@ Delete a pet.
 `POST /pet/{petId}/uploadImage`
 
 Upload image of the pet.
+
+# List a pet's vet visits. (/api/petstore/pet/listPetVisits)
+
+`GET /pet/{petId}/visits`
+
+Returns the vet visits recorded for a pet. Takes one parameter of each kind: the pet in the path, a page size in the query, and the clinic in a header.
 
 # Returns pet inventories by status. (/api/petstore/store/getInventory)
 

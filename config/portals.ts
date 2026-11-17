@@ -65,12 +65,15 @@ export const portals = {
       // Generated from the `plugin` block.
       contextPlugin: "/context-plugin/",
 
-      // Generated from src/spec/petstore.json — 19 operations across pet,
+      // Generated from src/spec/petstore.json — 20 operations across pet,
       // store and user. No index route: /api/petstore/ is a 404 since the
       // reference stopped generating a landing page, and the "API Reference"
       // tab links straight to the first operation instead.
       apiEndpoint: "/api/petstore/pet/addPet/",
       apiEndpointDelete: "/api/petstore/pet/deletePet/",
+      // One parameter of each kind: petId (path), limit (query), X-Clinic-Id
+      // (header). No auth, so the playground needs no credentials.
+      apiEndpointParams: "/api/petstore/pet/listPetVisits/",
 
       // Machine-facing routes an AI agent reads.
       llms: "/llms.txt",
@@ -148,6 +151,14 @@ export const portals = {
   "codegen-oas31": {
     buildDir: "test-builds/codegen-oas31",
     label: "Codegen request examples (OpenAPI 3.1)",
+    routes: {},
+  },
+  // How codegen-v2 turns a request's examples into a code sample: field
+  // types, parameters, named examples, unions, media types. Scenarios with an
+  // open codegen defect are left out of its spec; its description lists them.
+  "codegen-requests": {
+    buildDir: "test-builds/codegen-requests",
+    label: "Codegen request scenarios (OpenAPI 3.0)",
     routes: {},
   },
 } satisfies Record<string, PortalConfig>;

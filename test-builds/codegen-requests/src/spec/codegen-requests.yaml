@@ -1,0 +1,909 @@
+openapi: 3.0.3
+info:
+  title: Codegen Requests
+  version: 1.0.0
+  description: >-
+    Code sample scenarios for codegen-v2: how it turns a request's examples into
+    a code sample. One operation per scenario (or a few scenarios that cannot
+    interfere). Each description names the scenario IDs from
+    tests/artifacts/codegen/code-samples.planned-scenarios.csv and the outcome
+    codegen-v2 should produce. Authored values carry an AUTHORED- prefix so a
+    generated placeholder is unmistakable.
+
+    Only scenarios codegen-v2 handles correctly are here, so the baselines hold
+    correct samples. Left out until their defects are fixed, then added back:
+    T-17 and T-39 free-form object (apimatic/codegen-v2#813), T-33 int64 beyond
+    2^53 in TypeScript (#798), U-11 recursive model (#813), B-13 explicit null
+    (#576), M-04 XML body (#618), M-06..M-09 vendor +json, */*,
+    yang-data+json and Application/json bodies (#612, PR #616).
+servers:
+  - url: https://codegen-requests.example.com
+tags:
+  - name: types
+  - name: params
+  - name: examples
+  - name: body
+  - name: unions
+  - name: media
+  - name: shapes
+paths:
+  # ---------------------------------------------------------------- field types
+  /types/no-example:
+    post:
+      operationId: types_no_example
+      tags: [types]
+      summary: Every field type, no example
+      description: >-
+        T-01..T-22 (T-16 is in media_multipart, T-17 is excluded). No example anywhere, every
+        property required, so each shows its placeholder.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AllTypes'
+      responses:
+        '200': { description: OK }
+  /types/with-example:
+    post:
+      operationId: types_with_example
+      tags: [types]
+      summary: Every field type, with example
+      description: >-
+        T-23..T-44 (T-38 is in media_multipart). Every value comes from the
+        example. int64 4294967296 is beyond int32 but within JS's safe range.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AllTypes'
+            example:
+              str: AUTHORED-string
+              password: AUTHORED-password
+              email: authored@example.org
+              uri: https://authored.example.org/x
+              uriRef: /authored/path
+              ipv4: 198.51.100.7
+              ipv6: '2001:db8::7'
+              hostname: authored.example.org
+              uuid: 11111111-2222-3333-4444-555555555555
+              int32: 42
+              int64: 4294967296
+              double: 42.5
+              bool: false
+              date: '2026-05-01'
+              dateTime: '2026-05-01T10:15:30Z'
+              strEnum: second-member
+              intEnum: 20
+              strArray: [AUTHORED-a, AUTHORED-b]
+              strMap: { k1: AUTHORED-1, k2: AUTHORED-2 }
+              nested: { req: AUTHORED-nested-req, opt: AUTHORED-nested-opt }
+      responses:
+        '200': { description: OK }
+
+  # ---------------------------------------------------------------- parameters
+  /params/no-example/{pathNoEx}:
+    get:
+      operationId: params_no_example
+      tags: [params]
+      summary: Params with no example
+      description: >-
+        P-01, P-02, P-03 required query/header/path, no example: placeholder.
+        P-07, P-08 optional query/header, no example: left out. Also R-01 (GET,
+        no body).
+      parameters:
+        - { name: pathNoEx, in: path, required: true, schema: { type: string } }
+        - { name: qReq, in: query, required: true, schema: { type: string } }
+        - { name: hReq, in: header, required: true, schema: { type: string } }
+        - { name: qOpt, in: query, required: false, schema: { type: string } }
+        - { name: hOpt, in: header, required: false, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /params/with-example/{pathEx}:
+    get:
+      operationId: params_with_example
+      tags: [params]
+      summary: Params with example
+      description: >-
+        P-04, P-05, P-06 required query/header/path with example: the example.
+        P-09 optional query with example: the example. P-10 example on
+        schema.example only: the example if common carries it, else placeholder.
+      parameters:
+        - { name: pathEx, in: path, required: true, schema: { type: string }, example: AUTHORED-path }
+        - { name: qReqEx, in: query, required: true, schema: { type: string }, example: AUTHORED-query }
+        - { name: hReqEx, in: header, required: true, schema: { type: string }, example: AUTHORED-header }
+        - { name: qOptEx, in: query, required: false, schema: { type: string }, example: AUTHORED-optional }
+        - { name: qSchemaEx, in: query, required: true, schema: { type: string, example: AUTHORED-schema-ex } }
+      responses:
+        '200': { description: OK }
+  /query-styles:
+    get:
+      operationId: query_styles
+      tags: [params]
+      summary: Query parameter styles
+      description: >-
+        Q-01 form+explode (default), Q-02 form explode false, Q-03 deepObject,
+        Q-04 pipeDelimited, Q-05 spaceDelimited. Each passes its example; the
+        style should reach the request.
+      parameters:
+        - name: formExplode
+          in: query
+          required: true
+          schema: { type: array, items: { type: string } }
+          example: [AUTHORED-fe1, AUTHORED-fe2]
+        - name: formNoExplode
+          in: query
+          required: true
+          style: form
+          explode: false
+          schema: { type: array, items: { type: string } }
+          example: [AUTHORED-fn1, AUTHORED-fn2]
+        - name: deep
+          in: query
+          required: true
+          style: deepObject
+          explode: true
+          schema:
+            $ref: '#/components/schemas/DeepFilter'
+          example: { from: AUTHORED-from, to: AUTHORED-to }
+        - name: pipe
+          in: query
+          required: true
+          style: pipeDelimited
+          explode: false
+          schema: { type: array, items: { type: string } }
+          example: [AUTHORED-p1, AUTHORED-p2]
+        - name: space
+          in: query
+          required: true
+          style: spaceDelimited
+          explode: false
+          schema: { type: array, items: { type: string } }
+          example: [AUTHORED-s1, AUTHORED-s2]
+      responses:
+        '200': { description: OK }
+
+  # ---------------------------------------------------------- example selection
+  /examples/single:
+    post:
+      operationId: examples_single
+      tags: [examples]
+      summary: Single unnamed body example
+      description: E-01. One sample, keyed Example.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Simple' }
+            example: { a: AUTHORED-single }
+      responses:
+        '200': { description: OK }
+  /examples/two-named:
+    post:
+      operationId: examples_two_named
+      tags: [examples]
+      summary: Two named body examples
+      description: E-02. Two samples, keyed first-case and second-case.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Simple' }
+            examples:
+              first-case: { value: { a: AUTHORED-first } }
+              second-case: { value: { a: AUTHORED-second } }
+      responses:
+        '200': { description: OK }
+  /examples/same-names:
+    post:
+      operationId: examples_same_names
+      tags: [examples]
+      summary: Body and query named alike
+      description: >-
+        E-03. Two samples; each pairs the body and query values of the same
+        name.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string }
+          examples:
+            first-case: { value: AUTHORED-q-first }
+            second-case: { value: AUTHORED-q-second }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Simple' }
+            examples:
+              first-case: { value: { a: AUTHORED-body-first } }
+              second-case: { value: { a: AUTHORED-body-second } }
+      responses:
+        '200': { description: OK }
+  /examples/different-names:
+    post:
+      operationId: examples_different_names
+      tags: [examples]
+      summary: Body and query named differently
+      description: >-
+        E-04. Two samples keyed b1, b2 (body wins); the query shows q1's value in
+        both.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string }
+          examples:
+            q1: { value: AUTHORED-q1 }
+            q2: { value: AUTHORED-q2 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Simple' }
+            examples:
+              b1: { value: { a: AUTHORED-b1 } }
+              b2: { value: { a: AUTHORED-b2 } }
+      responses:
+        '200': { description: OK }
+  /examples/query-only:
+    post:
+      operationId: examples_query_only
+      tags: [examples]
+      summary: Only the query names examples
+      description: E-05. Two samples keyed q1, q2; the body shows placeholders.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string }
+          examples:
+            q1: { value: AUTHORED-q1 }
+            q2: { value: AUTHORED-q2 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Simple' }
+      responses:
+        '200': { description: OK }
+  /examples/header-path/{p}:
+    get:
+      operationId: examples_header_path
+      tags: [examples]
+      summary: Header outranks path
+      description: E-06. Two samples keyed h1, h2; the path shows p1 in both.
+      parameters:
+        - name: p
+          in: path
+          required: true
+          schema: { type: string }
+          examples:
+            p1: { value: AUTHORED-p1 }
+        - name: h
+          in: header
+          required: true
+          schema: { type: string }
+          examples:
+            h1: { value: AUTHORED-h1 }
+            h2: { value: AUTHORED-h2 }
+      responses:
+        '200': { description: OK }
+  /examples/ref:
+    post:
+      operationId: examples_ref
+      tags: [examples]
+      summary: Named example by $ref
+      description: E-07. One sample keyed ref-case with AUTHORED-ref.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Simple' }
+            examples:
+              ref-case: { $ref: '#/components/examples/RefExample' }
+      responses:
+        '200': { description: OK }
+
+  # ------------------------------------------------------- body example fitting
+  /body/b02-optional-missing:
+    post:
+      operationId: b02_optional_missing
+      tags: [body]
+      summary: Optional property missing
+      description: B-02. a from the example; b is optional and absent, so left out.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RequiredAndOptional' }
+            example: { a: AUTHORED-a }
+      responses:
+        '200': { description: OK }
+  /body/b03-extra-key:
+    post:
+      operationId: b03_extra_key
+      tags: [body]
+      summary: Undeclared key in the example
+      description: B-03. a shown; notInSchema dropped.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Simple' }
+            example: { a: AUTHORED-a, notInSchema: AUTHORED-extra }
+      responses:
+        '200': { description: OK }
+  /body/b05-enum-not-member:
+    post:
+      operationId: b05_enum_not_member
+      tags: [body]
+      summary: Enum value not in the list
+      description: B-05. First enum member (first-member).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EnumHolder' }
+            example: { value: NOT_A_MEMBER }
+      responses:
+        '200': { description: OK }
+  /body/b06-enum-case:
+    post:
+      operationId: b06_enum_case
+      tags: [body]
+      summary: Enum value in different case
+      description: B-06. First enum member; matching is case-sensitive.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EnumHolder' }
+            example: { value: SECOND-MEMBER }
+      responses:
+        '200': { description: OK }
+  /body/b07-number-as-string:
+    post:
+      operationId: b07_number_as_string
+      tags: [body]
+      summary: Integer given a numeric string
+      description: B-07. 7 as a number, if common keeps the string.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/IntHolder' }
+            example: { value: '7' }
+      responses:
+        '200': { description: OK }
+  /body/b08-boolean-as-string:
+    post:
+      operationId: b08_boolean_as_string
+      tags: [body]
+      summary: Boolean given "false"
+      description: B-08. false as a boolean (placeholder would be true), if common keeps the string.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BoolHolder' }
+            example: { value: 'false' }
+      responses:
+        '200': { description: OK }
+  /body/b09-string-as-number:
+    post:
+      operationId: b09_string_as_number
+      tags: [body]
+      summary: String given a number
+      description: B-09. The string "864508030147323".
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/StringHolder' }
+            example: { value: 864508030147323 }
+      responses:
+        '200': { description: OK }
+  /body/b10-datetime-no-tz:
+    post:
+      operationId: b10_datetime_no_tz
+      tags: [body]
+      summary: date-time without timezone
+      description: B-10. 2026-05-01T10:15:30Z (treated as UTC).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DateTimeHolder' }
+            example: { value: '2026-05-01T10:15:30' }
+      responses:
+        '200': { description: OK }
+  /body/b14-array-given-scalar:
+    post:
+      operationId: b14_array_given_scalar
+      tags: [body]
+      summary: Array given a scalar
+      description: B-14. One-item placeholder list (common may remove first).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ArrayHolder' }
+            example: { value: AUTHORED-x }
+      responses:
+        '200': { description: OK }
+  /body/b15-map-given-scalar:
+    post:
+      operationId: b15_map_given_scalar
+      tags: [body]
+      summary: Map given a scalar
+      description: B-15. { key = placeholder }.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MapHolder' }
+            example: { value: AUTHORED-x }
+      responses:
+        '200': { description: OK }
+
+  # ---------------------------------------------------- unions and composition
+  /unions/u01-discriminator-second:
+    post:
+      operationId: u01_discriminator_second
+      tags: [unions]
+      summary: Discriminator names the 2nd option
+      description: U-01. Dog with bark AUTHORED-woof and petType dog.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PetHolder' }
+            example: { pet: { petType: dog, bark: AUTHORED-woof } }
+      responses:
+        '200': { description: OK }
+  /unions/u02-discriminator-missing:
+    post:
+      operationId: u02_discriminator_missing
+      tags: [unions]
+      summary: Discriminator tag missing
+      description: U-02. The first mapped option (Cat) with its tag.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PetHolder' }
+            example: { pet: { bark: AUTHORED-woof } }
+      responses:
+        '200': { description: OK }
+  /unions/u03-discriminator-unknown:
+    post:
+      operationId: u03_discriminator_unknown
+      tags: [unions]
+      summary: Discriminator tag unknown
+      description: U-03. The first mapped option (Cat).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PetHolder' }
+            example: { pet: { petType: fish, fins: 2 } }
+      responses:
+        '200': { description: OK }
+  /unions/u04-oneof-fits-second:
+    post:
+      operationId: u04_oneof_fits_second
+      tags: [unions]
+      summary: oneOf, example fits the 2nd option
+      description: U-04. OptionB with y AUTHORED-y.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OneOfHolder' }
+            example: { value: { y: AUTHORED-y } }
+      responses:
+        '200': { description: OK }
+  /unions/u06-oneof-no-example:
+    post:
+      operationId: u06_oneof_no_example
+      tags: [unions]
+      summary: oneOf with no example
+      description: U-06. OptionA with placeholders.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OneOfHolder' }
+      responses:
+        '200': { description: OK }
+  /unions/u07-anyof-fits-second:
+    post:
+      operationId: u07_anyof_fits_second
+      tags: [unions]
+      summary: anyOf, example fits the 2nd option
+      description: U-07. OptionB with y AUTHORED-y.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AnyOfHolder' }
+            example: { value: { y: AUTHORED-y } }
+      responses:
+        '200': { description: OK }
+  /unions/u08-anyof-no-example:
+    post:
+      operationId: u08_anyof_no_example
+      tags: [unions]
+      summary: anyOf with no example
+      description: U-08. OptionA with placeholders.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AnyOfHolder' }
+      responses:
+        '200': { description: OK }
+  /unions/u09-allof:
+    post:
+      operationId: u09_allof
+      tags: [unions]
+      summary: allOf combining two models
+      description: U-09. One model with id and name from the example.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Combined' }
+            example: { id: AUTHORED-id, name: AUTHORED-name }
+      responses:
+        '200': { description: OK }
+  /unions/u10-allof-duplicate:
+    post:
+      operationId: u10_allof_duplicate
+      tags: [unions]
+      summary: allOf with the same property twice
+      description: U-10. v uses the first declaration (string), so AUTHORED-v.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CombinedDuplicate' }
+            example: { v: AUTHORED-v }
+      responses:
+        '200': { description: OK }
+  # --------------------------------------------------------------- media types
+  /media/multipart:
+    post:
+      operationId: media_multipart
+      tags: [media]
+      summary: multipart with a text part and a file
+      description: >-
+        M-01, T-16, T-38. note shows AUTHORED-note; upload shows the file
+        placeholder (its example is ignored).
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [note, upload]
+              properties:
+                note: { type: string, example: AUTHORED-note }
+                upload: { type: string, format: binary }
+            example: { note: AUTHORED-note, upload: AUTHORED-file-bytes }
+      responses:
+        '200': { description: OK }
+  /media/form:
+    post:
+      operationId: media_form
+      tags: [media]
+      summary: x-www-form-urlencoded
+      description: M-02. a from the example; b required with no value, so its placeholder.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [a, b]
+              properties:
+                a: { type: string }
+                b: { type: string }
+            example: { a: AUTHORED-form-a }
+      responses:
+        '200': { description: OK }
+  /media/text:
+    post:
+      operationId: media_text
+      tags: [media]
+      summary: text/plain body
+      description: M-03. AUTHORED-text.
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema: { type: string }
+            example: AUTHORED-text
+      responses:
+        '200': { description: OK }
+  /media/binary:
+    post:
+      operationId: media_binary
+      tags: [media]
+      summary: application/octet-stream body
+      description: M-05. File placeholder.
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema: { type: string, format: binary }
+      responses:
+        '200': { description: OK }
+  # ------------------------------------------------------------ request shapes
+  /shapes/resources/{id}:
+    put:
+      operationId: shapes_put
+      tags: [shapes]
+      summary: PUT with a body
+      description: R-02. Path id and body both shown.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string }, example: AUTHORED-id }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Simple' }
+            example: { a: AUTHORED-put }
+      responses:
+        '200': { description: OK }
+    patch:
+      operationId: shapes_patch
+      tags: [shapes]
+      summary: PATCH with a body
+      description: R-03. Body shown.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string }, example: AUTHORED-id }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Simple' }
+            example: { a: AUTHORED-patch }
+      responses:
+        '200': { description: OK }
+    delete:
+      operationId: shapes_delete
+      tags: [shapes]
+      summary: DELETE with a body
+      description: R-04. Body shown.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string }, example: AUTHORED-id }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Simple' }
+            example: { a: AUTHORED-delete }
+      responses:
+        '200': { description: OK }
+  /shapes/array-body:
+    post:
+      operationId: shapes_array_body
+      tags: [shapes]
+      summary: Body is an array
+      description: R-05. Both items shown.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items: { $ref: '#/components/schemas/Simple' }
+            example: [{ a: AUTHORED-item-1 }, { a: AUTHORED-item-2 }]
+      responses:
+        '200': { description: OK }
+  /shapes/union-body:
+    post:
+      operationId: shapes_union_body
+      tags: [shapes]
+      summary: Body is a union
+      description: R-06. OptionB with y AUTHORED-root-y.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/OptionA'
+                - $ref: '#/components/schemas/OptionB'
+            example: { y: AUTHORED-root-y }
+      responses:
+        '200': { description: OK }
+  /shapes/optional-body:
+    post:
+      operationId: shapes_optional_body
+      tags: [shapes]
+      summary: Optional body with no example
+      description: R-07. Body left out of the call.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Simple' }
+      responses:
+        '200': { description: OK }
+
+components:
+  examples:
+    RefExample:
+      value: { a: AUTHORED-ref }
+  schemas:
+    AllTypes:
+      type: object
+      required: [str, password, email, uri, uriRef, ipv4, ipv6, hostname, uuid, int32, int64, double, bool, date, dateTime, strEnum, intEnum, strArray, strMap, nested]
+      properties:
+        str: { type: string }
+        password: { type: string, format: password }
+        email: { type: string, format: email }
+        uri: { type: string, format: uri }
+        uriRef: { type: string, format: uri-reference }
+        ipv4: { type: string, format: ipv4 }
+        ipv6: { type: string, format: ipv6 }
+        hostname: { type: string, format: hostname }
+        uuid: { type: string, format: uuid }
+        int32: { type: integer, format: int32 }
+        int64: { type: integer, format: int64 }
+        double: { type: number, format: double }
+        bool: { type: boolean }
+        date: { type: string, format: date }
+        dateTime: { type: string, format: date-time }
+        strEnum: { $ref: '#/components/schemas/StrEnum' }
+        intEnum: { $ref: '#/components/schemas/IntEnum' }
+        strArray: { type: array, items: { type: string } }
+        strMap: { type: object, additionalProperties: { type: string } }
+        nested: { $ref: '#/components/schemas/Nested' }
+    Nested:
+      type: object
+      required: [req]
+      properties:
+        req: { type: string }
+        opt: { type: string }
+    StrEnum:
+      type: string
+      enum: [first-member, second-member, third-member]
+    IntEnum:
+      type: integer
+      enum: [10, 20, 30]
+    DeepFilter:
+      type: object
+      properties:
+        from: { type: string }
+        to: { type: string }
+    Simple:
+      type: object
+      required: [a]
+      properties:
+        a: { type: string }
+    RequiredAndOptional:
+      type: object
+      required: [a]
+      properties:
+        a: { type: string }
+        b: { type: string }
+    EnumHolder:
+      type: object
+      required: [value]
+      properties:
+        value: { $ref: '#/components/schemas/StrEnum' }
+    IntHolder:
+      type: object
+      required: [value]
+      properties:
+        value: { type: integer }
+    BoolHolder:
+      type: object
+      required: [value]
+      properties:
+        value: { type: boolean }
+    StringHolder:
+      type: object
+      required: [value]
+      properties:
+        value: { type: string }
+    DateTimeHolder:
+      type: object
+      required: [value]
+      properties:
+        value: { type: string, format: date-time }
+    ArrayHolder:
+      type: object
+      required: [value]
+      properties:
+        value: { type: array, items: { type: string } }
+    MapHolder:
+      type: object
+      required: [value]
+      properties:
+        value: { type: object, additionalProperties: { type: string } }
+    Cat:
+      type: object
+      required: [petType]
+      properties:
+        petType: { type: string }
+        meow: { type: string }
+    Dog:
+      type: object
+      required: [petType]
+      properties:
+        petType: { type: string }
+        bark: { type: string }
+    Pet:
+      oneOf:
+        - $ref: '#/components/schemas/Cat'
+        - $ref: '#/components/schemas/Dog'
+      discriminator:
+        propertyName: petType
+        mapping:
+          cat: '#/components/schemas/Cat'
+          dog: '#/components/schemas/Dog'
+    PetHolder:
+      type: object
+      required: [pet]
+      properties:
+        pet: { $ref: '#/components/schemas/Pet' }
+    OptionA:
+      type: object
+      required: [x]
+      properties:
+        x: { type: string }
+    OptionB:
+      type: object
+      required: [y]
+      properties:
+        y: { type: string }
+    OneOfHolder:
+      type: object
+      required: [value]
+      properties:
+        value:
+          oneOf:
+            - $ref: '#/components/schemas/OptionA'
+            - $ref: '#/components/schemas/OptionB'
+    AnyOfHolder:
+      type: object
+      required: [value]
+      properties:
+        value:
+          anyOf:
+            - $ref: '#/components/schemas/OptionA'
+            - $ref: '#/components/schemas/OptionB'
+    Base:
+      type: object
+      required: [id]
+      properties:
+        id: { type: string }
+    Extra:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+    Combined:
+      allOf:
+        - $ref: '#/components/schemas/Base'
+        - $ref: '#/components/schemas/Extra'
+    DupString:
+      type: object
+      required: [v]
+      properties:
+        v: { type: string }
+    DupInteger:
+      type: object
+      required: [v]
+      properties:
+        v: { type: integer }
+    CombinedDuplicate:
+      allOf:
+        - $ref: '#/components/schemas/DupString'
+        - $ref: '#/components/schemas/DupInteger'

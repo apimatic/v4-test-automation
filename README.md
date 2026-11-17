@@ -68,7 +68,7 @@ PORTAL=auth pnpm test:functional   # stage 3 — also starts the API Tester
 
 # Portal Artifacts API — needs APIMATIC_AUTH_KEY, skipped without it
 pnpm test:sdk-docs              # petstore SDK docs vs baselines
-pnpm test:code-samples          # codegen-v2 code samples, OpenAPI 3.0 + 3.1 builds
+pnpm test:code-samples          # codegen-v2 code samples: the 3.0, 3.1 and request-scenario builds
 pnpm test:portal-artifacts-api  # both, in one run (what CI runs)
 
 # nav.json (copies of petstore) — kept out of test:visual, ~5 min on its own

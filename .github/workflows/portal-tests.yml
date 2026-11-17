@@ -196,6 +196,27 @@ jobs:
           PORTAL_PREBUILT: "1"
         run: pnpm test:functional
 
+      # ---- stage 3, petstore build ----------------------------------------
+      # The petstore playground: server selection and server variables
+      # (tests/functional/petstore/). The spec's servers don't resolve, so the
+      # tests intercept the calls themselves; no API Tester, no secrets.
+      # Generated explicitly rather than reusing "Generate the portal", which
+      # builds whatever the `build` input names.
+      - name: Generate the petstore portal
+        id: petstore-portal
+        if: always()
+        env:
+          PORTAL: petstore
+        run: pnpm portal:generate
+
+      - name: Functional — petstore
+        if: ${{ !cancelled() && steps.petstore-portal.outcome == 'success' }}
+        shell: bash
+        env:
+          PORTAL: petstore
+          PORTAL_PREBUILT: "1"
+        run: pnpm test:functional
+
       # ---- stage 3, apimatic build ----------------------------------------
       # The apimatic build's playground calls the real https://api.apimatic.io
       # (the spec's only server), so this always hits prod with the prod key,

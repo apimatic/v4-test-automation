@@ -8,12 +8,16 @@ import { authKey, generateArtifacts } from "../../../utils/portal-artifacts-api.
 
 /**
  * Stage 1: the code samples codegen-v2 generates through the Portal Artifacts
- * API, for builds made to exercise request-level examples (apimatic-common#1409).
+ * API, for builds made to exercise request-level examples.
  *
  * Each build has one operation per case, and each operation's description says
  * whether its sample should carry the authored example (values prefixed
- * AUTHORED-) or a generated placeholder. The 3.0 and 3.1 builds cover the
- * cases specific to each OpenAPI version.
+ * AUTHORED-) or a generated placeholder.
+ *   - codegen-oas30 / codegen-oas31: the cases apimatic-common#1409 changed,
+ *     specific to each OpenAPI version
+ *   - codegen-requests: how codegen-v2 builds a sample from a request's
+ *     examples. Its scenario IDs and expected samples are in
+ *     code-samples.planned-scenarios.csv beside this file
  *
  * Per build, one generation (see utils/portal-artifacts-api.ts), then:
  *   - every operation in the spec has a code sample in every declared
@@ -30,7 +34,7 @@ import { authKey, generateArtifacts } from "../../../utils/portal-artifacts-api.
  * generation per build on that key's account.
  */
 
-const BUILDS = ["codegen-oas30", "codegen-oas31"];
+const BUILDS = ["codegen-oas30", "codegen-oas31", "codegen-requests"];
 const HTTP_METHODS = ["get", "put", "post", "delete", "options", "head", "patch", "trace"];
 
 /** code-samples/<language>.json: path -> HTTP method (upper case) -> sample fields. */

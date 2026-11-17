@@ -1,0 +1,31 @@
+{
+  "$schema": "https://cdn.jsdelivr.net/npm/@apimatic/cli@2.0.0-beta.1/apimatic.schema.json",
+  "schemaVersion": 1,
+  "portal": {
+    "site": {
+      "name": "Codegen Requests",
+      "description": "Code sample scenarios for codegen-v2 request examples."
+    },
+    "brand": {
+      "colors": {},
+      "colorMode": "both"
+    },
+    "navigation": {
+      "links": []
+    },
+    "ai": {
+      "pageActions": true
+    }
+  },
+  "languages": {
+    "csharp": {},
+    "typescript": {},
+    "python": {}
+  },
+  "plugin": {
+    "pluginId": "my-api-plugin",
+    "pluginName": "My API Plugin",
+    "pluginVersion": "0.1.0",
+    "license": "MIT"
+  }
+}
