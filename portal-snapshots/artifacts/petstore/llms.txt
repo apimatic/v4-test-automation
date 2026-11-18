@@ -61,6 +61,7 @@
     - [Updates a pet in the store with form data.](/api/petstore/pet/updatePetWithForm): Updates a pet resource based on the form data.
     - [Deletes a pet.](/api/petstore/pet/deletePet): Delete a pet.
     - [Uploads an image.](/api/petstore/pet/uploadFile): Upload image of the pet.
+    - [List a pet's vet visits.](/api/petstore/pet/listPetVisits): Returns the vet visits recorded for a pet. Takes one parameter of each kind: the pet in the path, a page size in the query, and the clinic in a header.
   - Store: Access to Petstore orders
     - [Returns pet inventories by status.](/api/petstore/store/getInventory): Returns a map of status codes to quantities.
     - [Place an order for a pet.](/api/petstore/store/placeOrder): Place a new order in the store.

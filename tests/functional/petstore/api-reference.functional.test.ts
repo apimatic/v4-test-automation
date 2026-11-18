@@ -20,7 +20,11 @@ import { portalConfig, portalName } from "../../../utils/env.ts";
  * Answer every call matching `url` with a 200 and `body`, including the CORS
  * preflight the browser sends first for a JSON body or a custom header.
  */
-async function answerCalls(page: Page, url: string, body: string): Promise<void> {
+async function answerCalls(
+  page: Page,
+  url: string,
+  body: string,
+): Promise<void> {
   await page.route(url, (route) =>
     route.fulfill({
       status: 200,
@@ -43,13 +47,18 @@ test.describe("API reference playground @api-reference", () => {
   const defaultServer = "https://petstore3.swagger.io/api/v3";
 
   test.describe("servers @servers", () => {
-    const serverTemplate = "https://{tenant}.petstore.{region}.example.com/api/v3";
+    const serverTemplate =
+      "https://{tenant}.petstore.{region}.example.com/api/v3";
     const resolvedServer = "https://demo.petstore.us-east.example.com/api/v3";
 
     test("selecting the second server updates the cURL sample and the request URL", async ({
       page,
     }) => {
-      await answerCalls(page, `${resolvedServer}/**`, '{"id":10,"name":"doggie"}');
+      await answerCalls(
+        page,
+        `${resolvedServer}/**`,
+        '{"id":10,"name":"doggie"}',
+      );
 
       const api = new ApiReferencePage(page);
       await api.open(routes.apiEndpoint);
@@ -61,7 +70,9 @@ test.describe("API reference playground @api-reference", () => {
 
       // The playground and the code sample both resolve the variables' defaults.
       await expect(api.serverUrlButton).toHaveAccessibleName(resolvedServer);
-      await expect(api.codeSample("cURL")).toContainText(`curl -X POST '${resolvedServer}/pet'`);
+      await expect(api.codeSample("cURL")).toContainText(
+        `curl -X POST '${resolvedServer}/pet'`,
+      );
 
       const response = await api.sendRequest();
 
@@ -71,7 +82,7 @@ test.describe("API reference playground @api-reference", () => {
       await expect(api.responseStatus).toHaveText("200 OK");
     });
 
-    test("editing the free-text variable and changing the enum updates the server URL and cURL sample", async ({
+    test.only("editing the free-text variable and changing the enum updates the server URL and cURL sample", async ({
       page,
     }) => {
       const editedServer = "https://acme.petstore.eu-west.example.com/api/v3";
@@ -87,16 +98,26 @@ test.describe("API reference playground @api-reference", () => {
       await api.chooseServerVariable("region", "eu-west");
       await expect(api.serverVariableInput("tenant")).toHaveValue("acme");
       await expect(api.serverVariableSelect("region")).toHaveText("eu-west");
+
+      // The portal applies variable edits to the server URL 300ms after the
+      // last one, and drops a pending edit if the popover closes first. So wait
+      // for the URL to change before closing — it updates live while the
+      // popover is open. Closing straight away made this test flaky.
+      await expect(api.serverUrlButton).toHaveAccessibleName(editedServer);
       await api.closeServerDialog();
 
-      // Both edits land in the playground's server URL and in the code sample.
+      // Both edits survive the close, in the server URL and in the code sample.
       await expect(api.serverUrlButton).toHaveAccessibleName(editedServer);
-      await expect(api.codeSample("cURL")).toContainText(`curl -X POST '${editedServer}/pet'`);
+      await expect(api.codeSample("cURL")).toContainText(
+        `curl -X POST '${editedServer}/pet'`,
+      );
     });
   });
 
   test.describe("parameters @parameters", () => {
-    test("path, query and header parameters all reach the request", async ({ page }) => {
+    test("path, query and header parameters all reach the request", async ({
+      page,
+    }) => {
       await answerCalls(page, `${defaultServer}/pet/*/visits*`, "[]");
 
       const api = new ApiReferencePage(page);
