@@ -3,14 +3,22 @@ import { test, expect, type Page } from "@playwright/test";
 import { ApiReferencePage } from "../../../pages/ApiReferencePage.ts";
 import { DocsPage } from "../../../pages/DocsPage.ts";
 import { getPortal } from "../../../config/portals.ts";
-import { apimaticConfigPath, portalConfig, portalName } from "../../../utils/env.ts";
+import {
+  apimaticConfigPath,
+  portalConfig,
+  portalName,
+} from "../../../utils/env.ts";
 import {
   normalizeText,
   type ApimaticConfig,
   type GeneratedPortal,
 } from "../../../utils/artifacts.ts";
 import { generateScenario } from "../../../utils/scenario.ts";
-import { scenarioBaseURL, serveDir, type ServedPortal } from "../../../utils/serve.ts";
+import {
+  scenarioBaseURL,
+  serveDir,
+  type ServedPortal,
+} from "../../../utils/serve.ts";
 
 /**
  * Stage 3: the API reference playground on the petstore build — which server a
@@ -92,7 +100,7 @@ test.describe("API reference playground @api-reference", () => {
       await expect(api.responseStatus).toHaveText("200 OK");
     });
 
-    test.only("editing the free-text variable and changing the enum updates the server URL and cURL sample", async ({
+    test("editing the free-text variable and changing the enum updates the server URL and cURL sample", async ({
       page,
     }) => {
       const editedServer = "https://acme.petstore.eu-west.example.com/api/v3";
@@ -192,7 +200,9 @@ test.describe("portal.brand — logo @brand", () => {
     test("one logo is used in both colour modes", async ({ page }) => {
       // Read the declared path off the scenario's own apimatic.json.
       const declared = portal.config().portal?.brand?.logo;
-      expect(typeof declared, "portal.brand.logo should be a single path").toBe("string");
+      expect(typeof declared, "portal.brand.logo should be a single path").toBe(
+        "string",
+      );
       // static/ is the web root: static/images/logo.png is served as /images/logo.png.
       const expectedSrc = `/${(declared as string).replace(/^static\//, "")}`;
 
@@ -201,10 +211,16 @@ test.describe("portal.brand — logo @brand", () => {
 
       // The same single logo shows in each mode, and nothing else shows with it.
       await docs.setColorMode("light");
-      expect(await docs.visibleLogoSources(), "logo shown in light mode").toEqual([expectedSrc]);
+      expect(
+        await docs.visibleLogoSources(),
+        "logo shown in light mode",
+      ).toEqual([expectedSrc]);
 
       await docs.setColorMode("dark");
-      expect(await docs.visibleLogoSources(), "logo shown in dark mode").toEqual([expectedSrc]);
+      expect(
+        await docs.visibleLogoSources(),
+        "logo shown in dark mode",
+      ).toEqual([expectedSrc]);
     });
   });
 });
@@ -222,7 +238,9 @@ type NavLink = { label: string; url: string };
 
 /** The navigation links the served build declares. */
 function declaredNavLinks(): NavLink[] {
-  const config: ApimaticConfig = JSON.parse(fs.readFileSync(apimaticConfigPath(), "utf-8"));
+  const config: ApimaticConfig = JSON.parse(
+    fs.readFileSync(apimaticConfigPath(), "utf-8"),
+  );
   return config.portal?.navigation?.links ?? [];
 }
 
@@ -233,7 +251,9 @@ test.describe("portal.navigation @navigation", () => {
   const { routes } = portalConfig();
   const links = declaredNavLinks();
 
-  test("external link — opens in a new tab with rel noreferrer noopener", async ({ page }) => {
+  test("external link — opens in a new tab with rel noreferrer noopener", async ({
+    page,
+  }) => {
     const external = links.find((link) => /^https?:\/\//.test(link.url));
     test.skip(!external, "no external link in portal.navigation.links");
     const target = new URL(external!.url);
@@ -243,7 +263,11 @@ test.describe("portal.navigation @navigation", () => {
     let referer: string | undefined = "not requested";
     await page.context().route(`${target.origin}/**`, async (route) => {
       referer = (await route.request().allHeaders())["referer"];
-      await route.fulfill({ status: 200, contentType: "text/html", body: "<title>stub</title>" });
+      await route.fulfill({
+        status: 200,
+        contentType: "text/html",
+        body: "<title>stub</title>",
+      });
     });
 
     const docs = new DocsPage(page);
@@ -254,22 +278,32 @@ test.describe("portal.navigation @navigation", () => {
     await expect(link).toHaveAttribute("href", external!.url);
     await expect(link).toHaveAttribute("target", "_blank");
     const rel = ((await link.getAttribute("rel")) ?? "").split(/\s+/);
-    expect(rel, "rel on the link").toEqual(expect.arrayContaining(["noreferrer", "noopener"]));
+    expect(rel, "rel on the link").toEqual(
+      expect.arrayContaining(["noreferrer", "noopener"]),
+    );
 
     // What it does: a new tab opens on the external URL, and the portal stays put.
     const portalUrl = page.url();
-    const [newTab] = await Promise.all([page.waitForEvent("popup"), link.click()]);
+    const [newTab] = await Promise.all([
+      page.waitForEvent("popup"),
+      link.click(),
+    ]);
     await newTab.waitForLoadState("domcontentloaded");
     expect(newTab.url(), "the new tab's address").toBe(target.href);
     expect(page.url(), "the portal tab's address").toBe(portalUrl);
 
     // What rel does: noopener leaves the new tab no handle back to the portal,
     // noreferrer keeps the portal's address out of the request.
-    expect(await newTab.evaluate(() => window.opener), "window.opener in the new tab").toBeNull();
+    expect(
+      await newTab.evaluate(() => window.opener),
+      "window.opener in the new tab",
+    ).toBeNull();
     expect(referer, "Referer header sent to the external site").toBeUndefined();
   });
 
-  test("internal link — navigates to the portal page without a reload", async ({ page }) => {
+  test("internal link — navigates to the portal page without a reload", async ({
+    page,
+  }) => {
     const internal = links.find((link) => link.url.startsWith("/"));
     test.skip(!internal, "no internal link in portal.navigation.links");
 
@@ -284,7 +318,8 @@ test.describe("portal.navigation @navigation", () => {
     });
     const documentsLoaded: string[] = [];
     page.on("request", (request) => {
-      if (request.resourceType() === "document") documentsLoaded.push(request.url());
+      if (request.resourceType() === "document")
+        documentsLoaded.push(request.url());
     });
 
     await docs.navLink(internal!.label).click();
@@ -297,8 +332,13 @@ test.describe("portal.navigation @navigation", () => {
     const marker = await page.evaluate(
       () => (window as unknown as { noReloadMarker?: boolean }).noReloadMarker,
     );
-    expect(marker, "the page's JavaScript state survived the navigation").toBe(true);
-    expect(documentsLoaded, "HTML documents fetched during the navigation").toEqual([]);
+    expect(marker, "the page's JavaScript state survived the navigation").toBe(
+      true,
+    );
+    expect(
+      documentsLoaded,
+      "HTML documents fetched during the navigation",
+    ).toEqual([]);
   });
 });
 
@@ -339,7 +379,9 @@ test.describe("portal.ai @ai", () => {
       portal?.cleanup();
     });
 
-    test("the popover is gone and Copy Markdown still copies the page", async ({ page }) => {
+    test("the popover is gone and Copy Markdown still copies the page", async ({
+      page,
+    }) => {
       // Read the declared side off the scenario's own apimatic.json.
       expect(
         portal.config().portal?.ai?.pageActions,
@@ -354,16 +396,23 @@ test.describe("portal.ai @ai", () => {
       await docs.open(route);
 
       // Copy Markdown is still in the page actions bar...
-      await expect(docs.copyMarkdownButton, "Copy Markdown button").toBeVisible();
+      await expect(
+        docs.copyMarkdownButton,
+        "Copy Markdown button",
+      ).toBeVisible();
       // ...but the "Open" menu beside it, which opens the popover, is not.
-      await expect(docs.pageActionsMenuButton, "the button that opens the popover").toHaveCount(0);
+      await expect(
+        docs.pageActionsMenuButton,
+        "the button that opens the popover",
+      ).toHaveCount(0);
 
       // And Copy Markdown still does its job: the page's markdown file lands on
       // the clipboard. Line endings normalised — Windows' clipboard adds \r.
       const copied = await docs.copyPageMarkdown();
-      expect(normalizeText(copied), `clipboard vs the generated ${markdownFile}`).toBe(
-        normalizeText(portal.read(markdownFile)),
-      );
+      expect(
+        normalizeText(copied),
+        `clipboard vs the generated ${markdownFile}`,
+      ).toBe(normalizeText(portal.read(markdownFile)));
     });
   });
 });
@@ -394,8 +443,12 @@ test.describe("languages — publishing @sdks", () => {
         {
           config: (config) => {
             // Keep `source`, drop `package` and `packageConfiguration`.
-            const entry = config.languages![language] as { publishing: { source?: unknown } };
-            config.languages![language] = { publishing: { source: entry.publishing.source } };
+            const entry = config.languages![language] as {
+              publishing: { source?: unknown };
+            };
+            config.languages![language] = {
+              publishing: { source: entry.publishing.source },
+            };
           },
         },
         { build: "petstore" },
@@ -409,9 +462,17 @@ test.describe("languages — publishing @sdks", () => {
 
     test("the card shows Download and View source", async ({ page }) => {
       // Read the declared side off the scenario's own apimatic.json.
-      const declared = portal.declaredLanguages().find((l) => l.name === language);
-      expect(declared?.repositoryUrl, `${language} publishing.source.repositoryUrl`).toBeTruthy();
-      expect(declared?.version, `${language} publishing.package should be gone`).toBeUndefined();
+      const declared = portal
+        .declaredLanguages()
+        .find((l) => l.name === language);
+      expect(
+        declared?.repositoryUrl,
+        `${language} publishing.source.repositoryUrl`,
+      ).toBeTruthy();
+      expect(
+        declared?.version,
+        `${language} publishing.package should be gone`,
+      ).toBeUndefined();
       // Each language's SDK archive is served from __downloads/sdk/<language>.zip.
       const downloadHref = `/__downloads/sdk/${language}.zip`;
 
@@ -421,17 +482,41 @@ test.describe("languages — publishing @sdks", () => {
       await docs.open(getPortal("petstore").routes.sdks);
       const card = docs.sdkCard(language);
       await expect(card, `${language} card on the SDKs overview`).toBeVisible();
-      await expect(docs.downloadSdkLink(card), "Download SDK on the card").toBeVisible();
-      await expect(docs.downloadSdkLink(card)).toHaveAttribute("href", downloadHref);
-      await expect(docs.sdkSourceLink(card), "Source on the card").toBeVisible();
-      await expect(docs.sdkSourceLink(card)).toHaveAttribute("href", declared!.repositoryUrl!);
+      await expect(
+        docs.downloadSdkLink(card),
+        "Download SDK on the card",
+      ).toBeVisible();
+      await expect(docs.downloadSdkLink(card)).toHaveAttribute(
+        "href",
+        downloadHref,
+      );
+      await expect(
+        docs.sdkSourceLink(card),
+        "Source on the card",
+      ).toBeVisible();
+      await expect(docs.sdkSourceLink(card)).toHaveAttribute(
+        "href",
+        declared!.repositoryUrl!,
+      );
 
       // The language's own page: "Download SDK" and "View source".
       await docs.open(languageRoute);
-      await expect(docs.downloadSdkLink(), "Download SDK on the SDK page").toBeVisible();
-      await expect(docs.downloadSdkLink()).toHaveAttribute("href", downloadHref);
-      await expect(docs.sdkSourceLink(), "View source on the SDK page").toBeVisible();
-      await expect(docs.sdkSourceLink()).toHaveAttribute("href", declared!.repositoryUrl!);
+      await expect(
+        docs.downloadSdkLink(),
+        "Download SDK on the SDK page",
+      ).toBeVisible();
+      await expect(docs.downloadSdkLink()).toHaveAttribute(
+        "href",
+        downloadHref,
+      );
+      await expect(
+        docs.sdkSourceLink(),
+        "View source on the SDK page",
+      ).toBeVisible();
+      await expect(docs.sdkSourceLink()).toHaveAttribute(
+        "href",
+        declared!.repositoryUrl!,
+      );
     });
   });
 });
