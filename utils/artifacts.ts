@@ -23,19 +23,24 @@ export type DeclaredLanguage = {
   /** The package identifier, whatever the language calls it. */
   packageName?: string;
   repositoryUrl?: string;
+  /** publishing.source.branch — the branch "View source" should open. */
+  branch?: string;
 };
 
 export type ApimaticConfig = {
   portal?: {
     site?: { name?: string; description?: string };
     brand?: {
-      logo?: { light?: string; dark?: string };
+      /** One path for both colour modes, or a light/dark pair. */
+      logo?: string | { light?: string; dark?: string };
       favicon?: string;
       colors?: { primary?: { light?: string; dark?: string } };
       colorMode?: string;
     };
     navigation?: { links?: Array<{ label: string; url: string }> };
     ai?: { pageActions?: boolean };
+    /** Where the context plugin is hosted. When set, no plugin.zip is bundled. */
+    pluginUrl?: string;
   };
   languages?: Record<string, unknown>;
   plugin?: {
@@ -61,6 +66,7 @@ export function declaredLanguages(config: ApimaticConfig): DeclaredLanguage[] {
       version: publishing.package?.version,
       packageName: pkgConfig.name ?? pkgConfig.packageId,
       repositoryUrl: publishing.source?.repositoryUrl,
+      branch: publishing.source?.branch,
     };
   });
 }

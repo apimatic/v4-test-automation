@@ -41,6 +41,12 @@ export class DocsPage extends BasePage {
   readonly searchList: Locator;
   /** Copies the page as markdown — part of the AI page actions. */
   readonly copyMarkdownButton: Locator;
+  /**
+   * The "Open" menu beside Copy Markdown. Clicking it opens the AI page actions
+   * popover: View as Markdown, Open in ChatGPT / Claude / Cursor. Only rendered
+   * when `portal.ai.pageActions` is on; Copy Markdown is rendered either way.
+   */
+  readonly pageActionsMenuButton: Locator;
   readonly pageHeading: Locator;
   /**
    * The tab bar under the top bar, one link per tab in nav.json's `tabs`, with
@@ -54,6 +60,13 @@ export class DocsPage extends BasePage {
    * tab switcher for the mobile layout, and collapsed folders hide their pages.
    */
   readonly sidebarEntries: Locator;
+  /**
+   * The site logo image(s) in the top bar's home link. A light/dark logo pair
+   * renders one image per mode with the other hidden, so read what's showing
+   * through `visibleLogoSources()`. The images have empty alt text, which keeps
+   * them out of the accessibility tree — hence a CSS locator, not getByRole.
+   */
+  readonly logos: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -67,10 +80,79 @@ export class DocsPage extends BasePage {
     this.searchInput = this.searchDialog.getByPlaceholder("Search");
     this.searchList = page.locator("#fd-search-list");
     this.copyMarkdownButton = page.getByRole("button", { name: /Copy Markdown/i }).first();
+    this.pageActionsMenuButton = this.pageContent.getByRole("button", { name: "Open", exact: true });
     this.pageHeading = this.pageContent.locator("h1").first();
     this.headerTabs = this.subnav.locator("[data-header-tabs]");
     this.tabLinks = this.headerTabs.locator("a");
     this.sidebarEntries = this.sidebar.locator("a, button").filter({ visible: true });
+    this.logos = this.subnav.locator('a[href="/"] img');
+  }
+
+  /**
+   * A `portal.navigation.links` entry, by its label. The portal renders each
+   * link twice — in the top bar, and in the sidebar for the mobile layout —
+   * with one of the two hidden, so this keeps the one that's showing.
+   */
+  navLink(label: string): Locator {
+    return this.page.getByRole("link", { name: label, exact: true }).filter({ visible: true });
+  }
+
+  /**
+   * One language's card on the SDKs overview (/sdks/), found by its link to
+   * that language's page (`/sdks/<language>`), which every card carries.
+   */
+  sdkCard(language: string): Locator {
+    return this.pageContent
+      .locator("article")
+      .filter({ has: this.page.locator(`a[href="/sdks/${language}"]`) });
+  }
+
+  /**
+   * "Download SDK" — in the header of an SDK page, or inside `sdkCard()` when
+   * given one. On a card the name carries the language ("Download SDK, Python").
+   */
+  downloadSdkLink(within: Locator = this.pageContent): Locator {
+    return within.getByRole("link", { name: /^Download SDK\s*(,.*)?$/ });
+  }
+
+  /**
+   * The link to the SDK's source repository: "View source" in the header of an
+   * SDK page, "Source, <Language>" on an overview card.
+   */
+  sdkSourceLink(within: Locator = this.pageContent): Locator {
+    return within.getByRole("link", { name: /^(View source|Source)\s*(,.*)?$/ });
+  }
+
+  /** The `src` of every logo image currently visible, in page order. */
+  async visibleLogoSources(): Promise<string[]> {
+    return this.logos
+      .filter({ visible: true })
+      .evaluateAll((images) => images.map((image) => image.getAttribute("src") ?? ""));
+  }
+
+  /**
+   * Click Copy Markdown and return what it put on the clipboard.
+   *
+   * The clipboard is seeded with a placeholder first, so a click that copies
+   * nothing fails here rather than reading back whatever was there before.
+   * The test needs `permissions: ["clipboard-read", "clipboard-write"]`.
+   */
+  async copyPageMarkdown(): Promise<string> {
+    const placeholder = "(nothing copied)";
+    await this.page.evaluate((text) => navigator.clipboard.writeText(text), placeholder);
+    await this.copyMarkdownButton.click();
+    await expect
+      .poll(() => this.clipboardText(), {
+        message: "Copy Markdown put nothing on the clipboard",
+        timeout: 10_000,
+      })
+      .not.toBe(placeholder);
+    return this.clipboardText();
+  }
+
+  /** What's on the clipboard right now. */
+  async clipboardText(): Promise<string> {
+    return this.page.evaluate(() => navigator.clipboard.readText());
   }
 
   /** Navigate to a portal route and wait until it's stable enough to screenshot. */
